@@ -1,0 +1,123 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { Template } from '../types';
+import { getTemplateByUid } from '../data/templates';
+import {
+  Invitation,
+  getInvitationBySlug,
+  getEventDetailsForInvitation,
+  getInvitationTitle,
+  getInvitationUrl,
+} from '../lib/invitations';
+import { buildWaLink, changeRequestMessage, WHATSAPP_PRIMARY } from '../lib/whatsapp';
+import { applyInvitationMeta, resetSocialMeta } from '../lib/socialMeta';
+import { TemplateDemoView } from './TemplateDemoView';
+import { LoadingScreen } from './LoadingScreen';
+import { InvitationNotFound } from './InvitationNotFound';
+import { UiButton } from './UiButton';
+
+interface InvitationViewProps {
+  slug: string;
+  onGoHome: () => void;
+}
+
+export const InvitationView: React.FC<InvitationViewProps> = ({ slug, onGoHome }) => {
+  const [loading, setLoading] = useState(true);
+
+  const invitation: Invitation | undefined = useMemo(() => getInvitationBySlug(slug), [slug]);
+  const template: Template | undefined = useMemo(
+    () => (invitation ? getTemplateByUid(invitation.templateUid) : undefined),
+    [invitation]
+  );
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = window.setTimeout(() => setLoading(false), 650);
+    return () => window.clearTimeout(timer);
+  }, [slug]);
+
+  // Dynamic social metadata for this invitation
+  useEffect(() => {
+    if (invitation && template) {
+      applyInvitationMeta(invitation, template, window.location.href);
+    } else {
+      resetSocialMeta();
+    }
+    return () => resetSocialMeta();
+  }, [invitation, template]);
+
+  if (loading) {
+    return <LoadingScreen label="Menyiapkan undangan..." />;
+  }
+
+  if (!invitation || !template) {
+    return <InvitationNotFound onGoHome={onGoHome} />;
+  }
+
+  const invitationUrl = getInvitationUrl(invitation);
+
+  if (invitation.status === 'draft') {
+    return (
+      <div className="flex-grow w-full min-h-screen flex items-center justify-center px-4 py-16 pt-28 bg-background">
+        <div className="max-w-md w-full text-center flex flex-col items-center gap-4">
+          <div className="w-20 h-20 rounded-full bg-secondary/15 border border-secondary/30 flex items-center justify-center">
+            <span className="material-symbols-outlined text-4xl text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
+              visibility_off
+            </span>
+          </div>
+          <h1 className="font-headline text-2xl font-extrabold text-primary tracking-tight">
+            Undangan belum dipublikasikan
+          </h1>
+          <p className="font-body text-sm text-on-surface-variant leading-relaxed">
+            Pemilik undangan belum menerbitkan undangan ini. Silakan coba kembali nanti.
+          </p>
+          <UiButton size="lg" fullWidth variant="primary" icon="auto_awesome" iconFilled onClick={onGoHome}>
+            Kembali ke MomenKita
+          </UiButton>
+          <a
+            href={buildWaLink(changeRequestMessage(invitationUrl), WHATSAPP_PRIMARY)}
+            target="_blank"
+            rel="noreferrer"
+            className="font-body text-[11px] sm:text-xs font-bold uppercase tracking-wider text-primary hover:underline underline-offset-4 cursor-pointer flex items-center gap-1.5"
+          >
+            <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>chat</span>
+            Butuh Perubahan? Hubungi Admin
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  const eventDetails = getEventDetailsForInvitation(template, invitation);
+  const invitationTitle = getInvitationTitle(invitation, template);
+
+  return (
+    <div className="relative">
+      <TemplateDemoView
+        key={invitation.slug}
+        template={template}
+        isInvitation
+        invitationSlug={invitation.slug}
+        invitationTitle={invitationTitle}
+        invitationPhone={invitation.customerPhone || null}
+        eventDetailsOverride={eventDetails}
+        wishesOverride={template.sampleWishes}
+        musicOverride={invitation.music ? { title: invitation.music.title, url: invitation.music.url, startTime: invitation.music.startTime } : null}
+        disableMusic={invitation.musicEnabled === false}
+        onOpenWhatsApp={() => undefined}
+        onBackToCatalog={onGoHome}
+      />
+
+      {/* "Butuh Perubahan?" → WhatsApp MomenKita (admin) */}
+      <a
+        href={buildWaLink(changeRequestMessage(invitationUrl), WHATSAPP_PRIMARY)}
+        target="_blank"
+        rel="noreferrer"
+        className="fixed bottom-24 sm:bottom-6 right-3 sm:right-5 z-[60] inline-flex items-center gap-1.5 btn-micro bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-amber-300 font-body text-[10px] sm:text-xs font-bold rounded-full px-3 py-2 sm:px-4 sm:py-2.5 shadow-xl"
+        title="Butuh perubahan pada undangan ini? Hubungi admin MomenKita."
+      >
+        <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>chat</span>
+        <span className="hidden min-[420px]:inline">Butuh Perubahan?</span>
+      </a>
+    </div>
+  );
+};

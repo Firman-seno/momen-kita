@@ -1,0 +1,6 @@
+{
+  "name": "MomenKita",
+  "description": "Undangan Digital untuk Setiap Momen Spesial — Birthday, Sunatan, Wedding & Aqiqah",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

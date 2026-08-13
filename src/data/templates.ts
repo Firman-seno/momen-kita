@@ -1,0 +1,1153 @@
+import { Template, ThemeStyle, EventDetails, WishItem, CategoryKey, TemplateBadge, FontStyleName, AnimationStyle, BackgroundType, FrameStyle, ButtonStyle } from '../types';
+import { getTemplateMusic } from '../lib/musicMatching';
+
+/* ============================================================
+   CATEGORY DEFINITIONS
+   ============================================================ */
+export interface CategoryInfo {
+  key: CategoryKey;
+  label: string;
+  emoji: string;
+  icon: string;
+  tagline: string;
+  description: string;
+  count: number;
+  image: string;
+}
+
+export const CATEGORIES: CategoryInfo[] = [
+  {
+    key: 'birthday',
+    label: 'Birthday',
+    emoji: '🎂',
+    icon: 'celebration',
+    tagline: 'Undangan ulang tahun ceria & personal',
+    description: 'Rayakan hari istimewa dengan undangan digital yang ceria dan personal.',
+    count: 100,
+    image: 'https://images.unsplash.com/photo-1543332164-6e82f355badc?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    key: 'sunatan',
+    label: 'Sunatan',
+    emoji: '✂️',
+    icon: 'mosque',
+    tagline: 'Desain Islami elegan & berkesan',
+    description: 'Undangan khitanan dengan desain Islami yang elegan dan berkesan.',
+    count: 100,
+    image: 'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    key: 'wedding',
+    label: 'Wedding',
+    emoji: '💍',
+    icon: 'favorite',
+    tagline: 'Romantis, premium & modern',
+    description: 'Bagikan kisah cinta dan hari bahagia dengan undangan digital yang romantis.',
+    count: 100,
+    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    key: 'aqiqah',
+    label: 'Aqiqah',
+    emoji: '👶',
+    icon: 'child_friendly',
+    tagline: 'Hangat, modern & penuh makna',
+    description: 'Rayakan hadirnya buah hati dengan undangan aqiqah yang hangat dan penuh makna.',
+    count: 100,
+    image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=600&q=80',
+  },
+];
+
+export const CATEGORY_LABELS: Record<CategoryKey, string> = {
+  birthday: 'Birthday',
+  sunatan: 'Sunatan',
+  wedding: 'Wedding',
+  aqiqah: 'Aqiqah',
+};
+
+export const CATEGORY_EMOJIS: Record<CategoryKey, string> = {
+  birthday: '🎂',
+  sunatan: '✂️',
+  wedding: '💍',
+  aqiqah: '👶',
+};
+
+export const CATEGORY_KEYS: CategoryKey[] = ['birthday', 'sunatan', 'wedding', 'aqiqah'];
+
+/* ============================================================
+   PALETTES
+   ============================================================ */
+interface PaletteDef {
+  display: string;
+  primary: string;
+  secondary: string;
+  accent: string;
+  gradient: string;
+  cardBg: string;
+  text: string;
+  sub: string;
+}
+
+const PALETTES: Record<string, PaletteDef> = {
+  'pink-white': { display: 'Pink & White', primary: '#ff2a85', secondary: '#f59e0b', accent: '#38bdf8', gradient: 'from-pink-900 via-rose-800 to-amber-900', cardBg: 'bg-rose-950/80', text: '#ffe4e6', sub: '#fdba74' },
+  'blue-white': { display: 'Sky Blue & White', primary: '#0284c7', secondary: '#f59e0b', accent: '#10b981', gradient: 'from-sky-950 via-blue-900 to-indigo-950', cardBg: 'bg-slate-900/80', text: '#e0f2fe', sub: '#7dd3fc' },
+  rainbow: { display: 'Rainbow', primary: '#10b981', secondary: '#ec4899', accent: '#f59e0b', gradient: 'from-emerald-950 via-teal-900 to-cyan-950', cardBg: 'bg-teal-950/80', text: '#a7f3d0', sub: '#6ee7b7' },
+  'jungle-green': { display: 'Jungle Green & Earth', primary: '#84cc16', secondary: '#eab308', accent: '#ef4444', gradient: 'from-lime-950 via-emerald-900 to-green-950', cardBg: 'bg-emerald-950/80', text: '#ecfdf5', sub: '#a3e635' },
+  'pink-gold': { display: 'Pink & Gold', primary: '#ec4899', secondary: '#a855f7', accent: '#facc15', gradient: 'from-fuchsia-950 via-pink-900 to-purple-950', cardBg: 'bg-pink-950/80', text: '#fce7f3', sub: '#f472b6' },
+  'pastel-purple': { display: 'Lavender & Pink', primary: '#c084fc', secondary: '#38bdf8', accent: '#fbcfe8', gradient: 'from-[#181024] via-[#1f1530] to-[#0c0812]', cardBg: 'bg-[#221734]/85', text: '#f3e8ff', sub: '#c084fc' },
+  'space-navy': { display: 'Navy & Neon', primary: '#22d3ee', secondary: '#a855f7', accent: '#38bdf8', gradient: 'from-slate-950 via-cyan-950 to-fuchsia-950', cardBg: 'bg-slate-900/80', text: '#f8fafc', sub: '#67e8f9' },
+  'safari-earth': { display: 'Safari Earth', primary: '#a16207', secondary: '#16a34a', accent: '#f59e0b', gradient: 'from-[#241c12] via-[#2a2217] to-[#120e08]', cardBg: 'bg-[#241c12]/85', text: '#fef3c7', sub: '#fbbf24' },
+  'ocean-teal': { display: 'Ocean Teal & Coral', primary: '#2dd4bf', secondary: '#fb7185', accent: '#38bdf8', gradient: 'from-cyan-950 via-teal-950 to-blue-950', cardBg: 'bg-teal-950/85', text: '#ccfbf1', sub: '#5eead4' },
+  'candy-pastel': { display: 'Candy Pastel', primary: '#f472b6', secondary: '#38bdf8', accent: '#fef08a', gradient: 'from-[#1f1322] via-[#1a182b] to-[#12192e]', cardBg: 'bg-[#25182a]/85', text: '#fbcfe8', sub: '#7dd3fc' },
+  'pastel-pink': { display: 'Soft Pastel Pink', primary: '#f9a8d4', secondary: '#fbcfe8', accent: '#fff1f2', gradient: 'from-[#241320] via-[#2a1630] to-[#120912]', cardBg: 'bg-[#2a1630]/85', text: '#fce7f3', sub: '#f9a8d4' },
+  'teddy-brown': { display: 'Brown & Cream', primary: '#d97706', secondary: '#fbbf24', accent: '#a16207', gradient: 'from-[#241a10] via-[#2e2012] to-[#120c06]', cardBg: 'bg-[#2a1e10]/85', text: '#fef3c7', sub: '#fbbf24' },
+  'racing-red': { display: 'Racing Red & Black', primary: '#ef4444', secondary: '#fbbf24', accent: '#ffffff', gradient: 'from-[#1f0d0d] via-[#2a1212] to-[#0e0505]', cardBg: 'bg-[#2a1010]/85', text: '#fee2e2', sub: '#fca5a5' },
+  'football-green': { display: 'Football Green & White', primary: '#22c55e', secondary: '#f8fafc', accent: '#16a34a', gradient: 'from-[#04190c] via-[#0a2415] to-[#020d06]', cardBg: 'bg-[#0a2415]/85', text: '#dcfce7', sub: '#4ade80' },
+  'super-redblue': { display: 'Superhero Red & Blue', primary: '#3b82f6', secondary: '#ef4444', accent: '#facc15', gradient: 'from-[#101a30] via-[#1a2440] to-[#080c18]', cardBg: 'bg-[#16203a]/85', text: '#e0e7ff', sub: '#93c5fd' },
+  'galaxy-purple': { display: 'Galaxy Purple & Gold', primary: '#a78bfa', secondary: '#d4af37', accent: '#f0abfc', gradient: 'from-[#16102a] via-[#1e1438] to-[#0a0612]', cardBg: 'bg-[#1e1438]/85', text: '#ede9fe', sub: '#c4b5fd' },
+  'neon-cyan': { display: 'Neon Cyan & Fuchsia', primary: '#06b6d4', secondary: '#ec4899', accent: '#a855f7', gradient: 'from-slate-950 via-cyan-950 to-fuchsia-950', cardBg: 'bg-slate-900/80', text: '#f8fafc', sub: '#67e8f9' },
+  rosegold: { display: 'Rose Gold', primary: '#f472b6', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#1e0810] via-[#2a0b16] to-[#0f0408]', cardBg: 'bg-[#240a14]/85', text: '#ffe4e6', sub: '#f43f5e' },
+  'ivory-gold': { display: 'Ivory & Gold', primary: '#c5a059', secondary: '#f472b6', accent: '#ffffff', gradient: 'from-[#1a0f18] via-[#24101e] to-[#0e0710]', cardBg: 'bg-[#22101e]/85', text: '#fef08a', sub: '#f472b6' },
+  'black-gold': { display: 'Black & Gold', primary: '#d4af37', secondary: '#e11d48', accent: '#ffffff', gradient: 'from-[#140008] via-[#1a0812] to-[#0a0004]', cardBg: 'bg-[#1e0a14]/85', text: '#fef08a', sub: '#f43f5e' },
+  'basketball-orange': { display: 'Basketball Orange & Navy', primary: '#f97316', secondary: '#1e3a8a', accent: '#ffffff', gradient: 'from-[#1d1010] via-[#2a1a10] to-[#0e0810]', cardBg: 'bg-[#26180f]/85', text: '#ffedd5', sub: '#fdba74' },
+  'gaming-neon': { display: 'Gaming Neon Green', primary: '#4ade80', secondary: '#22d3ee', accent: '#a855f7', gradient: 'from-[#041412] via-[#0a1f1a] to-[#020908]', cardBg: 'bg-[#0a201a]/85', text: '#bbf7d0', sub: '#6ee7b7' },
+  'kpop-pink': { display: 'K-Pop Pink & Purple', primary: '#fb7185', secondary: '#c084fc', accent: '#fef08a', gradient: 'from-[#200b18] via-[#2a0f22] to-[#100509]', cardBg: 'bg-[#2a0f22]/85', text: '#fecdd3', sub: '#f472b6' },
+  'floral-blush': { display: 'Blush & Green', primary: '#f9a8d4', secondary: '#4ade80', accent: '#fef08a', gradient: 'from-[#221018] via-[#2a1520] to-[#10090e]', cardBg: 'bg-[#2a1520]/85', text: '#fce7f3', sub: '#f9a8d4' },
+  'boho-terracotta': { display: 'Terracotta & Sand', primary: '#ea580c', secondary: '#fbbf24', accent: '#a3e635', gradient: 'from-[#241008] via-[#2e1609] to-[#120703]', cardBg: 'bg-[#2a1308]/85', text: '#ffedd5', sub: '#fdba74' },
+  'vintage-cream': { display: 'Vintage Cream & Rose', primary: '#e5b2b8', secondary: '#d4af37', accent: '#fef08a', gradient: 'from-[#241710] via-[#2a1d14] to-[#120b07]', cardBg: 'bg-[#2a1d14]/85', text: '#fef3c7', sub: '#e5b2b8' },
+  'retro-90s': { display: 'Retro 90s Pop', primary: '#f472b6', secondary: '#22d3ee', accent: '#facc15', gradient: 'from-[#180f26] via-[#221633] to-[#0c0712]', cardBg: 'bg-[#221633]/85', text: '#fce7f3', sub: '#f9a8d4' },
+  'adult-charcoal': { display: 'Charcoal & Gold', primary: '#d4af37', secondary: '#38bdf8', accent: '#f43f5e', gradient: 'from-[#0b1320] via-[#111c2e] to-[#080d17]', cardBg: 'bg-[#131f33]/85', text: '#f1f5f9', sub: '#94a3b8' },
+  bluesilver: { display: 'Blue & Silver', primary: '#38bdf8', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#081220] via-[#0d1d33] to-[#050a14]', cardBg: 'bg-[#0d1e34]/85', text: '#e0f2fe', sub: '#7dd3fc' },
+  'purple-royal': { display: 'Royal Purple', primary: '#a855f7', secondary: '#38bdf8', accent: '#e9d5ff', gradient: 'from-purple-950 via-indigo-950 to-slate-950', cardBg: 'bg-purple-950/80', text: '#f3e8ff', sub: '#d8b4fe' },
+  'emerald-green': { display: 'Emerald Green', primary: '#34d399', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#022c22] via-[#064e3b] to-[#021f18]', cardBg: 'bg-[#04372a]/85', text: '#a7f3d0', sub: '#fef08a' },
+  'orange-warm': { display: 'Warm Orange', primary: '#fb923c', secondary: '#38bdf8', accent: '#f43f5e', gradient: 'from-[#221008] via-[#240a1c] to-[#0c0818]', cardBg: 'bg-[#2a1320]/85', text: '#fef3c7', sub: '#f472b6' },
+  'yellow-sun': { display: 'Sunny Yellow', primary: '#facc15', secondary: '#fb7185', accent: '#22d3ee', gradient: 'from-[#221a06] via-[#2a2008] to-[#120e03]', cardBg: 'bg-[#2a2008]/85', text: '#fef9c3', sub: '#fde047' },
+  monochrome: { display: 'Monochrome', primary: '#e5e5e5', secondary: '#a3a3a3', accent: '#ffffff', gradient: 'from-[#0f0f10] via-[#17171a] to-[#0a0a0c]', cardBg: 'bg-[#18181c]/90', text: '#ffffff', sub: '#a3a3a3' },
+  'pastel-lavender': { display: 'Lavender Mist', primary: '#c4b5fd', secondary: '#f9a8d4', accent: '#e0e7ff', gradient: 'from-[#191226] via-[#201a33] to-[#0d0a14]', cardBg: 'bg-[#201a33]/85', text: '#ede9fe', sub: '#c4b5fd' },
+  'pastel-mint': { display: 'Mint Fresh', primary: '#34d399', secondary: '#f472b6', accent: '#fef08a', gradient: 'from-[#0d1f18] via-[#12261f] to-[#08120e]', cardBg: 'bg-[#12281e]/85', text: '#a7f3d0', sub: '#6ee7b7' },
+  'pastel-peach': { display: 'Peach Blossom', primary: '#fda4af', secondary: '#fdba74', accent: '#fff1f2', gradient: 'from-[#24120c] via-[#2e170f] to-[#120805]', cardBg: 'bg-[#2a150d]/85', text: '#ffe4e6', sub: '#fda4af' },
+  'pastel-blue': { display: 'Pastel Sky Blue', primary: '#7dd3fc', secondary: '#f9a8d4', accent: '#ffffff', gradient: 'from-sky-950 via-blue-900 to-indigo-950', cardBg: 'bg-slate-900/80', text: '#e0f2fe', sub: '#7dd3fc' },
+  'sky-cloud': { display: 'Cloud Blue & White', primary: '#7dd3fc', secondary: '#fef9c3', accent: '#ffffff', gradient: 'from-sky-950 via-blue-900 to-indigo-950', cardBg: 'bg-slate-900/80', text: '#e0f2fe', sub: '#7dd3fc' },
+  'garden-pink': { display: 'Garden Pink', primary: '#fb7185', secondary: '#4ade80', accent: '#fef08a', gradient: 'from-[#1e0f18] via-[#2a1420] to-[#0f0710]', cardBg: 'bg-[#26111d]/85', text: '#fecdd3', sub: '#fb7185' },
+  'gold-lux': { display: 'Gold Luxe', primary: '#d4af37', secondary: '#fef08a', accent: '#ffffff', gradient: 'from-[#1c160e] via-[#241d13] to-[#120e09]', cardBg: 'bg-[#221b12]/85', text: '#fef08a', sub: '#eab308' },
+  'navy-royal': { display: 'Navy Royal', primary: '#60a5fa', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#0b1420] via-[#101e30] to-[#060b12]', cardBg: 'bg-[#101d2e]/85', text: '#fef08a', sub: '#7dd3fc' },
+  'red-navy': { display: 'Red & Navy', primary: '#ef4444', secondary: '#1e3a8a', accent: '#fbbf24', gradient: 'from-[#1d1014] via-[#26121a] to-[#0e080a]', cardBg: 'bg-[#26121a]/85', text: '#fee2e2', sub: '#fca5a5' },
+  'white-clean': { display: 'White & Clean', primary: '#d4d4d8', secondary: '#a1a1aa', accent: '#ffffff', gradient: 'from-[#121215] via-[#1a1a1f] to-[#0a0a0c]', cardBg: 'bg-[#1a1a20]/90', text: '#fafafa', sub: '#a1a1aa' },
+  geometric: { display: 'Geometric Ink', primary: '#818cf8', secondary: '#38bdf8', accent: '#f0abfc', gradient: 'from-[#0d1124] via-[#141a33] to-[#070a14]', cardBg: 'bg-[#141a33]/85', text: '#e0e7ff', sub: '#a5b4fc' },
+  artdeco: { display: 'Art Deco Gold', primary: '#eab308', secondary: '#0f172a', accent: '#ffffff', gradient: 'from-[#14120c] via-[#1d1a12] to-[#0b0a06]', cardBg: 'bg-[#1d1a12]/85', text: '#fef08a', sub: '#d4af37' },
+  pixel: { display: 'Pixel Navy', primary: '#38bdf8', secondary: '#f59e0b', accent: '#10b981', gradient: 'from-cyan-950 via-slate-900 to-indigo-950', cardBg: 'bg-slate-900/80', text: '#cffaff', sub: '#67e8f9' },
+  'green-white': { display: 'Green & White', primary: '#22c55e', secondary: '#fef9c3', accent: '#ffffff', gradient: 'from-[#04190c] via-[#0a2415] to-[#020d06]', cardBg: 'bg-[#0a2415]/85', text: '#dcfce7', sub: '#86efac' },
+  'emerald-gold': { display: 'Emerald & Gold', primary: '#34d399', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#021f18] via-[#053227] to-[#01140f]', cardBg: 'bg-[#063f31]/90', text: '#a7f3d0', sub: '#fef08a' },
+  'teal-gold': { display: 'Teal & Gold', primary: '#2dd4bf', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#04221e] via-[#0a322c] to-[#021412]', cardBg: 'bg-[#0a322c]/85', text: '#ccfbf1', sub: '#5eead4' },
+  'burgundy-gold': { display: 'Burgundy & Gold', primary: '#e11d48', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#20060c] via-[#2a0810] to-[#100306]', cardBg: 'bg-[#2a0810]/85', text: '#ffe4e6', sub: '#fda4af' },
+  'royalblue': { display: 'Royal Blue & Gold', primary: '#3b82f6', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#081226] via-[#0d1d38] to-[#040a14]', cardBg: 'bg-[#0d1d38]/85', text: '#dbeafe', sub: '#93c5fd' },
+  'sage-gold': { display: 'Sage & Gold', primary: '#86efac', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#0c1410] via-[#121c17] to-[#080d0a]', cardBg: 'bg-[#14201a]/90', text: '#ecfdf5', sub: '#a7f3d0' },
+  'cream-gold': { display: 'Cream & Gold', primary: '#d4af37', secondary: '#fef3c7', accent: '#ffffff', gradient: 'from-[#1d1608] via-[#261d0c] to-[#100b04]', cardBg: 'bg-[#241c0b]/85', text: '#fef9c3', sub: '#fde047' },
+  'charcoal-gold': { display: 'Charcoal & Gold', primary: '#c5a059', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#141009] via-[#1a140b] to-[#0a0804]', cardBg: 'bg-[#1c160e]/85', text: '#fef08a', sub: '#c5a059' },
+  'white-gold': { display: 'White & Gold', primary: '#e5e5e5', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#181614] via-[#1f1d1a] to-[#0d0c0a]', cardBg: 'bg-[#1f1d1a]/90', text: '#f5f5f4', sub: '#d4af37' },
+  'maroon-gold': { display: 'Maroon & Gold', primary: '#be123c', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#1d0510] via-[#2a0718] to-[#100307]', cardBg: 'bg-[#2a0718]/85', text: '#ffe4e6', sub: '#fda4af' },
+  'dustyblue': { display: 'Dusty Blue', primary: '#94a3b8', secondary: '#d4af37', accent: '#e2e8f0', gradient: 'from-[#0e141c] via-[#161d28] to-[#080c12]', cardBg: 'bg-[#161d28]/85', text: '#e2e8f0', sub: '#94a3b8' },
+  turquoise: { display: 'Turquoise & Gold', primary: '#2dd4bf', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#04201f] via-[#0a2d2b] to-[#021211]', cardBg: 'bg-[#0a2d2b]/85', text: '#ccfbf1', sub: '#5eead4' },
+  'brown-gold': { display: 'Brown & Gold', primary: '#d97706', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#1d1306] via-[#281a09] to-[#0f0a03]', cardBg: 'bg-[#281a09]/85', text: '#fef3c7', sub: '#fbbf24' },
+  'dusty-pink': { display: 'Dusty Pink', primary: '#f9a8d4', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#200a14] via-[#2a0f1c] to-[#120510]', cardBg: 'bg-[#2a0f1c]/85', text: '#fce7f3', sub: '#f9a8d4' },
+  champagne: { display: 'Champagne', primary: '#e9cba8', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#1a1208] via-[#241a0d] to-[#100b05]', cardBg: 'bg-[#241a0d]/85', text: '#fef3c7', sub: '#e9cba8' },
+  sage: { display: 'Sage Green', primary: '#a7f3d0', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#0c1410] via-[#141f19] to-[#080d0a]', cardBg: 'bg-[#14201a]/90', text: '#ecfdf5', sub: '#a7f3d0' },
+  dustyrose: { display: 'Dusty Rose', primary: '#f9a8d4', secondary: '#e5b2b8', accent: '#ffffff', gradient: 'from-[#1c0a12] via-[#260f1a] to-[#100508]', cardBg: 'bg-[#260f1a]/85', text: '#fce7f3', sub: '#f9a8d4' },
+  navy: { display: 'Navy Elegance', primary: '#60a5fa', secondary: '#e2e8f0', accent: '#ffffff', gradient: 'from-[#0a1420] via-[#101d30] to-[#050b12]', cardBg: 'bg-[#101d30]/85', text: '#dbeafe', sub: '#93c5fd' },
+  emerald: { display: 'Emerald', primary: '#34d399', secondary: '#a7f3d0', accent: '#ffffff', gradient: 'from-[#022c22] via-[#064e3b] to-[#021f18]', cardBg: 'bg-[#04372a]/85', text: '#a7f3d0', sub: '#6ee7b7' },
+  burgundy: { display: 'Burgundy', primary: '#fb7185', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#20060c] via-[#2a0810] to-[#100306]', cardBg: 'bg-[#2a0810]/85', text: '#ffe4e6', sub: '#fda4af' },
+  terracotta: { display: 'Terracotta', primary: '#fb923c', secondary: '#fdba74', accent: '#ffffff', gradient: 'from-[#241008] via-[#2e1609] to-[#120703]', cardBg: 'bg-[#2a1308]/85', text: '#ffedd5', sub: '#fdba74' },
+  blush: { display: 'Blush', primary: '#fda4af', secondary: '#f9a8d4', accent: '#ffffff', gradient: 'from-[#200a10] via-[#2a0f18] to-[#120507]', cardBg: 'bg-[#2a0f18]/85', text: '#fecdd3', sub: '#fda4af' },
+  lavender: { display: 'Lavender', primary: '#c4b5fd', secondary: '#f9a8d4', accent: '#ffffff', gradient: 'from-[#160f24] via-[#1e1433] to-[#0c0814]', cardBg: 'bg-[#1e1433]/85', text: '#ede9fe', sub: '#c4b5fd' },
+  earth: { display: 'Earth Tone', primary: '#d6b98c', secondary: '#a3e635', accent: '#ffffff', gradient: 'from-[#191108] via-[#221708] to-[#0e0a04]', cardBg: 'bg-[#221708]/85', text: '#fef3c7', sub: '#d6b98c' },
+  'bali-green': { display: 'Bali Green', primary: '#4ade80', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#031a10] via-[#0a2418] to-[#020d07]', cardBg: 'bg-[#0a2418]/85', text: '#dcfce7', sub: '#86efac' },
+  'oriental-red': { display: 'Oriental Red & Gold', primary: '#ef4444', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#1d0608] via-[#28080c] to-[#100305]', cardBg: 'bg-[#28080c]/85', text: '#fee2e2', sub: '#fca5a5' },
+  modern: { display: 'Modern Neutral', primary: '#a1a1aa', secondary: '#e4e4e7', accent: '#ffffff', gradient: 'from-[#131316] via-[#1a1a1f] to-[#0a0a0c]', cardBg: 'bg-[#1a1a20]/90', text: '#fafafa', sub: '#a1a1aa' },
+  vintage: { display: 'Vintage Rose', primary: '#e5b2b8', secondary: '#d4af37', accent: '#fef3c7', gradient: 'from-[#221510] via-[#2a1a12] to-[#110b07]', cardBg: 'bg-[#2a1a12]/85', text: '#fef3c7', sub: '#e5b2b8' },
+  'skyblue': { display: 'Baby Blue', primary: '#7dd3fc', secondary: '#e0f2fe', accent: '#ffffff', gradient: 'from-sky-950 via-blue-900 to-indigo-950', cardBg: 'bg-slate-900/80', text: '#e0f2fe', sub: '#7dd3fc' },
+  'brown-cream': { display: 'Brown & Cream', primary: '#d97706', secondary: '#fbbf24', accent: '#a16207', gradient: 'from-[#241a10] via-[#2e2012] to-[#120c06]', cardBg: 'bg-[#2a1e10]/85', text: '#fef3c7', sub: '#fbbf24' },
+  beige: { display: 'Warm Beige', primary: '#e7d3b4', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#19120a] via-[#221910] to-[#0f0a05]', cardBg: 'bg-[#221910]/85', text: '#fef3c7', sub: '#e7d3b4' },
+  mint: { display: 'Mint', primary: '#6ee7b7', secondary: '#a7f3d0', accent: '#ffffff', gradient: 'from-[#0c1a12] via-[#12231a] to-[#070d08]', cardBg: 'bg-[#12231a]/85', text: '#d1fae5', sub: '#6ee7b7' },
+  peach: { display: 'Peach', primary: '#fdba74', secondary: '#fda4af', accent: '#ffffff', gradient: 'from-[#221007] via-[#2a150c] to-[#120704]', cardBg: 'bg-[#2a150c]/85', text: '#ffedd5', sub: '#fdba74' },
+  watercolor: { display: 'Watercolor Soft', primary: '#c4b5fd', secondary: '#f9a8d4', accent: '#7dd3fc', gradient: 'from-[#15121f] via-[#1c1830] to-[#0c0a12]', cardBg: 'bg-[#1c1830]/85', text: '#ede9fe', sub: '#c4b5fd' },
+  'rose-quartz': { display: 'Rose Quartz', primary: '#f9a8d4', secondary: '#fda4af', accent: '#ffffff', gradient: 'from-[#200812] via-[#2a0c1a] to-[#120510]', cardBg: 'bg-[#2a0c1a]/85', text: '#fce7f3', sub: '#f9a8d4' },
+  vanilla: { display: 'Vanilla Cream', primary: '#fef3c7', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#1c160a] via-[#251e10] to-[#0f0b05]', cardBg: 'bg-[#251e10]/85', text: '#fef9c3', sub: '#fde047' },
+  stone: { display: 'Stone Grey', primary: '#a8a29e', secondary: '#d6d3d1', accent: '#ffffff', gradient: 'from-[#121110] via-[#1a1917] to-[#0a0a09]', cardBg: 'bg-[#1a1917]/90', text: '#f5f5f4', sub: '#a8a29e' },
+  'grey-neutral': { display: 'Neutral Grey', primary: '#9ca3af', secondary: '#d1d5db', accent: '#ffffff', gradient: 'from-[#111213] via-[#18191b] to-[#0a0b0c]', cardBg: 'bg-[#18191b]/90', text: '#f9fafb', sub: '#9ca3af' },
+  'islamic-green': { display: 'Islamic Green & Gold', primary: '#22c55e', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#032218] via-[#06352a] to-[#02120d]', cardBg: 'bg-[#06352a]/85', text: '#dcfce7', sub: '#86efac' },
+  'midnight': { display: 'Midnight Blue', primary: '#818cf8', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#070b1a] via-[#0c1326] to-[#04060d]', cardBg: 'bg-[#0c1326]/85', text: '#e0e7ff', sub: '#a5b4fc' },
+  crimson: { display: 'Crimson Rose', primary: '#f43f5e', secondary: '#d4af37', accent: '#ffffff', gradient: 'from-[#1e0810] via-[#2a0b16] to-[#0f0408]', cardBg: 'bg-[#240a14]/85', text: '#ffe4e6', sub: '#f43f5e' },
+  'cotton-candy': { display: 'Cotton Candy', primary: '#f9a8d4', secondary: '#7dd3fc', accent: '#ffffff', gradient: 'from-[#1e0e1c] via-[#271326] to-[#100610]', cardBg: 'bg-[#271326]/85', text: '#fce7f3', sub: '#f9a8d4' },
+  'candy-pop': { display: 'Candy Pop', primary: '#fb7185', secondary: '#facc15', accent: '#38bdf8', gradient: 'from-[#1f0a14] via-[#2a0e1c] to-[#100609]', cardBg: 'bg-[#2a0e1c]/85', text: '#fecdd3', sub: '#fda4af' },
+};
+
+const FALLBACK_PALETTES: Record<CategoryKey, string[]> = {
+  birthday: ['pink-white', 'blue-white', 'rainbow', 'jungle-green', 'pastel-pink', 'space-navy', 'orange-warm', 'purple-royal', 'yellow-sun', 'monochrome'],
+  sunatan: ['emerald-gold', 'navy-royal', 'maroon-gold', 'royalblue', 'turquoise', 'dustyblue', 'sage-gold', 'brown-gold', 'charcoal-gold', 'white-gold'],
+  wedding: ['ivory-gold', 'champagne', 'sage', 'dustyrose', 'navy', 'emerald', 'burgundy', 'terracotta', 'blush', 'lavender'],
+  aqiqah: ['skyblue', 'dusty-pink', 'pastel-pink', 'beige', 'pastel-mint', 'pastel-purple', 'peach', 'watercolor', 'navy-royal', 'monochrome'],
+};
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+type FontKey = 'cute' | 'playful' | 'elegant' | 'luxury' | 'minimal' | 'neon' | 'retro' | 'hand';
+
+const FONTS: Record<FontKey, { family: string; style: FontStyleName; label: string }> = {
+  cute: { family: "'Fredoka', sans-serif", style: 'cute', label: 'Playful Rounded' },
+  playful: { family: "'Bricolage Grotesque', sans-serif", style: 'playful', label: 'Bold Modern' },
+  elegant: { family: "'Playfair Display', serif", style: 'elegant', label: 'Elegant Serif' },
+  luxury: { family: "'Cinzel', serif", style: 'luxury', label: 'Classic Luxury' },
+  minimal: { family: "'Space Grotesk', sans-serif", style: 'minimalist', label: 'Clean Sans' },
+  neon: { family: "'Outfit', sans-serif", style: 'neon', label: 'Neon Futurist' },
+  retro: { family: "'Fredoka', sans-serif", style: 'retro', label: 'Retro Pop' },
+  hand: { family: "'Great Vibes', cursive", style: 'handwritten', label: 'Elegant Script' },
+};
+
+/* ============================================================
+   STYLE POOLS (animation, layout, background, frame, button, decoration)
+   ============================================================ */
+const ANIM_POOLS: Record<CategoryKey, AnimationStyle[]> = {
+  birthday: ['floating-balloons', 'twinkling-stars', 'sparkle', 'butterflies', 'neon-pulse', 'subtle-drift'],
+  sunatan: ['islamic-glow', 'twinkling-stars', 'sparkle', 'subtle-drift'],
+  wedding: ['sparkle', 'butterflies', 'subtle-drift', 'petals-fall'],
+  aqiqah: ['twinkling-stars', 'sparkle', 'subtle-drift', 'floating-moon'],
+};
+
+const LAYOUT_POOLS: Record<CategoryKey, string[]> = {
+  birthday: ['Centered Cover', 'Vertical Story Scroll', 'Polaroid Grid', 'Split Panel', 'Hero Banner', 'Card Stack', 'Timeline Layout', 'Arch Frame', 'Fullscreen Hero', 'Two Column'],
+  sunatan: ['Centered Arch', 'Vertical Story Scroll', 'Golden Frame', 'Split Panel', 'Hero Mosque', 'Serene Single Column', 'Ornamental Border', 'Timeline Layout', 'Elegant Banner', 'Calligraphy Focus'],
+  wedding: ['Centered Arch', 'Vertical Story Scroll', 'Split Panel', 'Gallery Focus', 'Hero Banner', 'Timeline Layout', 'Elegant Columns', 'Fullscreen Hero', 'Polaroid Collage', 'Minimal Grid'],
+  aqiqah: ['Centered Cover', 'Vertical Story Scroll', 'Polaroid Grid', 'Soft Cards', 'Hero Banner', 'Moon Arch', 'Card Stack', 'Split Panel', 'Timeline Layout', 'Rounded Grid'],
+};
+
+const BG_POOLS: Record<CategoryKey, BackgroundType[]> = {
+  birthday: ['celebration-confetti', 'kids-adventure', 'comic-doodles', 'neon-glow', 'floral-lace', 'marble-gold', 'luxury-emerald', 'pastel-clouds', 'minimalist-lines', 'wine-jazz'],
+  sunatan: ['islamic-gold', 'marble-gold', 'luxury-emerald', 'wedding-royal', 'minimalist-lines', 'baby-moon'],
+  wedding: ['wedding-garden', 'wedding-royal', 'marble-gold', 'floral-lace', 'luxury-emerald', 'minimalist-lines', 'wine-jazz', 'watercolor'],
+  aqiqah: ['baby-moon', 'pastel-clouds', 'baby-animal', 'watercolor', 'wedding-garden', 'minimalist-lines'],
+};
+
+const FRAME_POOLS: Record<CategoryKey, FrameStyle[]> = {
+  birthday: ['cute-ribbon', 'glass-frame', 'polaroid', 'arch', 'neon-border', 'minimal-circle', 'gold-border', 'comic-frame', 'royal-crest', 'floral-ring'],
+  sunatan: ['islamic-arch', 'arch', 'gold-border', 'minimal-circle', 'royal-crest', 'glass-frame'],
+  wedding: ['arch', 'gold-border', 'floral-ring', 'minimal-line', 'royal-crown', 'glass-frame', 'polaroid'],
+  aqiqah: ['moon-arch', 'cute-ribbon', 'glass-frame', 'polaroid', 'minimal-circle', 'floral-wreath', 'gold-border'],
+};
+
+const BUTTON_POOLS: Record<CategoryKey, ButtonStyle[]> = {
+  birthday: ['playful', 'pastel-pill', 'rose-gold', 'neon-glow', 'gold-luxury', 'minimal-dark', 'cartoon-pop', 'emerald-glass'],
+  sunatan: ['islamic-gold', 'gold-luxury', 'emerald-glass', 'minimal-dark', 'rose-gold'],
+  wedding: ['gold-luxury', 'emerald-glass', 'rose-gold', 'minimal-dark', 'garden-rose'],
+  aqiqah: ['pastel-pill', 'rose-gold', 'minimal-dark', 'cartoon-pop', 'islamic-gold'],
+};
+
+const DECO_POOLS: Record<CategoryKey, string[][]> = {
+  birthday: [
+    ['🎈', '🎉', '🎁', '🎂', '⭐'], ['☁️', '⭐', '🚀', '🌙', '✨'], ['🌈', '🎉', '🍰', '🎈', '🦄'],
+    ['🦖', '🌴', '🐾', '🍃', '⭐'], ['🦄', '⭐', '💖', '👑', '🌸'], ['🦸', '💥', '⚡', '⭐', '🏆'],
+    ['🎧', '⚡', '🌌', '✨', '💿'], ['🌸', '👑', '✨', '🦋', '🥂'], ['🎈', '🎁', '🍭', '🎊', '💝'],
+    ['🎂', '🍰', '🧁', '🎈', '🎉'],
+  ],
+  sunatan: [
+    ['🕌', '☪️', '⭐', '🌙', '✨'], ['🌿', '💧', '✨', '☪️', '⭐'], ['🕌', '✨', '🌙', '⭐', '📖'],
+    ['☪️', '🌙', '⭐', '✨', '🕌'], ['🕋', '✨', '🌙', '⭐', '📿'], ['🌿', '⭐', '✨', '☪️', '🕌'],
+    ['📖', '🌙', '☪️', '⭐', '✨'], ['⭐', '☪️', '🌙', '✨', '🕌'], ['🌷', '⭐', '☪️', '✨', '🌙'],
+    ['🕋', '📿', '✨', '🌙', '⭐'],
+  ],
+  wedding: [
+    ['💍', '🌹', '✨', '🥂', '💐'], ['🌸', '💍', '✨', '💐', '🕊️'], ['💐', '🌿', '✨', '💍', '🥂'],
+    ['🌷', '💍', '✨', '💐', '💛'], ['💍', '🥂', '✨', '🌹', '💐'], ['🕊️', '💐', '✨', '💍', '🌷'],
+    ['🌹', '💍', '✨', '🥂', '💐'], ['💐', '✨', '💍', '🌿', '🥂'], ['🥂', '💍', '✨', '🌹', '💐'],
+    ['💍', '💐', '✨', '🕊️', '🌷'],
+  ],
+  aqiqah: [
+    ['🌙', '⭐', '☁️', '👶', '✨'], ['👶', '🧸', '☁️', '✨', '🎈'], ['🌙', '⭐', '👶', '✨', '☁️'],
+    ['🐰', '🥕', '🌷', '✨', '☁️'], ['👶', '🌟', '☁️', '🌙', '✨'], ['🍼', '👶', '🧸', '☁️', '✨'],
+    ['🌙', '☁️', '⭐', '👶', '🕊️'], ['🧸', '👶', '☁️', '⭐', '🌸'], ['👶', '🌷', '🐰', '✨', '☁️'],
+    ['⭐', '🌙', '👶', '✨', '🍼'],
+  ],
+};
+
+const FEATURES = ['Background Music', 'Live Countdown', 'Maps Integration', 'Photo Gallery', 'RSVP & Guestbook'];
+
+/* ============================================================
+   TEMPLATE SEEDS — one unique record per template
+   tuple: [name, subcategory, designStyle, paletteKey, fontKey, illustrationStyle, badge?]
+   ============================================================ */
+type Seed = [string, string, string, string, FontKey, string, TemplateBadge?];
+
+const BIRTHDAY_SEEDS: Seed[] = [
+  ['Pink Balloons Kids', 'Cute Kids', 'Balloon Fun', 'pink-white', 'cute', 'Floating Balloons', 'POPULAR'],
+  ['Blue Clouds & Stars', 'Cute Kids', 'Sky Dream', 'blue-white', 'cute', 'Clouds & Stars'],
+  ['Rainbow Confetti', 'Colorful', 'Confetti Pop', 'rainbow', 'playful', 'Confetti Burst'],
+  ['Dinosaur Jungle', 'Dinosaur', 'Jungle Adventure', 'jungle-green', 'playful', 'Dino Silhouettes'],
+  ['Little Princess', 'Princess', 'Royal Fairy Tale', 'pink-gold', 'hand', 'Crown & Castle', 'POPULAR'],
+  ['Magical Unicorn', 'Unicorn', 'Fantasy Pastel', 'pastel-purple', 'cute', 'Unicorn & Sparkles'],
+  ['Space Adventure', 'Space', 'Cosmic Voyage', 'space-navy', 'playful', 'Rockets & Planets'],
+  ['Safari Birthday', 'Safari', 'Wild Explorer', 'safari-earth', 'playful', 'Safari Animals'],
+  ['Under The Sea', 'Ocean', 'Ocean Wonder', 'ocean-teal', 'playful', 'Fish & Coral', 'FEATURED'],
+  ['Candy Party', 'Colorful', 'Sweet Treats', 'candy-pastel', 'playful', 'Candy & Lollipops'],
+  ['Pastel Dream', 'Pastel', 'Soft Romance', 'pastel-pink', 'cute', 'Pastel Watercolor'],
+  ['Teddy Bear Party', 'Cute Kids', 'Cuddly Friends', 'teddy-brown', 'cute', 'Teddy Bears'],
+  ['Racing Champion', 'Racing', 'Speed & Finish', 'racing-red', 'playful', 'Race Cars'],
+  ['Football Star', 'Football', 'Soccer Stadium', 'football-green', 'playful', 'Football & Trophy'],
+  ['Superhero Birthday', 'Superhero', 'Hero Mission', 'super-redblue', 'playful', 'Hero Capes', 'POPULAR'],
+  ['Galaxy Night', 'Space', 'Starry Galaxy', 'galaxy-purple', 'elegant', 'Galaxy Swirl'],
+  ['Neon Birthday', 'Neon', 'Glow Night', 'neon-cyan', 'neon', 'Neon Signs'],
+  ['Sweet Seventeen', 'Sweet Seventeen', 'Glam Celebration', 'rosegold', 'elegant', 'Glitter & Rose', 'TRENDING'],
+  ['Elegant Birthday', 'Elegant', 'Refined Luxury', 'ivory-gold', 'elegant', 'Floral Lines'],
+  ['Black Gold Celebration', 'Luxury', 'Midnight Royal', 'black-gold', 'luxury', 'Gold Foil', 'POPULAR'],
+  ['Basketball Slam Dunk', 'Basketball', 'Court Vibes', 'basketball-orange', 'playful', 'Basketball Court'],
+  ['Gaming Controller', 'Gaming', 'Player One', 'gaming-neon', 'neon', 'Game Controllers'],
+  ['K-Pop Idol Party', 'K-Pop', 'Stage Lights', 'kpop-pink', 'neon', 'Stage & Lightstick'],
+  ['Floral Garden Party', 'Floral', 'Garden Bloom', 'floral-blush', 'hand', 'Watercolor Florals'],
+  ['Bohemian Birthday', 'Bohemian', 'Free Spirit', 'boho-terracotta', 'hand', 'Pampas & Wildflowers'],
+  ['Vintage Tea Party', 'Vintage', 'Old Charm', 'vintage-cream', 'hand', 'Tea Cups & Lace'],
+  ['Retro 90s Party', 'Retro', 'Nostalgia Pop', 'retro-90s', 'retro', 'Retro Shapes'],
+  ['Adult Birthday Cocktail', 'Adult', 'Midnight Toast', 'adult-charcoal', 'elegant', 'Cocktail Glasses'],
+  ['Pink & Gold Glam', 'Pink & Gold', 'Glamour Shine', 'pink-gold', 'elegant', 'Gold Sparkle', 'TRENDING'],
+  ['Blue & Silver Soiree', 'Blue & Silver', 'Winter Glam', 'bluesilver', 'elegant', 'Silver Snowflakes'],
+  ['Purple Dream Party', 'Purple', 'Royal Haze', 'purple-royal', 'elegant', 'Purple Haze'],
+  ['Emerald Green Party', 'Green', 'Fresh Celebration', 'emerald-green', 'elegant', 'Emerald Leaves'],
+  ['Tangerine Fun', 'Orange', 'Citrus Pop', 'orange-warm', 'playful', 'Orange Slices'],
+  ['Sunny Yellow Bash', 'Yellow', 'Sunshine Smile', 'yellow-sun', 'playful', 'Suns & Smiles'],
+  ['Monochrome Modern', 'Monochrome', 'Black White', 'monochrome', 'minimal', 'Line Art'],
+  ['Mermaid Lagoon', 'Under The Sea', 'Mermaid Tale', 'ocean-teal', 'cute', 'Mermaid Tails', 'NEW'],
+  ['Ocean Explorer', 'Ocean', 'Deep Dive', 'sky-cloud', 'playful', 'Submarine & Waves'],
+  ['Dino Roar', 'Dinosaur', 'T-Rex Power', 'jungle-green', 'playful', 'Dino Footprints'],
+  ['Unicorn Rainbow', 'Unicorn', 'Dreamy Ride', 'rainbow', 'cute', 'Rainbow Unicorn'],
+  ['Fairy Wings', 'Fairy', 'Enchanted Forest', 'pastel-lavender', 'hand', 'Fairy & Wings'],
+  ['Balloon Carnival', 'Balloon', 'Carnival Joy', 'candy-pop', 'playful', 'Balloon Arch'],
+  ['Circus Party', 'Cartoon', 'Big Top Fun', 'red-navy', 'playful', 'Circus Tent'],
+  ['Little Explorer', 'Adventure', 'Map Quest', 'safari-earth', 'playful', 'Maps & Compass'],
+  ['Pirate Treasure', 'Cartoon', 'Pirate Hunt', 'ocean-teal', 'playful', 'Ships & Treasure'],
+  ['Robot Party', 'Gaming', 'Tech Bot', 'gaming-neon', 'neon', 'Robots & Gears'],
+  ['Train Adventure', 'Cartoon', 'All Aboard', 'blue-white', 'playful', 'Trains & Tracks'],
+  ['Farm Animal Party', 'Safari', 'Barnyard Friends', 'brown-cream', 'cute', 'Farm Animals', 'NEW'],
+  ['Zoo Friends', 'Safari', 'Zoo Day', 'jungle-green', 'cute', 'Zoo Animals'],
+  ['Puppy Party', 'Cute Kids', 'Puppy Love', 'teddy-brown', 'cute', 'Puppies & Paws'],
+  ['Kitty Cat Party', 'Cute Kids', 'Meow Time', 'pastel-pink', 'cute', 'Cats & Whiskers'],
+  ['Bumblebee Birthday', 'Colorful', 'Honey Buzz', 'yellow-sun', 'playful', 'Bees & Honey'],
+  ['Ladybug Party', 'Cute Kids', 'Little Dots', 'red-navy', 'cute', 'Ladybugs'],
+  ['Starry Night Party', 'Space', 'Night Sky', 'galaxy-purple', 'elegant', 'Night Stars'],
+  ['Rocket Launch Party', 'Space', 'Blast Off', 'space-navy', 'playful', 'Rockets'],
+  ['Moon Landing Party', 'Space', 'Apollo Fun', 'sky-cloud', 'playful', 'Moon & Astronauts'],
+  ['Superhero Training', 'Superhero', 'Boot Camp', 'super-redblue', 'playful', 'Shield Badges'],
+  ['Ninja Birthday', 'Cartoon', 'Stealth Mode', 'monochrome', 'playful', 'Ninja Stars'],
+  ['Cowboy Party', 'Retro', 'Wild West', 'boho-terracotta', 'retro', 'Boots & Lasso'],
+  ['Jungle Tribe Party', 'Safari', 'Rainforest Fun', 'jungle-green', 'playful', 'Tropical Leaves'],
+  ['Dessert Bar Party', 'Colorful', 'Sweet Bar', 'candy-pastel', 'playful', 'Desserts'],
+  ['Chocolate Dream', 'Colorful', 'Cocoa Delight', 'brown-gold', 'playful', 'Chocolate Drops'],
+  ['Strawberry Cream', 'Pastel', 'Berry Sweet', 'pastel-pink', 'cute', 'Strawberries'],
+  ['Lavender Fields', 'Pastel', 'Calm Meadow', 'pastel-lavender', 'hand', 'Lavender Sprigs'],
+  ['Mint Fresh Party', 'Pastel', 'Cool Breeze', 'pastel-mint', 'cute', 'Mint Leaves'],
+  ['Peach Blossom', 'Pastel', 'Soft Petals', 'pastel-peach', 'hand', 'Peach Blossoms'],
+  ['Cloud Nine Party', 'Cute Kids', 'Sky High', 'sky-cloud', 'cute', 'Clouds', 'NEW'],
+  ['Bubble Pop Party', 'Cute Kids', 'Soap Fun', 'pastel-purple', 'cute', 'Bubbles'],
+  ['Cupcake Corner', 'Colorful', 'Bake Shop', 'candy-pop', 'cute', 'Cupcakes'],
+  ['Ice Cream Party', 'Colorful', 'Scoops Fun', 'pastel-peach', 'playful', 'Ice Cream Cones'],
+  ['Donut Party', 'Colorful', 'Sprinkle Day', 'candy-pastel', 'playful', 'Donuts'],
+  ['Pancake Breakfast', 'Cute Kids', 'Morning Fun', 'brown-cream', 'cute', 'Pancakes & Syrup'],
+  ['Picnic Party', 'Bohemian', 'Park Day', 'boho-terracotta', 'hand', 'Picnic Baskets'],
+  ['Garden Tea Party', 'Floral', 'Afternoon Tea', 'garden-pink', 'hand', 'Tea & Roses'],
+  ['Rosy Retro', 'Vintage', 'Rose Pop', 'vintage-cream', 'retro', 'Retro Roses'],
+  ['Parisian Chic', 'Elegant', 'French Class', 'ivory-gold', 'hand', 'Eiffel & Macarons'],
+  ['Golden Hour Party', 'Luxury', 'Sunset Glow', 'gold-lux', 'luxury', 'Golden Sun'],
+  ['Champagne Toast', 'Luxury', 'Cheers Night', 'champagne', 'luxury', 'Champagne Glasses'],
+  ['Royal Crown', 'Luxury', 'Monarch Night', 'black-gold', 'luxury', 'Crown & Scepter'],
+  ['Crown Princess', 'Princess', 'Royal Ball', 'rosegold', 'hand', 'Tiara & Ballgown', 'FEATURED'],
+  ['Queen For A Day', 'Luxury', 'Majesty', 'gold-lux', 'luxury', 'Queens & Pearls'],
+  ['Minimal Line Art', 'Minimalist', 'Simple Lines', 'monochrome', 'minimal', 'Line Drawings'],
+  ['Monochrome Chic', 'Monochrome', 'Paris Black', 'monochrome', 'minimal', 'Bold Typography'],
+  ['Black & White Party', 'Monochrome', 'Timeless', 'white-clean', 'minimal', 'Checker Pattern'],
+  ['Terracotta Trend', 'Bohemian', 'Clay Love', 'boho-terracotta', 'hand', 'Clay Pots'],
+  ['Sage & Stone', 'Minimalist', 'Natural Calm', 'sage', 'minimal', 'Sage Branches'],
+  ['Nordic Party', 'Minimalist', 'Scandi Clean', 'white-clean', 'minimal', 'Nordic Shapes'],
+  ['Modern Geometric', 'Modern', 'Shape Play', 'geometric', 'minimal', 'Geometric Blocks'],
+  ['Art Deco Glam', 'Vintage', 'Roaring 20s', 'artdeco', 'luxury', 'Deco Ornaments'],
+  ['Neon Nights', 'Neon', 'City Lights', 'neon-cyan', 'neon', 'Neon City'],
+  ['Cyber Party', 'Gaming', 'Cyberwave', 'pixel', 'neon', 'Cyber Grid'],
+  ['Pixel Party', 'Gaming', '8-bit Fun', 'pixel', 'retro', 'Pixel Art'],
+  ['Arcade Fever', 'Gaming', 'Coin Up', 'gaming-neon', 'retro', 'Arcade Machines'],
+  ['Rhythm & Beats', 'K-Pop', 'Dance Music', 'kpop-pink', 'neon', 'Music Notes'],
+  ['Dance Party', 'Teen', 'Move It', 'neon-cyan', 'neon', 'Dance Silhouettes', 'TRENDING'],
+  ['Glow Party', 'Neon', 'Blacklight Fun', 'neon-cyan', 'neon', 'Glow Sticks'],
+  ['Confetti Pop', 'Colorful', 'Party Burst', 'rainbow', 'playful', 'Confetti Drops'],
+  ['Balloon Bouquet', 'Balloon', 'String of Joy', 'candy-pastel', 'cute', 'Balloon Bunch'],
+  ['Silver Shimmer', 'Blue & Silver', 'Silver Lining', 'bluesilver', 'elegant', 'Silver Glitter'],
+  ['Gold Luxe Birthday', 'Black & Gold', 'Gold Rush', 'gold-lux', 'luxury', 'Gold Dust'],
+  ['VIP Midnight Celebration', 'Premium', 'Exclusive Gala', 'emerald-green', 'luxury', 'Emerald & Gold', 'POPULAR'],
+];
+
+const SUNATAN_SEEDS: Seed[] = [
+  ['Little Prince', 'Cute Boy', 'Royal Little One', 'royalblue', 'elegant', 'Crown & Star', 'POPULAR'],
+  ['Green Islamic Garden', 'Islamic Modern', 'Paradise Garden', 'islamic-green', 'elegant', 'Garden Ornaments'],
+  ['Navy Gold Sunnah', 'Navy Gold', 'Regal Sunnah', 'navy-royal', 'luxury', 'Geometric Navy'],
+  ['Elegant Mosque', 'Mosque Illustration', 'Sacred Dome', 'ivory-gold', 'elegant', 'Mosque Silhouette', 'FEATURED'],
+  ['Golden Arabesque', 'Arabesque', 'Golden Filigree', 'gold-lux', 'luxury', 'Arabesque Pattern'],
+  ['Islamic Geometry', 'Geometric Islamic', 'Divine Patterns', 'teal-gold', 'luxury', 'Geometric Star', 'TRENDING'],
+  ['Little Muslim Boy', 'Islamic Kids', 'Cute Akhwat', 'islamic-green', 'cute', 'Peci & Sarung'],
+  ['Emerald Celebration', 'Emerald Gold', 'Jade Festive', 'emerald-gold', 'luxury', 'Emerald Dome'],
+  ['Blue Mosque', 'Mosque Illustration', 'Istanbul Blue', 'royalblue', 'elegant', 'Blue Dome'],
+  ['Royal Islamic', 'Luxury Islamic', 'Sultan Palace', 'maroon-gold', 'luxury', 'Crown & Crescent'],
+  ['Sage Islamic', 'Earth Tone', 'Calm Greens', 'sage-gold', 'elegant', 'Sage Ornament'],
+  ['Cream & Gold', 'Cream', 'Soft Ivory', 'cream-gold', 'elegant', 'Cream Filigree'],
+  ['Modern Khitan', 'Modern Indonesian', 'Urban Muslim', 'charcoal-gold', 'minimal', 'Modern Lines'],
+  ['Islamic Minimal', 'Minimalist Islamic', 'Clean Faith', 'white-gold', 'minimal', 'Minimal Crescent', 'NEW'],
+  ['Little Sultan', 'Cute Boy', 'Young Royalty', 'maroon-gold', 'cute', 'Sultan Crown'],
+  ['Arabian Night', 'Luxury Islamic', 'Night Bazaar', 'midnight', 'luxury', 'Arabian Lamps'],
+  ['Elegant Bismillah', 'Islamic Modern', 'Opening Blessing', 'white-gold', 'hand', 'Bismillah Calligraphy'],
+  ['Islamic Floral', 'Islamic Pattern', 'Blossom Faith', 'dusty-pink', 'hand', 'Floral Islamic'],
+  ['Geometric Gold', 'Geometric Islamic', 'Octagon Gold', 'black-gold', 'luxury', '8-Point Star'],
+  ['White Gold Khitan', 'White Gold', 'Pure Celebration', 'white-gold', 'elegant', 'Gold Frame', 'POPULAR'],
+  ['Turquoise Islamic', 'Turquoise', 'Fresh Faith', 'turquoise', 'elegant', 'Turquoise Pattern'],
+  ['Royal Blue Islamic', 'Royal Blue', 'Blue Majesty', 'royalblue', 'elegant', 'Blue Filigree'],
+  ['Brown Elegant', 'Brown', 'Earthy Elegance', 'brown-gold', 'elegant', 'Wood Pattern'],
+  ['Maroon Islamic', 'Maroon', 'Deep Faith', 'maroon-gold', 'luxury', 'Maroon Ornament'],
+  ['Dusty Blue Sunnah', 'Dusty Blue', 'Muted Calm', 'dustyblue', 'elegant', 'Dusty Blue Pattern'],
+  ['Green Paradise', 'Green Islamic', 'Jannah Theme', 'islamic-green', 'elegant', 'Green Arch'],
+  ['Olive Garden', 'Earth Tone', 'Olive Branch', 'sage', 'elegant', 'Olive Leaves'],
+  ['Sand Dune Islamic', 'Earth Tone', 'Desert Calm', 'beige', 'elegant', 'Sand Patterns'],
+  ['Desert Gold', 'Earth Tone', 'Golden Sand', 'brown-gold', 'luxury', 'Dune Lines'],
+  ['Pearl White Islamic', 'White Gold', 'Pearl Faith', 'white-gold', 'elegant', 'Pearl Accents'],
+  ['Ivory Crescent', 'Cream', 'Ivory Light', 'cream-gold', 'hand', 'Crescent Moon'],
+  ['Midnight Mosque', 'Navy Gold', 'Night Dome', 'midnight', 'luxury', 'Night Mosque'],
+  ['Sultan Crown', 'Luxury Islamic', 'Regal Crown', 'charcoal-gold', 'luxury', 'Crown Motif'],
+  ['Al-Fatihah', 'Islamic Modern', 'Opening Blessing', 'emerald-gold', 'hand', 'Quran Motif'],
+  ['Bismillah Bloom', 'Islamic Floral', 'Flower of Faith', 'dusty-pink', 'hand', 'Bloom Calligraphy'],
+  ['Arabic Calligraphy', 'Arabesque', 'Ink of Faith', 'charcoal-gold', 'hand', 'Calligraphy Art'],
+  ['Kufi Pattern', 'Geometric Islamic', 'Ancient Lines', 'teal-gold', 'luxury', 'Kufi Script'],
+  ['Mosque Silhouette', 'Mosque Illustration', 'Skyline Faith', 'navy-royal', 'elegant', 'Mosque Skyline'],
+  ['Crescent Moon', 'Islamic Kids', 'Moonlight Boy', 'skyblue', 'cute', 'Moon & Star'],
+  ['Star & Crescent', 'Traditional Indonesian', 'Heritage Faith', 'turquoise', 'elegant', 'Star Crescent'],
+  ['Green Zamzam', 'Green Islamic', 'Holy Water', 'islamic-green', 'elegant', 'Zamzam Motif'],
+  ['Emerald Dome', 'Emerald Gold', 'Jewel Dome', 'emerald-gold', 'luxury', 'Emerald Arch'],
+  ['Royal Turban', 'Traditional Indonesian', 'Traditional Royal', 'maroon-gold', 'elegant', 'Turban & Crown'],
+  ['Prayer Mat Pattern', 'Islamic Pattern', 'Sajadah Motif', 'emerald-gold', 'elegant', 'Prayer Mat'],
+  ['Kasidah Nights', 'Traditional Indonesian', 'Nasyid Night', 'midnight', 'elegant', 'Music & Moon'],
+  ['Modern Santri', 'Modern Indonesian', 'Young Santri', 'sage-gold', 'minimal', 'Santri Silhouette', 'NEW'],
+  ['Little Hafiz', 'Islamic Kids', 'Quran Reader', 'skyblue', 'cute', 'Quran Book'],
+  ['Cute Little Akhwat', 'Islamic Kids', 'Sweet Faith', 'dusty-pink', 'cute', 'Hijab & Smile'],
+  ['Baby Boy Muslim', 'Islamic Kids', 'Little Ustadz', 'islamic-green', 'cute', 'Peci & Teal'],
+  ['Peci & Sarung', 'Traditional Indonesian', 'Classic Javanese', 'brown-gold', 'elegant', 'Peci & Sarung'],
+  ['Gamelan Gold', 'Traditional Indonesian', 'Javanese Tune', 'gold-lux', 'luxury', 'Gamelan Motif'],
+  ['Batik Khitan', 'Traditional Indonesian', 'Batik Heritage', 'maroon-gold', 'elegant', 'Batik Pattern'],
+  ['Keraton Jawa', 'Traditional Indonesian', 'Javanese Palace', 'charcoal-gold', 'luxury', 'Keraton Motif'],
+  ['Sundanese Elegant', 'Modern Indonesian', 'Priangan Style', 'dustyblue', 'elegant', 'Sundanese Motif'],
+  ['Bali Islamic', 'Modern Indonesian', 'Island Faith', 'bali-green', 'elegant', 'Balinese Islamic'],
+  ['Minang Gold', 'Traditional Indonesian', 'Minangkabau', 'gold-lux', 'luxury', 'Rumah Gadang'],
+  ['Aceh Heritage', 'Traditional Indonesian', 'Aceh Faith', 'emerald-gold', 'elegant', 'Aceh Motif'],
+  ['Golden Lantern', 'Luxury Islamic', 'Lamp of Faith', 'gold-lux', 'luxury', 'Lanterns', 'TRENDING'],
+  ['Ramadan Glow', 'Islamic Modern', 'Blessed Month', 'midnight', 'elegant', 'Ramadan Lantern'],
+  ['Maulid Celebration', 'Islamic Modern', 'Prophet Praise', 'emerald-gold', 'elegant', 'Maulid Motif'],
+  ['Mosque Sunset', 'Mosque Illustration', 'Golden Dome', 'brown-gold', 'elegant', 'Sunset Mosque'],
+  ['Dome & Minaret', 'Mosque Illustration', 'Sacred Skyline', 'navy-royal', 'elegant', 'Minaret Silhouette'],
+  ['Arabic Ink', 'Arabesque', 'Ink Lines', 'charcoal-gold', 'hand', 'Ink Calligraphy'],
+  ['Geometric Stars', 'Geometric Islamic', 'Star Geometry', 'teal-gold', 'luxury', 'Star Grid'],
+  ['Octagon Pattern', 'Geometric Islamic', '8 Sides', 'royalblue', 'luxury', 'Octagon Motif'],
+  ['Eight-Pointed Star', 'Geometric Islamic', 'Divine Star', 'emerald-gold', 'luxury', 'Star Burst'],
+  ['Golden Frame', 'White Gold', 'Frame of Light', 'white-gold', 'elegant', 'Gold Border'],
+  ['Platinum Islamic', 'White Gold', 'Silver Faith', 'white-gold', 'minimal', 'Platinum Lines'],
+  ['Silver Crescent', 'Dusty Blue', 'Silver Moon', 'dustyblue', 'elegant', 'Silver Moon'],
+  ['Steel Blue', 'Dusty Blue', 'Steel Calm', 'dustyblue', 'minimal', 'Steel Lines'],
+  ['Misty Blue', 'Dusty Blue', 'Mist & Faith', 'skyblue', 'elegant', 'Mist Clouds'],
+  ['Sage Leaf', 'Sage Green', 'Leaf of Faith', 'sage', 'elegant', 'Sage Leaves'],
+  ['Mint Islamic', 'Sage Green', 'Fresh Calm', 'pastel-mint', 'elegant', 'Mint Motif'],
+  ['Olive & Gold', 'Earth Tone', 'Olive Gold', 'sage-gold', 'elegant', 'Olive Filigree'],
+  ['Sandstone', 'Brown', 'Stone Faith', 'beige', 'elegant', 'Sandstone Pattern'],
+  ['Walnut Brown', 'Brown', 'Deep Wood', 'brown-gold', 'elegant', 'Walnut Lines'],
+  ['Espresso Islamic', 'Brown', 'Dark Roast', 'brown-gold', 'luxury', 'Espresso Motif'],
+  ['Deep Maroon', 'Maroon', 'Rich Faith', 'maroon-gold', 'luxury', 'Maroon Arch'],
+  ['Wine Islamic', 'Maroon', 'Vintage Faith', 'burgundy-gold', 'luxury', 'Wine Pattern'],
+  ['Plum Royal', 'Maroon', 'Plum Majesty', 'purple-royal', 'luxury', 'Plum Ornament'],
+  ['Teal Islamic', 'Turquoise', 'Teal Calm', 'teal-gold', 'elegant', 'Teal Pattern'],
+  ['Cyan Dome', 'Turquoise', 'Aqua Dome', 'turquoise', 'elegant', 'Cyan Arch'],
+  ['Aqua Islamic', 'Turquoise', 'Water Faith', 'turquoise', 'elegant', 'Aqua Motif'],
+  ['Sapphire Royal', 'Royal Blue', 'Sapphire', 'royalblue', 'luxury', 'Sapphire Motif'],
+  ['Indigo Mosque', 'Royal Blue', 'Indigo Dome', 'midnight', 'elegant', 'Indigo Arch'],
+  ['Ultramarine', 'Royal Blue', 'Deep Blue', 'navy-royal', 'elegant', 'Ultramarine Lines'],
+  ['Elegant Taupe', 'Earth Tone', 'Taupe Calm', 'beige', 'minimal', 'Taupe Lines'],
+  ['Beige Islamic', 'Cream', 'Soft Beige', 'beige', 'elegant', 'Beige Pattern'],
+  ['Vanilla Cream', 'Cream', 'Vanilla Soft', 'cream-gold', 'elegant', 'Vanilla Motif'],
+  ['Off-White Islamic', 'Cream', 'Clean Ivory', 'white-gold', 'minimal', 'Off-White Lines'],
+  ['Champagne Crescent', 'White Gold', 'Sparkling Moon', 'champagne', 'luxury', 'Champagne Crescent'],
+  ['Gold Filigree', 'Arabesque', 'Fine Gold', 'gold-lux', 'luxury', 'Filigree Art'],
+  ['Damask Gold', 'Luxury Islamic', 'Damask Royal', 'black-gold', 'luxury', 'Damask Pattern'],
+  ['Brocade Islamic', 'Luxury Islamic', 'Woven Gold', 'maroon-gold', 'luxury', 'Brocade Motif'],
+  ['Royal Velvet', 'Luxury Islamic', 'Velvet Court', 'burgundy-gold', 'luxury', 'Velvet Lines'],
+  ['Emerald & Ivory', 'Emerald Gold', 'Green Ivory', 'emerald-gold', 'elegant', 'Emerald Ivory'],
+  ['Jade Islamic', 'Emerald Gold', 'Jade Stone', 'emerald', 'luxury', 'Jade Motif'],
+  ['Green Mercy', 'Green Islamic', 'Mercy Green', 'islamic-green', 'elegant', 'Mercy Leaves'],
+  ['Paradise Garden', 'Green Islamic', 'Jannah View', 'emerald-gold', 'elegant', 'Paradise Garden', 'FEATURED'],
+  ['Khitan Mubarak', 'Islamic Modern', 'Blessed Day', 'emerald-gold', 'elegant', 'Mubarak Calligraphy', 'POPULAR'],
+];
+
+const WEDDING_SEEDS: Seed[] = [
+  ['Eternal Love', 'Classic', 'Timeless Vow', 'ivory-gold', 'hand', 'Rings & Vows', 'POPULAR'],
+  ['Garden Romance', 'Garden', 'Garden Serenade', 'sage', 'hand', 'Garden Florals'],
+  ['Champagne Elegance', 'Luxury', 'Golden Fizz', 'champagne', 'luxury', 'Champagne Toast'],
+  ['Black Gold Wedding', 'Black Gold', 'Midnight Luxe', 'black-gold', 'luxury', 'Gold Noir', 'POPULAR'],
+  ['Sage Botanical', 'Botanical', 'Green Serenity', 'sage', 'elegant', 'Botanical Leaves'],
+  ['Dusty Rose Romance', 'Dusty Rose', 'Rose Whisper', 'dustyrose', 'hand', 'Dusty Roses'],
+  ['Royal White', 'Royal', 'White Majesty', 'white-gold', 'elegant', 'Crown & White'],
+  ['Modern Minimal', 'Minimalist', 'Clean Vows', 'modern', 'minimal', 'Minimal Lines'],
+  ['Golden Bloom', 'Floral', 'Bloom Gold', 'gold-lux', 'hand', 'Gold Florals'],
+  ['Classic Ivory', 'Classic', 'Ivory Tradition', 'ivory-gold', 'elegant', 'Ivory Lace'],
+  ['Rustic Love', 'Rustic', 'Country Heart', 'terracotta', 'hand', 'Rustic Wood'],
+  ['Emerald Luxury', 'Emerald', 'Green Royal', 'emerald', 'luxury', 'Emerald Jewels', 'FEATURED'],
+  ['Navy Romance', 'Navy', 'Deep Love', 'navy', 'elegant', 'Navy Starlight'],
+  ['Floral Symphony', 'Floral', 'Flower Harmony', 'blush', 'hand', 'Symphony Florals'],
+  ['Elegant Islamic', 'Islamic Wedding', 'Nikah Elegance', 'emerald-gold', 'elegant', 'Islamic Motif', 'POPULAR'],
+  ['Romantic Garden', 'Garden', 'Love in Bloom', 'garden-pink', 'hand', 'Romantic Garden'],
+  ['Luxury Champagne', 'Luxury', 'Grand Toast', 'champagne', 'luxury', 'Luxury Champagne'],
+  ['Timeless Wedding', 'Classic', 'Forever Classic', 'ivory-gold', 'elegant', 'Timeless Motif'],
+  ['Royal Garden', 'Royal', 'Palace Garden', 'gold-lux', 'luxury', 'Royal Florals'],
+  ['Modern Botanical', 'Botanical', 'Fresh Botanics', 'sage', 'minimal', 'Modern Botanics'],
+  ['Blush & Bloom', 'Floral', 'Blush Petals', 'blush', 'hand', 'Blush Florals', 'NEW'],
+  ['Rose Garden', 'Garden', 'Rose Alley', 'dustyrose', 'hand', 'Rose Florals'],
+  ['Peony Dreams', 'Floral', 'Peony Cloud', 'blush', 'hand', 'Peony Bloom'],
+  ['Cherry Blossom', 'Floral', 'Sakura Spring', 'pastel-pink', 'hand', 'Sakura Petals'],
+  ['Wildflower Wedding', 'Bohemian', 'Wild Meadow', 'boho-terracotta', 'hand', 'Wildflowers'],
+  ['Bohemian Love', 'Bohemian', 'Free Spirit Vows', 'boho-terracotta', 'hand', 'Boho Florals'],
+  ['Terracotta Romance', 'Terracotta', 'Clay Love', 'terracotta', 'hand', 'Terracotta Clay'],
+  ['Burgundy Elegance', 'Burgundy', 'Deep Crimson', 'burgundy', 'elegant', 'Burgundy Velvet'],
+  ['Wine & Gold', 'Burgundy', 'Vintage Wine', 'burgundy-gold', 'luxury', 'Wine Glass'],
+  ['Crimson Rose', 'Burgundy', 'Red Roses', 'crimson', 'hand', 'Crimson Roses'],
+  ['Dusty Blue Classic', 'Dusty Blue', 'Misty Blue', 'dustyblue', 'elegant', 'Dusty Blue Florals'],
+  ['Seafoam Wedding', 'Dusty Blue', 'Ocean Calm', 'ocean-teal', 'elegant', 'Seafoam Waves'],
+  ['Twilight Blue', 'Dusty Blue', 'Twilight Sky', 'navy', 'elegant', 'Twilight Glow'],
+  ['Moonlight Wedding', 'Navy', 'Moon Glow', 'navy-royal', 'elegant', 'Moonlit Night'],
+  ['Starry Night Wedding', 'Navy', 'Star Vows', 'midnight', 'elegant', 'Starry Sky'],
+  ['Midnight Romance', 'Navy', 'Night Love', 'navy', 'elegant', 'Midnight Stars'],
+  ['Emerald Isle', 'Emerald', 'Island Green', 'emerald', 'elegant', 'Emerald Isle'],
+  ['Jungle Green', 'Botanical', 'Tropical Vows', 'jungle-green', 'elegant', 'Jungle Leaves'],
+  ['Forest Wedding', 'Botanical', 'Woodland Love', 'emerald', 'elegant', 'Forest Ferns'],
+  ['Olive Branch', 'Botanical', 'Peace Olive', 'sage', 'elegant', 'Olive Branch'],
+  ['Ivory Tower', 'Classic', 'Grand Ivory', 'ivory-gold', 'luxury', 'Ivory Columns'],
+  ['Heritage Wedding', 'Traditional Indonesian', 'Adat Heritage', 'maroon-gold', 'luxury', 'Heritage Motif'],
+  ['Javanese Royal', 'Javanese', 'Keraton Style', 'charcoal-gold', 'luxury', 'Javanese Motif', 'FEATURED'],
+  ['Adat Jawa', 'Javanese', 'Java Tradition', 'brown-gold', 'elegant', 'Adat Batik'],
+  ['Solo Elegance', 'Javanese', 'Solo Batik', 'maroon-gold', 'elegant', 'Solo Batik'],
+  ['Yogyakarta Heritage', 'Javanese', 'Jogja Royal', 'gold-lux', 'luxury', 'Jogja Motif'],
+  ['Sundanese Chic', 'Sundanese', 'Priangan Love', 'dustyblue', 'elegant', 'Sundanese Motif'],
+  ['Priangan Wedding', 'Sundanese', 'Sunda Elegance', 'sage', 'elegant', 'Priangan Pattern'],
+  ['Balinese Bliss', 'Balinese', 'Island Blessing', 'bali-green', 'elegant', 'Balinese Motif', 'TRENDING'],
+  ['Bali Garden', 'Balinese', 'Tropical Garden', 'bali-green', 'hand', 'Bali Florals'],
+  ['Canang Sari', 'Balinese', 'Sacred Offering', 'earth', 'elegant', 'Canang Motif'],
+  ['Modern Oriental', 'Modern Oriental', 'Asian Modern', 'oriental-red', 'elegant', 'Oriental Lines'],
+  ['Oriental Silk', 'Modern Oriental', 'Silk Red', 'crimson', 'luxury', 'Silk Pattern'],
+  ['Asian Fusion', 'Modern Oriental', 'East Meets West', 'oriental-red', 'elegant', 'Fusion Motif'],
+  ['Vintage Love', 'Vintage', 'Old Romance', 'vintage', 'hand', 'Vintage Lace'],
+  ['Retro Romance', 'Vintage', 'Classic 70s', 'retro-90s', 'retro', 'Retro Florals'],
+  ['70s Bride', 'Vintage', 'Disco Love', 'retro-90s', 'retro', 'Retro Heart'],
+  ['Editorial Elegance', 'Editorial', 'Magazine Vows', 'monochrome', 'minimal', 'Editorial Typography'],
+  ['Editorial Chic', 'Editorial', 'Fashion Love', 'modern', 'minimal', 'Editorial Grid'],
+  ['Luxury Black', 'Luxury Black', 'Noir Luxe', 'black-gold', 'luxury', 'Black Gold'],
+  ['Noir Wedding', 'Luxury Black', 'Black Romance', 'monochrome', 'luxury', 'Noir Lines'],
+  ['Obsidian Gold', 'Luxury Black', 'Black Stone', 'black-gold', 'luxury', 'Obsidian Gold'],
+  ['Soft Pastel', 'Soft Pastel', 'Gentle Love', 'pastel-purple', 'hand', 'Pastel Florals'],
+  ['Peach Blush', 'Soft Pastel', 'Peach Dream', 'peach', 'hand', 'Peach Petals'],
+  ['Cotton Candy', 'Soft Pastel', 'Sweet Cloud', 'cotton-candy', 'hand', 'Cotton Candy'],
+  ['Lavender Love', 'Soft Pastel', 'Lavender Haze', 'lavender', 'hand', 'Lavender Florals'],
+  ['Sage & Linen', 'Sage Green', 'Linen Calm', 'sage', 'minimal', 'Linen Texture'],
+  ['Eucalyptus', 'Botanical', 'Green Eucalyptus', 'sage', 'hand', 'Eucalyptus Leaves'],
+  ['Fern & Olive', 'Botanical', 'Fern Love', 'emerald', 'elegant', 'Fern Motif'],
+  ['White Garden', 'Garden', 'Pure White', 'white-gold', 'elegant', 'White Florals'],
+  ['Al Fresco', 'Garden', 'Open Air Vows', 'bali-green', 'elegant', 'Outdoor Garden'],
+  ['Courtyard Wedding', 'Garden', 'Inner Courtyard', 'ivory-gold', 'elegant', 'Courtyard Motif'],
+  ['Vineyard Vows', 'Rustic', 'Grape Valley', 'burgundy', 'elegant', 'Vineyard Grapes'],
+  ['Barn Wedding', 'Rustic', 'Country Barn', 'terracotta', 'hand', 'Barn Wood'],
+  ['Country Love', 'Rustic', 'Rural Heart', 'earth', 'hand', 'Country Florals'],
+  ['Wild Rose', 'Rustic', 'Wild Roses', 'dustyrose', 'hand', 'Wild Rose'],
+  ['Golden Rings', 'Classic', 'Ring Ceremony', 'gold-lux', 'luxury', 'Golden Rings'],
+  ['Forever Yours', 'Romantic', 'Endless Love', 'ivory-gold', 'hand', 'Heart & Vows'],
+  ['Soulmates', 'Romantic', 'Twin Hearts', 'blush', 'hand', 'Soulmate Hearts'],
+  ['Love Story', 'Romantic', 'Our Chapter', 'navy', 'elegant', 'Story Pages'],
+  ['Enchanted Evening', 'Romantic', 'Magic Night', 'midnight', 'elegant', 'Enchanted Glow'],
+  ['First Dance', 'Romantic', 'Dance of Love', 'dustyrose', 'hand', 'Dance Silhouette'],
+  ['Wedding Waltz', 'Classic', 'Waltz of Vows', 'ivory-gold', 'hand', 'Waltz Motif'],
+  ['Bridal Waltz', 'Classic', 'Bride & Dance', 'champagne', 'elegant', 'Bridal Motif'],
+  ['Silk & Lace', 'Classic', 'Lace Romance', 'white-gold', 'elegant', 'Silk Lace'],
+  ['Ivory Lace', 'Classic', 'Lace Ivory', 'ivory-gold', 'elegant', 'Ivory Lace'],
+  ['Marquee Wedding', 'Modern', 'Tent Celebration', 'modern', 'minimal', 'Marquee Lines'],
+  ['Rooftop Vows', 'Modern', 'City Skyline', 'navy', 'minimal', 'Rooftop View'],
+  ['Urban Love', 'Modern', 'City Heart', 'adult-charcoal', 'minimal', 'Urban Grid'],
+  ['Glasshouse', 'Modern', 'Glass Pavilion', 'sage', 'minimal', 'Glass Lines'],
+  ['Minimal Line', 'Minimalist', 'Line of Love', 'monochrome', 'minimal', 'Line Art'],
+  ['Quiet Luxury', 'Minimalist', 'Silent Elegance', 'white-gold', 'minimal', 'Quiet Lines'],
+  ['Warm Neutral', 'Minimalist', 'Warm Calm', 'beige', 'minimal', 'Neutral Tones'],
+  ['Stone & Sand', 'Earth Tone', 'Earthy Love', 'beige', 'elegant', 'Stone Texture'],
+  ['Clay & Cream', 'Earth Tone', 'Clay Soft', 'terracotta', 'elegant', 'Clay Motif'],
+  ['Taupe Romance', 'Earth Tone', 'Taupe Love', 'dustyblue', 'elegant', 'Taupe Florals'],
+  ['Islamic Nikah', 'Islamic Wedding', 'Nikah Blessing', 'emerald-gold', 'elegant', 'Nikah Motif', 'NEW'],
+  ['Mahr & Blessing', 'Islamic Wedding', 'Sacred Mahr', 'gold-lux', 'luxury', 'Mahr Motif'],
+  ['Halal Love', 'Islamic Wedding', 'Blessed Union', 'sage-gold', 'elegant', 'Halal Love Motif'],
+  ['Forever Wedding', 'Classic', 'Forever After', 'ivory-gold', 'hand', 'Forever Motif', 'POPULAR'],
+];
+
+const AQIQAH_SEEDS: Seed[] = [
+  ['Little Moon', 'Celestial', 'Moonlight Baby', 'navy-royal', 'cute', 'Moon & Stars', 'POPULAR'],
+  ['Baby Boy Clouds', 'Cloud & Sky', 'Sky Dreams', 'skyblue', 'cute', 'Clouds & Sun'],
+  ['Little Princess', 'Little Princess', 'Royal Baby Girl', 'dusty-pink', 'hand', 'Crown & Bow', 'POPULAR'],
+  ['Teddy Bear Aqiqah', 'Teddy Bear', 'Cuddly Bear', 'brown-cream', 'cute', 'Teddy Bears'],
+  ['Islamic Baby', 'Modern Islamic', 'Blessed Baby', 'islamic-green', 'elegant', 'Islamic Motif', 'TRENDING'],
+  ['Sage Baby', 'Sage', 'Calm Sage', 'sage', 'elegant', 'Sage Leaves'],
+  ['Dusty Pink', 'Dusty Pink', 'Soft Pink', 'dusty-pink', 'hand', 'Dusty Pink Florals'],
+  ['Little Prince', 'Little Prince', 'Baby Boy Royal', 'royalblue', 'elegant', 'Crown & Star', 'FEATURED'],
+  ['Golden Moon', 'Celestial', 'Gold Crescent', 'gold-lux', 'luxury', 'Golden Crescent'],
+  ['Baby Safari', 'Safari Baby', 'Wild Baby', 'safari-earth', 'cute', 'Safari Animals'],
+  ['Bunny Garden', 'Bunny', 'Bunny Hop', 'pastel-peach', 'cute', 'Bunnies & Carrots'],
+  ['Floral Baby', 'Floral Baby', 'Blossom Baby', 'blush', 'hand', 'Baby Florals'],
+  ['Celestial Baby', 'Celestial', 'Heavenly Baby', 'midnight', 'elegant', 'Celestial Stars'],
+  ['Cream & Gold', 'Cream', 'Soft Gold', 'cream-gold', 'elegant', 'Cream Filigree'],
+  ['Minimal Baby', 'Minimalist', 'Clean Baby', 'monochrome', 'minimal', 'Minimal Lines'],
+  ['Rainbow Baby', 'Rainbow', 'Color Blessing', 'rainbow', 'playful', 'Rainbow Drops', 'NEW'],
+  ['Little Star', 'Celestial', 'Star Baby', 'yellow-sun', 'cute', 'Stars & Sparkle'],
+  ['Modern Islamic Baby', 'Modern Islamic', 'Fresh Faith', 'white-gold', 'minimal', 'Modern Crescent'],
+  ['Sweet Baby', 'Cute Cartoon', 'Sweet Smile', 'rosegold', 'cute', 'Sweet Hearts'],
+  ['Moonlight Aqiqah', 'Celestial', 'Moon Glow', 'navy-royal', 'elegant', 'Moonlight'],
+  ['Baby Boy Blue', 'Baby Boy', 'Blue Blessing', 'skyblue', 'cute', 'Blue Stars'],
+  ['Baby Girl Pink', 'Baby Girl', 'Pink Blessing', 'dusty-pink', 'cute', 'Pink Hearts'],
+  ['Little Angel', 'Little Princess', 'Angel Baby', 'white-gold', 'hand', 'Angel Wings'],
+  ['Cherub Baby', 'Cute Cartoon', 'Cherub Cheeks', 'peach', 'cute', 'Cherubs'],
+  ['Sleepy Baby', 'Cloud & Sky', 'Sweet Slumber', 'pastel-lavender', 'cute', 'Sleeping Clouds'],
+  ['Baby Stars', 'Celestial', 'Starry Baby', 'navy-royal', 'cute', 'Baby Stars'],
+  ['New Moon', 'Celestial', 'Fresh Moon', 'midnight', 'elegant', 'New Crescent'],
+  ['Lunar Blessing', 'Modern Islamic', 'Lunar Grace', 'cream-gold', 'elegant', 'Lunar Motif'],
+  ['Islamic Crescent', 'Modern Islamic', 'Crescent Faith', 'islamic-green', 'elegant', 'Crescent Motif'],
+  ['Bismillah Baby', 'Modern Islamic', 'Bismillah Blessing', 'emerald-gold', 'hand', 'Bismillah Art'],
+  ['Alhamdulillah', 'Modern Islamic', 'Praise Blessing', 'emerald-gold', 'hand', 'Alhamdulillah'],
+  ['Barakallahu Baby', 'Modern Islamic', 'Blessed Gift', 'sage-gold', 'hand', 'Barakallahu Motif'],
+  ['Aqiqah Mubarak', 'Modern Islamic', 'Mubarak Day', 'maroon-gold', 'elegant', 'Mubarak Calligraphy', 'POPULAR'],
+  ['Baby Camel', 'Baby Animal', 'Desert Calf', 'brown-cream', 'cute', 'Baby Camel'],
+  ['Lamb Baby', 'Baby Animal', 'Little Lamb', 'beige', 'cute', 'Baby Lambs'],
+  ['Bunny Hop', 'Bunny', 'Hop Hop', 'pastel-mint', 'cute', 'Bunnies'],
+  ['Fluffy Cloud Baby', 'Cloud & Sky', 'Fluffy Sky', 'skyblue', 'cute', 'Fluffy Clouds'],
+  ['Cotton Cloud', 'Cloud & Sky', 'Cotton Sky', 'white-gold', 'cute', 'Cotton Clouds'],
+  ['Sky & Stars', 'Cloud & Sky', 'Sky Sparkle', 'skyblue', 'cute', 'Sky Stars'],
+  ['Sleepy Sheep', 'Baby Animal', 'Count Sheep', 'pastel-purple', 'cute', 'Sheep'],
+  ['Duckling Baby', 'Baby Animal', 'Quack Quack', 'yellow-sun', 'cute', 'Ducklings'],
+  ['Penguin Baby', 'Baby Animal', 'Waddle Waddle', 'monochrome', 'cute', 'Penguins'],
+  ['Elephant Baby', 'Safari Baby', 'Gentle Giant', 'dustyblue', 'cute', 'Baby Elephant'],
+  ['Giraffe Baby', 'Safari Baby', 'Tall Friend', 'yellow-sun', 'cute', 'Baby Giraffe'],
+  ['Lion Cub', 'Safari Baby', 'Little Roar', 'brown-cream', 'cute', 'Lion Cub'],
+  ['Monkey Baby', 'Safari Baby', 'Swing Time', 'brown-gold', 'cute', 'Baby Monkey'],
+  ['Zebra Baby', 'Safari Baby', 'Stripe Fun', 'monochrome', 'cute', 'Baby Zebra'],
+  ['Safari Sunset', 'Safari Baby', 'Wild Sunset', 'boho-terracotta', 'cute', 'Safari Sunset'],
+  ['Jungle Baby', 'Baby Animal', 'Rainforest', 'jungle-green', 'cute', 'Jungle Leaves'],
+  ['Koala Baby', 'Baby Animal', 'Koala Cuddle', 'stone', 'cute', 'Koalas'],
+  ['Panda Baby', 'Baby Animal', 'Panda Cuddle', 'monochrome', 'cute', 'Pandas'],
+  ['Fox Baby', 'Baby Animal', 'Foxy Fun', 'orange-warm', 'cute', 'Baby Fox'],
+  ['Hedgehog Baby', 'Baby Animal', 'Spiky Friend', 'brown-cream', 'cute', 'Hedgehogs'],
+  ['Owl Baby', 'Baby Animal', 'Night Owl', 'purple-royal', 'cute', 'Baby Owls'],
+  ['Bunny & Carrot', 'Bunny', 'Carrot Snack', 'pastel-peach', 'cute', 'Bunny Carrot'],
+  ['Rabbit Hole', 'Bunny', 'Wonderland', 'pastel-mint', 'cute', 'Rabbits'],
+  ['Honey Bee Baby', 'Cute Cartoon', 'Buzz Buzz', 'yellow-sun', 'playful', 'Bees & Honey'],
+  ['Butterfly Baby', 'Cute Cartoon', 'Flutter Flutter', 'dusty-pink', 'cute', 'Butterflies'],
+  ['Ladybug Baby', 'Cute Cartoon', 'Little Dots', 'red-navy', 'cute', 'Ladybugs'],
+  ['Frog Baby', 'Cute Cartoon', 'Ribbit Ribbit', 'pastel-mint', 'cute', 'Frogs'],
+  ['Turtle Baby', 'Cute Cartoon', 'Slow & Sweet', 'emerald-green', 'cute', 'Turtles'],
+  ['Watercolor Baby', 'Watercolor', 'Soft Paint', 'watercolor', 'hand', 'Watercolor Art', 'TRENDING'],
+  ['Watercolor Moon', 'Watercolor', 'Moon Paint', 'watercolor', 'hand', 'Moon Watercolor'],
+  ['Watercolor Bunnies', 'Watercolor', 'Bunny Paint', 'pastel-peach', 'hand', 'Bunny Art'],
+  ['Watercolor Floral', 'Watercolor', 'Floral Paint', 'blush', 'hand', 'Floral Watercolor'],
+  ['Botanical Baby', 'Botanical', 'Green Baby', 'sage', 'elegant', 'Botanical Leaves'],
+  ['Eucalyptus Baby', 'Botanical', 'Calm Green', 'sage', 'elegant', 'Eucalyptus'],
+  ['Fern Baby', 'Botanical', 'Fern Soft', 'emerald-green', 'elegant', 'Ferns'],
+  ['Blush Botanical', 'Botanical', 'Blush Green', 'blush', 'hand', 'Blush Botanics'],
+  ['Pastel Rainbow', 'Rainbow', 'Soft Rainbow', 'rainbow', 'playful', 'Pastel Rainbow'],
+  ['Rainbow Clouds', 'Rainbow', 'Cloud Rainbow', 'skyblue', 'cute', 'Rainbow Clouds'],
+  ['Rainbow Stars', 'Rainbow', 'Star Rainbow', 'pastel-purple', 'cute', 'Rainbow Stars'],
+  ['Pastel Sky', 'Pastel', 'Sky Pastel', 'pastel-blue', 'cute', 'Pastel Sky'],
+  ['Pastel Moon', 'Pastel', 'Moon Pastel', 'pastel-lavender', 'cute', 'Pastel Moon'],
+  ['Beige Baby', 'Beige', 'Neutral Beige', 'beige', 'elegant', 'Beige Tones'],
+  ['Warm Beige', 'Beige', 'Warm Neutrals', 'beige', 'elegant', 'Warm Lines'],
+  ['Oatmeal Baby', 'Beige', 'Oat Soft', 'cream-gold', 'cute', 'Oatmeal Tones'],
+  ['Sand Baby', 'Beige', 'Sand Soft', 'beige', 'cute', 'Sand Texture'],
+  ['Nude Baby', 'Beige', 'Nude Calm', 'beige', 'minimal', 'Nude Tones'],
+  ['Elegant Baby', 'Elegant Baby', 'Grace Baby', 'ivory-gold', 'elegant', 'Elegant Lines'],
+  ['Royal Baby', 'Luxury Baby', 'Little Royal', 'gold-lux', 'luxury', 'Royal Motif'],
+  ['Gold Luxe Baby', 'Luxury Baby', 'Gold Blessing', 'gold-lux', 'luxury', 'Gold Sparkle', 'FEATURED'],
+  ['Ivory Baby', 'Elegant Baby', 'Ivory Soft', 'ivory-gold', 'elegant', 'Ivory Florals'],
+  ['Champagne Baby', 'Luxury Baby', 'Sparkle Blessing', 'champagne', 'luxury', 'Champagne Bubbles'],
+  ['Neutral Baby', 'Neutral Baby', 'Clean Neutral', 'stone', 'minimal', 'Neutral Shapes'],
+  ['Monochrome Baby', 'Neutral Baby', 'Black White', 'monochrome', 'minimal', 'Monochrome Art'],
+  ['Stone Baby', 'Neutral Baby', 'Stone Soft', 'stone', 'minimal', 'Stone Tones'],
+  ['Grey Baby', 'Neutral Baby', 'Grey Calm', 'grey-neutral', 'minimal', 'Grey Shapes'],
+  ['Creamy Baby', 'Cream', 'Cream Dream', 'cream-gold', 'cute', 'Cream Drops'],
+  ['Vanilla Baby', 'Cream', 'Vanilla Soft', 'vanilla', 'cute', 'Vanilla Tones'],
+  ['Milk Baby', 'Cream', 'Milk Soft', 'white-gold', 'cute', 'Milk Clouds'],
+  ['Almond Baby', 'Beige', 'Almond Soft', 'beige', 'cute', 'Almond Tones'],
+  ['Hazelnut Baby', 'Beige', 'Hazelnut Warm', 'brown-cream', 'cute', 'Hazelnut Tones'],
+  ['Caramel Baby', 'Beige', 'Caramel Sweet', 'brown-gold', 'cute', 'Caramel Drops'],
+  ['Latte Baby', 'Beige', 'Latte Warm', 'brown-cream', 'cute', 'Latte Art'],
+  ['Soft Pink Baby', 'Dusty Pink', 'Pink Whisper', 'dusty-pink', 'cute', 'Soft Pink'],
+  ['Rose Quartz', 'Dusty Pink', 'Quartz Glow', 'rose-quartz', 'elegant', 'Rose Quartz'],
+  ['Muted Pink', 'Dusty Pink', 'Muted Rose', 'dusty-pink', 'elegant', 'Muted Pink Florals'],
+  ['Blush Baby', 'Dusty Pink', 'Blush Soft', 'blush', 'hand', 'Blush Tones'],
+  ['Aqiqah Little One', 'Modern Islamic', 'Little Blessing', 'emerald-gold', 'elegant', 'Mubarak Blessing', 'TRENDING'],
+];
+
+/* ============================================================
+   EVENT DATA POOLS
+   ============================================================ */
+const IMAGE_POOLS: Record<CategoryKey, string[]> = {
+  birthday: [
+    'https://images.unsplash.com/photo-1543332164-6e82f355badc?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1535141192574-5d4897c13136?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=600&q=80',
+  ],
+  sunatan: [
+    'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+  ],
+  wedding: [
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80',
+  ],
+  aqiqah: [
+    'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519682337058-a94d519337bc?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1544415033-29406be6e3eb?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1535141192574-5d4897c13136?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80',
+  ],
+};
+
+const GALLERY_POOLS: Record<CategoryKey, string[]> = {
+  birthday: [
+    'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1558636508-e0db3814bd1d?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&q=80',
+  ],
+  sunatan: [
+    'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+  ],
+  wedding: [
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=600&q=80',
+  ],
+  aqiqah: [
+    'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=600&q=80',
+  ],
+};
+
+const BIRTHDAY_NAMES = [
+  { name: 'Leo', age: 5, quote: "Let's roar into a wild adventure of fun, cake, and games!" },
+  { name: 'Miko', age: 7, quote: 'Blast off to outer space for an out-of-this-world birthday party!' },
+  { name: 'Alya', age: 3, quote: 'A magical day filled with laughter, balloons, and sweet treats!' },
+  { name: 'Kevin', age: 8, quote: "Calling all superheroes! Join Kevin's epic birthday mission." },
+  { name: 'Mia', age: 10, quote: "Double digits celebration! Let's party like rockstars!" },
+  { name: 'Lucas', age: 6, quote: 'Jump, splash, and play! Celebrate Lucas turning 6.' },
+  { name: 'Chloe', age: 4, quote: "Ponies, rainbows, and sparkles galore for Chloe's 4th!" },
+  { name: 'Ethan', age: 9, quote: "Get your game face on for Ethan's ultimate birthday quest!" },
+  { name: 'Sarah', age: 17, quote: 'Shining bright like diamonds as Sarah steps into her Sweet Seventeen!' },
+  { name: 'Elena', age: 21, quote: 'A night of elegance, laughter, and toast to the next golden chapter.' },
+  { name: 'Amanda', age: 30, quote: '30 & Fabulous! Cheers to three decades of joy and memories.' },
+  { name: 'Rizky', age: 25, quote: 'Quarter-century milestone! Join us for a memorable celebration.' },
+  { name: 'Jessica', age: 17, quote: 'Sweet, sparkling, and seventeen! Let us dance the night away.' },
+  { name: 'Victor', age: 40, quote: 'Celebrating four decades of grace, success, and cherished friendships.' },
+  { name: 'Nabila', age: 18, quote: 'Welcoming adulthood with open arms, music, and beautiful company.' },
+  { name: 'Gaston', age: 50, quote: 'Golden Jubilee! Celebrating 50 wonderful years of a life well lived.' },
+];
+
+const BOY_NAMES = ['Ahmad', 'Muhammad', 'Rizky', 'Fathan', 'Ibrahim', 'Zaki', 'Fadhil', 'Raihan', 'Rafiq', 'Yusuf', 'Abdullah', 'Khalil', 'Hafiz', 'Naufal', 'Zaid', 'Hamzah', 'Faris', 'Umar', 'Tsaqib', 'Azka'];
+const PARENTS_LIST = [
+  'Bapak Rudi Santoso & Ibu Siti Aminah',
+  'Bapak Hendra Wijaya & Ibu Dewi Lestari',
+  'Bapak Agus Firmansyah & Ibu Ratna Sari',
+  'Bapak Budi Hartono & Ibu Maya Puspita',
+  'Bapak Joko Prasetyo & Ibu Rina Marlina',
+  'Bapak Andi Saputra & Ibu Nur Aisyah',
+  'Bapak Dedi Kurniawan & Ibu Wulan Suci',
+  'Bapak Eko Nugroho & Ibu Fitri Handayani',
+  'Bapak Fajar Ramadhan & Ibu Laila Rahmawati',
+  'Bapak Gilang Permana & Ibu Intan Permata',
+];
+const GROOM_NAMES = ['Aditya Pratama', 'Rizky Ramadhan', 'Dimas Arya', 'Fajar Nugroho', 'Bayu Saputra', 'Gilang Mahesa', 'Reza Firmansyah', 'Aji Santoso', 'Bima Satria', 'Arga Pratama'];
+const BRIDE_NAMES = ['Nadia Ayu', 'Sarah Putri', 'Aisyah Rahma', 'Dinda Lestari', 'Putri Amelia', 'Salsabila Zahra', 'Naila Fitri', 'Keysha Anindya', 'Maharani Dewi', 'Rara Kirana'];
+const GROOM_PARENTS = [
+  'Bpk. Bambang & Ibu Sri Wahyuni',
+  'Bpk. Surya & Ibu Retno Palupi',
+  'Bpk. Heru & Ibu Yuni Astuti',
+  'Bpk. Anton & Ibu Lina Mardiana',
+  'Bpk. Wawan & Ibu Ida Kusuma',
+  'Bpk. Yusuf & Ibu Halimah',
+  'Bpk. Rahmat & Ibu Rina Hartati',
+  'Bpk. Dimas & Ibu Indah Wulandari',
+];
+const BRIDE_PARENTS = [
+  'Bpk. Suparman & Ibu Ratih Kusumawati',
+  'Bpk. Karso & Ibu Ningrum',
+  'Bpk. Jumadi & Ibu Sari',
+  'Bpk. Suryadi & Ibu Endang',
+  'Bpk. Iskandar & Ibu Farida',
+  'Bpk. Hadi & Ibu Murni',
+  'Bpk. Tono & Ibu Yuli',
+  'Bpk. Bambang & Ibu Nurhayati',
+];
+const BABY_NAMES: { name: string; gender: string }[] = [
+  { name: 'Alif', gender: 'Laki-laki' },
+  { name: 'Bilal', gender: 'Laki-laki' },
+  { name: 'Daffa', gender: 'Laki-laki' },
+  { name: 'Fayyadh', gender: 'Laki-laki' },
+  { name: 'Ghazi', gender: 'Laki-laki' },
+  { name: 'Hana', gender: 'Perempuan' },
+  { name: 'Kinan', gender: 'Perempuan' },
+  { name: 'Mikail', gender: 'Laki-laki' },
+  { name: 'Naira', gender: 'Perempuan' },
+  { name: 'Qisthi', gender: 'Perempuan' },
+  { name: 'Safa', gender: 'Perempuan' },
+  { name: 'Tariq', gender: 'Laki-laki' },
+  { name: 'Zahra', gender: 'Perempuan' },
+  { name: 'Alya', gender: 'Perempuan' },
+  { name: 'Bima', gender: 'Laki-laki' },
+  { name: 'Cinta', gender: 'Perempuan' },
+  { name: 'Danish', gender: 'Laki-laki' },
+  { name: 'Elang', gender: 'Laki-laki' },
+  { name: 'Fatimah', gender: 'Perempuan' },
+  { name: 'Hafizah', gender: 'Perempuan' },
+];
+
+const SUNATAN_VENUES = [
+  { venue: "Masjid Agung Al-Azhar", address: "Jl. Sisingamangaraja No.1, Jakarta Selatan" },
+  { venue: "Masjid Istiqlal Hall", address: "Jl. Taman Wijaya Kusuma, Jakarta Pusat" },
+  { venue: "Gedung Serbaguna Al-Ikhlas", address: "Jl. K.H. Ahmad Dahlan, Jakarta Selatan" },
+  { venue: "Islamic Center Hall", address: "Jl. Boulevard Barat Raya, Kelapa Gading" },
+  { venue: "Rumah Kediaman Keluarga", address: "Jl. Melati Indah No. 12, Bekasi" },
+  { venue: "Aula Masjid Raya Baiturrahman", address: "Jl. Syeikh Nawawi, Bogor" },
+];
+const WEDDING_VENUES = [
+  { venue: "The Grand Ballroom Hotel Kempinski", address: "Jl. M.H. Thamrin No.28, Jakarta Pusat" },
+  { venue: "Ritz-Carlton Ballroom", address: "Mega Kuningan Lot 1.1, Jakarta Selatan" },
+  { venue: "Garden Pavilion Dharmawangsa", address: "Jl. Brawijaya Raya No.26, Jakarta Selatan" },
+  { venue: "Skyline Rooftop Lounge", address: "Jl. Asia Afrika No.1, Senayan, Jakarta" },
+  { venue: "The Glass House Garden Resto", address: "Jl. Boulevard Barat Raya, Kelapa Gading" },
+  { venue: "Royal Garden Ballroom", address: "Jl. Jend. Sudirman Kav 52-53, Jakarta Selatan" },
+];
+const AQIQAH_VENUES = [
+  { venue: "Kediaman Keluarga", address: "Jl. Anggrek No. 8, Depok" },
+  { venue: "Masjid Baitul Ilmi", address: "Jl. Raya Cilandak, Jakarta Selatan" },
+  { venue: "Gedung Serbaguna Muslimah", address: "Jl. Kramat Raya No. 45, Jakarta Pusat" },
+  { venue: "Islamic Center Hall", address: "Jl. Boulevard Barat Raya, Kelapa Gading" },
+  { venue: "Rumah Orang Tua", address: "Jl. Mawar Indah No. 21, Tangerang" },
+];
+
+const SUNATAN_QUOTES = [
+  'Barakallahu lak wa baraka alaik, semoga menjadi anak yang saleh dan berbakti kepada orang tua.',
+  'Semoga menjadi anak yang sholeh, sehat, dan membanggakan keluarga. Aamiin.',
+  'Alhamdulillah, dengan penuh rasa syukur kami mengundang Bapak/Ibu dalam acara khitanan ini.',
+  'Semoga Allah menjadikannya anak yang saleh, penurut, dan berkah bagi kedua orang tuanya.',
+  'Dengan memohon ridho Allah, kami mengadakan syukuran khitanan putra tercinta kami.',
+  'Doa restu Bapak/Ibu adalah kado terindah bagi kami sekeluarga. Aamiin.',
+];
+const WEDDING_STORIES = [
+  'Dipertemukan oleh Allah dalam sebuah majelis taklim, kami belajar saling memahami hingga akhirnya memutuskan untuk melangkah bersama dalam ikatan suci.',
+  'Berawal dari pertemanan di masa kuliah, Allah mengikat hati kami hingga sampai pada janji suci pernikahan.',
+  'Setelah bertahun-tahun menjaga silaturahmi, Allah mempertemukan kami kembali dan menumbuhkan cinta yang akhirnya berlabuh ke pelaminan.',
+  'Kisah kami dimulai dari doa orang tua dan restu keluarga, hingga Allah menghadirkan sosok yang tepat untuk menemani perjalanan hidup.',
+  'Dari kenalan saudara, menjadi sahabat, lalu Allah takdirkan kami menjadi pasangan yang saling melengkapi.',
+  'Cinta kami tumbuh dari proses panjang mengenal dan memahami, hingga akhirnya Allah mempertemukan kami dalam ikatan yang barokah.',
+];
+const AQIQAH_QUOTES = [
+  'Selamat atas kelahiran buah hati tercinta. Semoga menjadi anak yang sholeh/sholehah, sehat, dan membawa berkah. Aamiin.',
+  'Alhamdulillah, dengan penuh syukur kami mengadakan syukuran aqiqah untuk putra/putri kami tercinta.',
+  'Semoga Allah meridhoi perjalanan hidup sang buah hati, menjadikannya anak yang berbakti dan penuh kasih sayang.',
+  'Terima kasih atas doa restunya. Kehadiran Anda adalah kebahagiaan bagi kami sekeluarga.',
+  'Barakallahu li walakum, semoga tumbuh menjadi anak yang saleh dan sholehah. Aamiin.',
+];
+const WEDDING_HASHTAGS = ['#EternalLove', '#OurWedding', '#SatuHatiSatuCinta', '#ForeverAndAlways', '#AkadDanResepsi', '#HappilyEverAfter'];
+
+const PRICE_BASE: Record<CategoryKey, number> = {
+  birthday: 59000,
+  sunatan: 79000,
+  wedding: 149000,
+  aqiqah: 79000,
+};
+
+const pick = <T,>(arr: T[], i: number): T => arr[i % arr.length];
+
+const buildEventDetails = (category: CategoryKey, idx: number, portrait: string): EventDetails => {
+  const base: EventDetails = {
+    date: `Sabtu, ${12 + (idx % 10)} ${['September', 'Oktober', 'November', 'Desember'][idx % 4]} 2026`,
+    time: `${(idx % 12) + 9}.00 WIB - Selesai`,
+    venue: '',
+    address: '',
+    messageQuote: '',
+    portraitImage: portrait,
+    galleryImages: GALLERY_POOLS[category].slice(0, 4),
+    eventLabel: CATEGORY_LABELS[category],
+  };
+
+  if (category === 'birthday') {
+    const person = pick(BIRTHDAY_NAMES, idx);
+    const venue = pick(
+      [
+        { venue: "McDonald's Playground Grand Indonesia", address: "Jl. M.H. Thamrin No.1, Jakarta Pusat" },
+        { venue: 'Kidzania Party Room Pacific Place', address: 'Jl. Jend. Sudirman Kav 52-53, Jakarta Selatan' },
+        { venue: 'The Glass House Garden Resto', address: 'Jl. Boulevard Barat Raya, Kelapa Gading' },
+        { venue: 'The Grand Ballroom Hotel Kempinski', address: 'Jl. M.H. Thamrin No.28, Jakarta Pusat' },
+        { venue: 'Skyline Rooftop Lounge', address: 'Jl. Asia Afrika No.1, Senayan, Jakarta' },
+      ],
+      idx
+    );
+    return {
+      ...base,
+      birthdayPerson: person.name,
+      age: person.age,
+      venue: venue.venue,
+      address: venue.address,
+      messageQuote: person.quote,
+      time: '18.30 WIB - Selesai',
+    };
+  }
+
+  if (category === 'sunatan') {
+    const venue = pick(SUNATAN_VENUES, idx);
+    return {
+      ...base,
+      childName: pick(BOY_NAMES, idx),
+      parentsName: pick(PARENTS_LIST, idx),
+      venue: venue.venue,
+      address: venue.address,
+      messageQuote: pick(SUNATAN_QUOTES, idx),
+      time: '09.00 WIB - Selesai',
+    };
+  }
+
+  if (category === 'wedding') {
+    const venue = pick(WEDDING_VENUES, idx);
+    return {
+      ...base,
+      groomName: pick(GROOM_NAMES, idx),
+      brideName: pick(BRIDE_NAMES, idx),
+      groomParents: pick(GROOM_PARENTS, idx),
+      brideParents: pick(BRIDE_PARENTS, idx),
+      akadDate: `Jum'at, ${5 + (idx % 8)} ${['November', 'Desember'][idx % 2]} 2026`,
+      resepsiDate: base.date,
+      venue: venue.venue,
+      address: venue.address,
+      coupleStory: pick(WEDDING_STORIES, idx),
+      hashtag: pick(WEDDING_HASHTAGS, idx),
+      messageQuote: `"Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya."`,
+      time: '10.00 WIB - Selesai',
+    };
+  }
+
+  // aqiqah
+  const baby = pick(BABY_NAMES, idx);
+  const venue = pick(AQIQAH_VENUES, idx);
+  return {
+    ...base,
+    babyName: baby.name,
+    babyGender: baby.gender,
+    babyBirthDate: `${2 + (idx % 20)} ${['Juni', 'Juli', 'Agustus'][idx % 3]} 2026`,
+    parentsName: pick(PARENTS_LIST, idx),
+    venue: venue.venue,
+    address: venue.address,
+    messageQuote: pick(AQIQAH_QUOTES, idx),
+    time: '10.00 WIB - Selesai',
+  };
+};
+
+const buildWishes = (category: CategoryKey, name: string): WishItem[] => {
+  const label = CATEGORY_LABELS[category];
+  const common: WishItem[] = [
+    { id: 'w1', name: 'Siti & Keluarga', message: `Selamat ${label} ${name}! Semoga sehat selalu, makin sukses, dan panjang umur! 🎉`, date: '2 jam yang lalu', attendance: 'Hadir' },
+    { id: 'w2', name: 'Budi Raharjo', message: `Semoga hari spesial ini menjadi kenangan indah. Barakallahu fik! ✨✨`, date: '5 jam yang lalu', attendance: 'Hadir' },
+    { id: 'w3', name: 'Clara & Friends', message: `Tidak sabar hadir di acaranya! Sukses selalu untuk keluarga besar. ❤️🥂`, date: '1 hari yang lalu', attendance: 'Hadir' },
+  ];
+  return common;
+};
+
+/* ============================================================
+   BUILDER — generate all 400 templates
+   ============================================================ */
+const ALL_SEEDS: Record<CategoryKey, Seed[]> = {
+  birthday: BIRTHDAY_SEEDS,
+  sunatan: SUNATAN_SEEDS,
+  wedding: WEDDING_SEEDS,
+  aqiqah: AQIQAH_SEEDS,
+};
+
+const buildThemeStyle = (category: CategoryKey, seed: Seed, idx: number): ThemeStyle => {
+  const [, sub, style, palKey, fontKey, , badge] = seed;
+  const palette = PALETTES[palKey] || pick(FALLBACK_PALETTES[category].map((k) => PALETTES[k]), idx);
+  const font = FONTS[fontKey];
+  const anim = pick(ANIM_POOLS[category], idx * 3);
+  const bg = pick(BG_POOLS[category], idx * 5);
+  const frame = pick(FRAME_POOLS[category], idx * 7);
+  const button = pick(BUTTON_POOLS[category], idx * 11);
+  const deco = pick(DECO_POOLS[category], idx);
+
+  const patternMap: Record<BackgroundType, string> = {
+    'celebration-confetti': 'balloons-party',
+    'kids-adventure': 'blue-clouds-stars',
+    'comic-doodles': 'comic-doodles',
+    'neon-glow': 'neon-grid',
+    'floral-lace': 'floral-lace',
+    'marble-gold': 'marble-gold',
+    'luxury-emerald': 'emerald-tiara',
+    'pastel-clouds': 'pastel-hearts',
+    'minimalist-lines': 'monochrome-line',
+    'wine-jazz': 'wine-jazz',
+    'islamic-gold': 'islamic-arabesque',
+    'wedding-royal': 'wedding-royal',
+    'wedding-garden': 'wedding-garden',
+    'baby-moon': 'baby-moon',
+    'baby-animal': 'baby-animal',
+    watercolor: 'watercolor-soft',
+  };
+
+  return {
+    primaryColor: palette.primary,
+    secondaryColor: palette.secondary,
+    accentColor: palette.accent,
+    bgGradient: palette.gradient,
+    cardBg: palette.cardBg,
+    textColor: palette.text,
+    subtextColor: palette.sub,
+    fontFamilyTitle: font.family,
+    fontStyle: font.style,
+    decorations: deco,
+    bgPattern: patternMap[bg],
+    backgroundType: bg,
+    animationType: anim,
+    frameStyle: frame,
+    buttonStyle: button,
+    paperTexture: /luxury|marble|royal|ivory|cream|elegant|minimal|white/.test(style + sub),
+    coverPattern: patternMap[bg],
+  };
+};
+
+const CATEGORY_TITLES: Record<CategoryKey, string> = {
+  birthday: 'Template Undangan Birthday',
+  sunatan: 'Template Undangan Sunatan',
+  wedding: 'Template Undangan Wedding',
+  aqiqah: 'Template Undangan Aqiqah',
+};
+
+export const getCategoryTitle = (category: CategoryKey | 'All'): string => {
+  if (category === 'All') return 'Semua Template Undangan';
+  return CATEGORY_TITLES[category];
+};
+
+export const TEMPLATES: Template[] = (() => {
+  const list: Template[] = [];
+
+  CATEGORY_KEYS.forEach((catKey) => {
+    const seeds = ALL_SEEDS[catKey];
+    seeds.forEach((seed, i) => {
+      const num = (i + 1).toString().padStart(3, '0');
+      const idStr = `#${num}`;
+      const uid = `${catKey}-${num}`;
+      const [name, , , , , , seedBadge] = seed;
+      const palette = PALETTES[seed[3]] || pick(FALLBACK_PALETTES[catKey].map((k) => PALETTES[k]), i);
+      const badge = seedBadge || ((i === 19 || i === 49 || i === 79) ? 'TRENDING' : undefined);
+      const price = PRICE_BASE[catKey] + ((i * 13) % 40) * 5000;
+      const portrait = pick(IMAGE_POOLS[catKey], i * 7 + 3);
+      const eventDetails = buildEventDetails(catKey, i, portrait);
+      const themeStyle = buildThemeStyle(catKey, seed, i);
+      const music = getTemplateMusic(catKey, i, {
+        subcategory: seed[1],
+        designStyle: seed[2],
+        illustrationStyle: seed[5],
+        colorPalette: palette.display,
+        fontStyle: themeStyle.fontStyle,
+      });
+
+      list.push({
+        id: idStr,
+        uid,
+        templateNumber: num,
+        name,
+        category: catKey,
+        categoryLabel: CATEGORY_LABELS[catKey],
+        subcategory: seed[1],
+        designStyle: seed[2],
+        colorPalette: palette.display,
+        typographyStyle: FONTS[seed[4]].label,
+        illustrationStyle: seed[5],
+        animationStyle: themeStyle.animationType || 'subtle-drift',
+        layoutStyle: pick(LAYOUT_POOLS[catKey], i * 7),
+        badge,
+        featured: badge === 'FEATURED' || badge === 'POPULAR',
+        demoStatus: i >= 92 ? 'premium' : 'active',
+        price,
+        image: portrait,
+        demoUrl: `/demo/${catKey}/${num}`,
+        musicUrl: music.musicUrl,
+        musicTrackName: music.musicTitle,
+        music,
+        description: `Premium digital ${CATEGORY_LABELS[catKey].toLowerCase()} invitation template with ${seed[2].toLowerCase()} design, custom typography, animations, and audio.`,
+        features: FEATURES,
+        themeStyle,
+        eventDetails,
+        sampleWishes: buildWishes(catKey, name),
+      });
+    });
+  });
+
+  return list;
+})();
+
+export const getTemplateByUid = (uid: string): Template | undefined => {
+  return TEMPLATES.find((t) => t.uid === uid);
+};
+
+export const formatRupiah = (number: number): string => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+  }).format(number);
+};

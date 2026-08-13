@@ -1,0 +1,301 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #14213d;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #ede4cf;
+  --color-on-primary-container: #14213d;
+  --color-primary-fixed: #c9a45c;
+  --color-primary-fixed-dim: #b08a3e;
+  --color-on-primary-fixed: #ffffff;
+  --color-on-primary-fixed-variant: #8a6a2c;
+
+  --color-secondary: #c9a45c;
+  --color-on-secondary: #14213d;
+  --color-secondary-container: #f2ead9;
+  --color-on-secondary-container: #6b5a2e;
+  --color-secondary-fixed: #efe4ce;
+  --color-secondary-fixed-dim: #d9bc83;
+  --color-on-secondary-fixed: #3d2f12;
+  --color-on-secondary-fixed-variant: #8a6a2c;
+
+  --color-tertiary: #a8b5a2;
+  --color-on-tertiary: #14213d;
+  --color-tertiary-container: #dce3d9;
+  --color-on-tertiary-container: #3d4a38;
+  --color-tertiary-fixed: #e4eae2;
+  --color-tertiary-fixed-dim: #c2cbbb;
+
+  --color-background: #faf8f3;
+  --color-on-background: #1f2937;
+
+  --color-surface: #faf8f3;
+  --color-surface-dim: #e9e4d8;
+  --color-surface-bright: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f4f1e9;
+  --color-surface-container: #eeeadf;
+  --color-surface-container-high: #e8e3d6;
+  --color-surface-container-highest: #e1dbcb;
+  --color-surface-variant: #e1dbcb;
+  --color-surface-tint: #14213d;
+
+  --color-on-surface: #1f2937;
+  --color-on-surface-variant: #6b7280;
+  --color-inverse-surface: #14213d;
+  --color-inverse-on-surface: #faf8f3;
+
+  --color-outline: #9aa3ae;
+  --color-outline-variant: #d8d3c6;
+
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-headline: "Bricolage Grotesque", sans-serif;
+  --font-body: "Hanken Grotesk", sans-serif;
+}
+
+html, body {
+  font-family: 'Hanken Grotesk', sans-serif;
+  background-color: #faf8f3;
+  color: #1f2937;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(20, 33, 61, 0.08);
+  box-shadow: 0px 10px 30px rgba(20, 33, 61, 0.06);
+}
+
+.demo-phone-container {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 12px solid #1a1a1a;
+  border-radius: 40px;
+  overflow: hidden;
+  position: relative;
+  background: #fff;
+  max-width: 414px;
+  margin: 0 auto;
+  aspect-ratio: 9/19.5;
+}
+
+.demo-phone-container::-webkit-scrollbar {
+  display: none;
+}
+.demo-phone-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.floral-bg {
+  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+  position: relative;
+}
+
+.floral-bg::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-image: radial-gradient(circle at 100% 0%, #ffe08822 0%, transparent 40%),
+                    radial-gradient(circle at 0% 100%, #ffaeda22 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.template-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.template-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0px 20px 40px rgba(20, 33, 61, 0.12);
+}
+
+@keyframes float-up {
+  0% { transform: translateY(0px) rotate(0deg); opacity: 0.8; }
+  50% { transform: translateY(-20px) rotate(5deg); opacity: 1; }
+  100% { transform: translateY(0px) rotate(0deg); opacity: 0.8; }
+}
+
+@keyframes float-balloon {
+  0% { transform: translateY(100vh) rotate(-5deg); opacity: 0.2; }
+  50% { opacity: 0.8; transform: translateY(50vh) rotate(8deg); }
+  100% { transform: translateY(-20vh) rotate(-5deg); opacity: 0; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes neon-pulse {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.6)); }
+  50% { filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.9)); }
+}
+
+@keyframes glitter-fall {
+  0% { transform: translateY(-10%) rotate(0deg); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(110%) rotate(360deg); opacity: 0; }
+}
+
+.animate-float-up {
+  animation: float-up 6s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+.animate-neon-pulse {
+  animation: neon-pulse 4s ease-in-out infinite;
+}
+
+.animate-glitter {
+  animation: glitter-fall 8s linear infinite;
+}
+
+/* ============================================================
+   PREMIUM MOTION SYSTEM
+   ============================================================ */
+
+/* Gentle entrance for decorative layers */
+@keyframes deco-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.deco-fade-in {
+  animation: deco-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Countdown digit change: small fade + scale */
+@keyframes tick-pop {
+  0% { opacity: 0.35; transform: scale(0.82); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.countdown-tick {
+  display: inline-block;
+  animation: tick-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Floating music player equalizer bars (0.3-0.5s beat while playing) */
+@keyframes eq-bounce {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+.eq-bar {
+  transform-origin: bottom;
+  animation: eq-bounce 0.42s ease-in-out infinite;
+}
+
+/* Universal button micro-interaction */
+.btn-micro {
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    opacity 0.25s ease;
+  will-change: transform;
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn-micro:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  }
+}
+.btn-micro:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* Clickable card lift (desktop hover only) */
+.card-lift {
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+  will-change: transform;
+}
+@media (hover: hover) and (pointer: fine) {
+  .card-lift:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .deco-fade-in {
+    animation: none !important;
+    opacity: 1;
+  }
+  .countdown-tick {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   Responsive & touch UX
+   ============================================================ */
+
+/* Smooth anchor/scroll navigation (respects reduced-motion above) */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Remove iOS tap highlight flash on buttons/links */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent accidental horizontal scroll from overflowing grid items */
+img,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Modest font-size scaling — tiny phones stay legible, large screens relax */
+@media (min-width: 1440px) {
+  .font-headline {
+    letter-spacing: -0.01em;
+  }
+  main {
+    font-size: 1.02rem;
+  }
+}
+
+/* Ensure fixed bottom bars don't cover content on mobile (music player / invite bar) */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+
