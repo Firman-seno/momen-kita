@@ -1,12 +1,12 @@
-import React from 'react';
-import { NavigationTab, CategoryKey } from '../types';
-import { CATEGORIES } from '../data/templates';
-import { buildWaLink, homepageWaMessage, WHATSAPP_ALTERNATE, WHATSAPP_ALTERNATE_DISPLAY, WHATSAPP_PRIMARY_DISPLAY } from '../lib/whatsapp';
-import { UiButton } from './UiButton';
+import React from "react";
+import { NavigationTab, CategoryKey } from "../types";
+import { CATEGORIES } from "../data/templates";
+import { buildWaLink, homepageWaMessage, WHATSAPP_ALTERNATE, WHATSAPP_ALTERNATE_DISPLAY, WHATSAPP_PRIMARY_DISPLAY } from "../lib/whatsapp";
+import { UiButton } from "./UiButton";
 
 interface FooterProps {
   onSelectTab: (tab: NavigationTab) => void;
-  onSelectCategory: (category: CategoryKey | 'All') => void;
+  onSelectCategory: (category: CategoryKey | "All") => void;
   onOpenWhatsApp: () => void;
   onOpenDashboard?: () => void;
 }
@@ -30,16 +30,12 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, onSelectCategory, o
             <br />
             Undangan digital modern, elegan, dan interaktif untuk setiap momen spesialmu.
           </p>
-          <p className="font-body text-xs text-white/50">
-            © 2026 MomenKita. Semua hak dilindungi.
-          </p>
+          <p className="font-body text-xs text-white/50">© 2026 MomenKita. Semua hak dilindungi.</p>
         </div>
 
         {/* Categories */}
         <div className="flex flex-col gap-2.5">
-          <h4 className="font-body text-xs font-bold uppercase text-secondary mb-1 tracking-wider">
-            Kategori
-          </h4>
+          <h4 className="font-body text-xs font-bold uppercase text-secondary mb-1 tracking-wider">Kategori</h4>
           {CATEGORIES.map((cat) => (
             <button
               key={cat.key}
@@ -55,85 +51,50 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, onSelectCategory, o
 
         {/* Company */}
         <div className="flex flex-col gap-2.5">
-          <h4 className="font-body text-xs font-bold uppercase text-secondary mb-1 tracking-wider">
-            MomenKita
-          </h4>
-          <button
-            onClick={() => onSelectTab('how-it-works')}
-            className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer"
-          >
+          <h4 className="font-body text-xs font-bold uppercase text-secondary mb-1 tracking-wider">MomenKita</h4>
+          <button onClick={() => onSelectTab("how-it-works")} className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer">
             Cara Kerja
           </button>
-          <button
-            onClick={() => onSelectTab('faq')}
-            className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer"
-          >
+          <button onClick={() => onSelectTab("faq")} className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer">
             FAQ & Bantuan
           </button>
-          <button
-            onClick={() => onSelectTab('music-credits')}
-            className="text-left font-body text-xs font-bold text-secondary hover:text-white transition-colors hover:underline underline-offset-4 cursor-pointer flex items-center gap-1"
-          >
+          <button onClick={() => onSelectTab("music-credits")} className="text-left font-body text-xs font-bold text-secondary hover:text-white transition-colors hover:underline underline-offset-4 cursor-pointer flex items-center gap-1">
             <span className="material-symbols-outlined text-xs">music_note</span>
             Lisensi Musik (400 Template)
           </button>
-          <button
-            onClick={() => onSelectTab('faq')}
-            className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer"
-          >
+          <button onClick={() => onSelectTab("faq")} className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer">
             Ketentuan Layanan
           </button>
-          <button
-            onClick={() => onSelectTab('faq')}
-            className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer"
-          >
+          <button onClick={() => onSelectTab("faq")} className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer">
             Kebijakan Privasi
           </button>
         </div>
 
         {/* WhatsApp */}
         <div className="flex flex-col gap-3">
-          <h4 className="font-body text-xs font-bold uppercase text-secondary mb-1 tracking-wider">
-            WhatsApp
-          </h4>
-          <UiButton
-            variant="accent"
-            size="md"
-            href={waHref}
-            external
-            icon="chat"
-            iconFilled
-            className="self-start"
-          >
+          <h4 className="font-body text-xs font-bold uppercase text-secondary mb-1 tracking-wider">WhatsApp</h4>
+          <UiButton variant="accent" size="md" href={waHref} external icon="chat" iconFilled className="self-start">
             Pesan via WhatsApp
           </UiButton>
-          <a
-            href={buildWaLink(homepageWaMessage)}
-            target="_blank"
-            rel="noreferrer"
-            className="text-left font-body text-xs font-bold text-white/85 hover:text-secondary transition-colors cursor-pointer"
-          >
+          <a href={buildWaLink(homepageWaMessage)} target="_blank" rel="noreferrer" className="text-left font-body text-xs font-bold text-white/85 hover:text-secondary transition-colors cursor-pointer">
             {WHATSAPP_PRIMARY_DISPLAY}
           </a>
-          <a
-            href={buildWaLink(homepageWaMessage, WHATSAPP_ALTERNATE)}
-            target="_blank"
-            rel="noreferrer"
-            className="text-left font-body text-xs font-bold text-white/60 hover:text-secondary transition-colors cursor-pointer"
-          >
+          <a href={buildWaLink(homepageWaMessage, WHATSAPP_ALTERNATE)} target="_blank" rel="noreferrer" className="text-left font-body text-xs font-bold text-white/60 hover:text-secondary transition-colors cursor-pointer">
             {WHATSAPP_ALTERNATE_DISPLAY}
           </a>
 
           {onOpenDashboard && (
             <div className="mt-2 pt-2 border-t border-white/15">
-              <button
-                onClick={onOpenDashboard}
+              <a
+                href="/admin/login?force=1"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer flex items-center gap-1.5"
-                title="Buka halaman login admin"
+                title="Buka halaman login admin di tab baru"
               >
                 <span className="material-symbols-outlined text-sm">dashboard</span>
                 Kelola Undangan (Dashboard)
-              </button>
+              </a>
             </div>
           )}
         </div>

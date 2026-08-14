@@ -1,29 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { NavigationTab } from '../types';
-import { buildWaLink, homepageWaMessage } from '../lib/whatsapp';
-import { UiButton } from './UiButton';
+import React, { useState, useEffect } from "react";
+import { NavigationTab } from "../types";
+import { buildWaLink, homepageWaMessage } from "../lib/whatsapp";
+import { UiButton } from "./UiButton";
 
 interface NavigationProps {
   currentTab: NavigationTab;
   onSelectTab: (tab: NavigationTab) => void;
   onOpenWhatsApp: (templateInfo?: string) => void;
-  onOpenAdminLogin?: () => void;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({
-  currentTab,
-  onSelectTab,
-  onOpenWhatsApp,
-  onOpenAdminLogin,
-}) => {
+export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab, onOpenWhatsApp }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems: { id: NavigationTab; label: string }[] = [
-    { id: 'home', label: 'Home' },
-    { id: 'templates', label: 'Templates' },
-    { id: 'categories', label: 'Categories' },
-    { id: 'how-it-works', label: 'How It Works' },
-    { id: 'faq', label: 'FAQ' },
+    { id: "home", label: "Home" },
+    { id: "templates", label: "Templates" },
+    { id: "categories", label: "Categories" },
+    { id: "how-it-works", label: "How It Works" },
+    { id: "faq", label: "FAQ" },
   ];
 
   const waHref = buildWaLink(homepageWaMessage);
@@ -32,10 +26,10 @@ export const Navigation: React.FC<NavigationProps> = ({
   useEffect(() => {
     if (!mobileMenuOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMobileMenuOpen(false);
+      if (e.key === "Escape") setMobileMenuOpen(false);
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [mobileMenuOpen]);
 
   return (
@@ -51,15 +45,12 @@ export const Navigation: React.FC<NavigationProps> = ({
         {/* Logo / Wordmark — never shrinks, never wraps */}
         <button
           onClick={() => {
-            onSelectTab('home');
+            onSelectTab("home");
             setMobileMenuOpen(false);
           }}
           className="flex items-center gap-1.5 sm:gap-2 text-lg sm:text-xl md:text-2xl font-bold font-headline text-primary cursor-pointer tracking-tight shrink-0 whitespace-nowrap rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
         >
-          <span
-            className="material-symbols-outlined text-xl sm:text-2xl text-secondary"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
+          <span className="material-symbols-outlined text-xl sm:text-2xl text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
             auto_awesome
           </span>
           MomenKita
@@ -75,9 +66,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                 key={item.id}
                 onClick={() => onSelectTab(item.id)}
                 className={`inline-flex items-center whitespace-nowrap py-2 font-body text-xs font-bold uppercase tracking-wider transition-all cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
-                  isActive
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-on-surface-variant hover:text-primary hover:scale-[1.02]'
+                  isActive ? "text-primary border-b-2 border-primary" : "text-on-surface-variant hover:text-primary hover:scale-[1.02]"
                 }`}
               >
                 {item.label}
@@ -89,25 +78,20 @@ export const Navigation: React.FC<NavigationProps> = ({
         {/* Right actions — compact group that never forces overflow */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Kelola Undangan — desktop only (secondary action) */}
-          <button
-            onClick={() => onOpenAdminLogin?.()}
+          <a
+            href="/admin/login?force=1"
+            target="_blank"
+            rel="noopener noreferrer"
             className="hidden xl:inline-flex items-center gap-1.5 font-body text-[11px] font-extrabold uppercase tracking-wider text-primary border border-primary/40 rounded-full px-4 py-2.5 hover:bg-primary hover:text-white transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-            title="Buka halaman login admin"
+            title="Buka halaman login admin di tab baru"
           >
             <span className="material-symbols-outlined text-sm">dashboard</span>
             Kelola Undangan
-          </button>
+          </a>
 
           {/* Primary CTA — kept visible from tablet portrait up */}
           <div className="hidden md:block shrink-0">
-            <UiButton
-              variant="primary"
-              size="md"
-              href={waHref}
-              external
-              icon="chat"
-              iconFilled
-            >
+            <UiButton variant="primary" size="md" href={waHref} external icon="chat" iconFilled>
               Pesan via WhatsApp
             </UiButton>
           </div>
@@ -116,13 +100,11 @@ export const Navigation: React.FC<NavigationProps> = ({
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden text-on-surface w-11 h-11 flex items-center justify-center rounded-xl bg-surface-container-high/60 active:bg-surface-container-high cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-            aria-label={mobileMenuOpen ? 'Tutup menu' : 'Buka menu'}
+            aria-label={mobileMenuOpen ? "Tutup menu" : "Buka menu"}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-nav-menu"
           >
-            <span className="material-symbols-outlined text-2xl">
-              {mobileMenuOpen ? 'close' : 'menu'}
-            </span>
+            <span className="material-symbols-outlined text-2xl">{mobileMenuOpen ? "close" : "menu"}</span>
           </button>
         </div>
       </div>
@@ -142,40 +124,28 @@ export const Navigation: React.FC<NavigationProps> = ({
                 setMobileMenuOpen(false);
               }}
               className={`text-left font-body text-sm font-bold uppercase tracking-wider py-3 px-3 rounded-xl transition-colors cursor-pointer flex items-center justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
-                currentTab === item.id
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-on-surface-variant hover:bg-surface-container-high'
+                currentTab === item.id ? "bg-primary/10 text-primary" : "text-on-surface-variant hover:bg-surface-container-high"
               }`}
             >
               <span>{item.label}</span>
               <span className="material-symbols-outlined text-base opacity-60">chevron_right</span>
             </button>
           ))}
-          <button
-            onClick={() => {
-              onOpenAdminLogin?.();
-              setMobileMenuOpen(false);
-            }}
-            className="text-left font-body text-sm font-bold uppercase tracking-wider py-3 px-3 rounded-xl transition-colors cursor-pointer flex items-center justify-between text-primary hover:bg-surface-container-high focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 w-full"
-            title="Buka halaman login admin"
+          <a
+            href="/admin/login?force=1"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMobileMenuOpen(false)}
+            className="text-left font-body text-sm font-bold uppercase tracking-wider py-3 px-3 rounded-xl transition-colors cursor-pointer flex items-center justify-between text-primary hover:bg-surface-container-high focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            title="Buka halaman login admin di tab baru"
           >
             <span className="flex items-center gap-2">
               <span className="material-symbols-outlined text-base">dashboard</span>
               Kelola Undangan
             </span>
-            <span className="material-symbols-outlined text-base opacity-60">chevron_right</span>
-          </button>
-          <UiButton
-            variant="primary"
-            size="md"
-            fullWidth
-            href={waHref}
-            external
-            icon="chat"
-            iconFilled
-            className="mt-2"
-            onClick={() => setMobileMenuOpen(false)}
-          >
+            <span className="material-symbols-outlined text-base opacity-60">open_in_new</span>
+          </a>
+          <UiButton variant="primary" size="md" fullWidth href={waHref} external icon="chat" iconFilled className="mt-2" onClick={() => setMobileMenuOpen(false)}>
             Pesan via WhatsApp
           </UiButton>
         </div>

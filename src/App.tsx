@@ -1,44 +1,41 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { Navigation } from './components/Navigation';
-import { Footer } from './components/Footer';
-import { HomeHero } from './components/HomeHero';
-import { TemplateCatalog } from './components/TemplateCatalog';
-import { CategoriesPage } from './components/CategoriesPage';
-import { TemplateDemoView } from './components/TemplateDemoView';
-import { WhatsAppOrderModal } from './components/WhatsAppOrderModal';
-import { OrderFlowModal } from './components/OrderFlowModal';
-import { HowItWorksModal } from './components/HowItWorksModal';
-import { FAQModal } from './components/FAQModal';
-import { MusicCreditsModal } from './components/MusicCreditsModal';
-import { FloatingWhatsAppButton } from './components/FloatingWhatsAppButton';
-import { InvitationView } from './components/InvitationView';
-import { InvitationEditor } from './components/InvitationEditor';
-import { Dashboard } from './components/Dashboard';
-import { AdminLogin } from './components/AdminLogin';
-import { AccessDenied } from './components/AccessDenied';
-import { TEMPLATES, getTemplateByUid } from './data/templates';
-import { resetSocialMeta } from './lib/socialMeta';
-import { isAdminAuthenticated, logoutAdmin } from './lib/admin';
-import { NavigationTab, Template, CategoryKey } from './types';
+import React, { useState, useEffect, useLayoutEffect } from "react";
+import { Navigation } from "./components/Navigation";
+import { Footer } from "./components/Footer";
+import { HomeHero } from "./components/HomeHero";
+import { TemplateCatalog } from "./components/TemplateCatalog";
+import { CategoriesPage } from "./components/CategoriesPage";
+import { TemplateDemoView } from "./components/TemplateDemoView";
+import { WhatsAppOrderModal } from "./components/WhatsAppOrderModal";
+import { OrderFlowModal } from "./components/OrderFlowModal";
+import { HowItWorksModal } from "./components/HowItWorksModal";
+import { FAQModal } from "./components/FAQModal";
+import { MusicCreditsModal } from "./components/MusicCreditsModal";
+import { FloatingWhatsAppButton } from "./components/FloatingWhatsAppButton";
+import { InvitationView } from "./components/InvitationView";
+import { InvitationEditor } from "./components/InvitationEditor";
+import { Dashboard } from "./components/Dashboard";
+import { AdminLogin } from "./components/AdminLogin";
+import { AccessDenied } from "./components/AccessDenied";
+import { TEMPLATES, getTemplateByUid } from "./data/templates";
+import { resetSocialMeta } from "./lib/socialMeta";
+import { isAdminAuthenticated, logoutAdmin } from "./lib/admin";
+import { NavigationTab, Template, CategoryKey } from "./types";
 
 const readCategoryFromUrl = (): string => {
   const params = new URLSearchParams(window.location.search);
-  const cat = params.get('category');
-  if (cat && ['birthday', 'sunatan', 'wedding', 'aqiqah'].includes(cat)) return cat;
-  return 'All';
+  const cat = params.get("category");
+  if (cat && ["birthday", "sunatan", "wedding", "aqiqah"].includes(cat)) return cat;
+  return "All";
 };
 
 export default function App() {
   // 'admin-checking' is the initial guard state — replaced before first paint,
   // so no homepage/admin dashboard ever flashes while auth is resolved.
-  const [currentTab, setCurrentTab] = useState<NavigationTab | 'admin' | 'admin-editor' | 'admin-login' | 'admin-checking' | 'denied'>('admin-checking');
+  const [currentTab, setCurrentTab] = useState<NavigationTab | "admin" | "admin-editor" | "admin-login" | "admin-checking" | "denied">("admin-checking");
   const [catalogCategory, setCatalogCategory] = useState<string>(readCategoryFromUrl());
 
   // Selected template for demo view (defaulting to #001 Pink Balloons Kids)
-  const defaultTemplate =
-    TEMPLATES.find((t) => t.uid === 'birthday-057') ||
-    TEMPLATES.find((t) => t.uid === 'birthday-001') ||
-    TEMPLATES[0];
+  const defaultTemplate = TEMPLATES.find((t) => t.uid === "birthday-057") || TEMPLATES.find((t) => t.uid === "birthday-001") || TEMPLATES[0];
   const [activeDemoTemplate, setActiveDemoTemplate] = useState<Template>(defaultTemplate);
 
   // Invitation / editor / dashboard route state
@@ -56,22 +53,22 @@ export default function App() {
   const [musicCreditsModalOpen, setMusicCreditsModalOpen] = useState(false);
 
   const goHome = () => {
-    setCurrentTab('home');
-    window.history.pushState({}, '', '/');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCurrentTab("home");
+    window.history.pushState({}, "", "/");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const openInvitation = (slug: string) => {
     setInvitationSlug(slug);
-    setCurrentTab('invitation');
-    window.history.pushState({}, '', `/i/${slug}`);
+    setCurrentTab("invitation");
+    window.history.pushState({}, "", `/i/${slug}`);
     window.scrollTo({ top: 0 });
   };
 
   // ---- Admin routing ----
   const goAdminLogin = () => {
-    setCurrentTab('admin-login');
-    window.history.pushState({}, '', '/admin/login');
+    setCurrentTab("admin-login");
+    window.history.pushState({}, "", "/admin/login");
     window.scrollTo({ top: 0 });
   };
 
@@ -80,9 +77,9 @@ export default function App() {
       goAdminLogin();
       return;
     }
-    setCurrentTab('admin');
-    window.history.pushState({}, '', '/admin/dashboard');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCurrentTab("admin");
+    window.history.pushState({}, "", "/admin/dashboard");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const openAdminEditorNew = (templateUid?: string, orderId?: string) => {
@@ -93,12 +90,8 @@ export default function App() {
     setEditorInvitationId(null);
     setEditorTemplateUid(templateUid || null);
     setEditorOrderId(orderId || null);
-    setCurrentTab('admin-editor');
-    window.history.pushState(
-      {},
-      '',
-      templateUid ? `/admin/editor/new/${templateUid}` : '/admin/editor/new'
-    );
+    setCurrentTab("admin-editor");
+    window.history.pushState({}, "", templateUid ? `/admin/editor/new/${templateUid}` : "/admin/editor/new");
     window.scrollTo({ top: 0 });
   };
 
@@ -110,15 +103,15 @@ export default function App() {
     setEditorInvitationId(id);
     setEditorTemplateUid(null);
     setEditorOrderId(null);
-    setCurrentTab('admin-editor');
-    window.history.pushState({}, '', `/admin/editor/${id}`);
+    setCurrentTab("admin-editor");
+    window.history.pushState({}, "", `/admin/editor/${id}`);
     window.scrollTo({ top: 0 });
   };
 
   const handleLogout = () => {
     logoutAdmin();
-    setCurrentTab('admin-login');
-    window.history.pushState({}, '', '/admin/login');
+    setCurrentTab("admin-login");
+    window.history.pushState({}, "", "/admin/login");
     window.scrollTo({ top: 0 });
   };
 
@@ -131,7 +124,7 @@ export default function App() {
     const invMatch = path.match(/^\/i\/([A-Za-z0-9_-]+)/);
     if (invMatch) {
       setInvitationSlug(invMatch[1]);
-      setCurrentTab('invitation');
+      setCurrentTab("invitation");
       return;
     }
 
@@ -139,12 +132,12 @@ export default function App() {
     //   ?force=1 (clicked via "KELOLA UNDANGAN") → ALWAYS show the login form
     //   direct visit with a valid session → straight to the dashboard
     //   otherwise → login form
-    if (path === '/admin/login') {
-      const forceLogin = params.get('force') === '1';
+    if (path === "/admin/login") {
+      const forceLogin = params.get("force") === "1";
       if (!forceLogin && isAdminAuthenticated()) {
         goAdminDashboard();
       } else {
-        setCurrentTab('admin-login');
+        setCurrentTab("admin-login");
       }
       return;
     }
@@ -159,7 +152,7 @@ export default function App() {
       setEditorTemplateUid(adminNewMatch[1]);
       setEditorInvitationId(null);
       setEditorOrderId(null);
-      setCurrentTab('admin-editor');
+      setCurrentTab("admin-editor");
       return;
     }
 
@@ -173,11 +166,11 @@ export default function App() {
       setEditorInvitationId(adminEditMatch[1]);
       setEditorTemplateUid(null);
       setEditorOrderId(null);
-      setCurrentTab('admin-editor');
+      setCurrentTab("admin-editor");
       return;
     }
 
-    if (path === '/admin/editor' || path === '/admin/editor/') {
+    if (path === "/admin/editor" || path === "/admin/editor/") {
       if (!isAdminAuthenticated()) {
         goAdminLogin();
         return;
@@ -185,15 +178,15 @@ export default function App() {
       setEditorTemplateUid(null);
       setEditorInvitationId(null);
       setEditorOrderId(null);
-      setCurrentTab('admin-editor');
+      setCurrentTab("admin-editor");
       return;
     }
 
     // Admin dashboard + all admin pages (dashboard/invitations/orders/settings…)
     // — every admin route is protected.
-    if (path === '/admin' || path.startsWith('/admin/')) {
+    if (path === "/admin" || path.startsWith("/admin/")) {
       if (isAdminAuthenticated()) {
-        setCurrentTab('admin');
+        setCurrentTab("admin");
       } else {
         goAdminLogin();
       }
@@ -201,11 +194,11 @@ export default function App() {
     }
 
     // Legacy customer-editor routes → now admin-only: admins go to /admin, others see AccessDenied
-    if (path.startsWith('/editor') || path.startsWith('/dashboard')) {
+    if (path.startsWith("/editor") || path.startsWith("/dashboard")) {
       if (isAdminAuthenticated()) {
-        setCurrentTab('admin');
+        setCurrentTab("admin");
       } else {
-        setCurrentTab('denied');
+        setCurrentTab("denied");
       }
       return;
     }
@@ -213,10 +206,10 @@ export default function App() {
     // New demo format: /demo/{category}/{number}
     const newMatch = path.match(/\/demo\/(birthday|sunatan|wedding|aqiqah)\/(\d+)/);
     if (newMatch) {
-      const found = getTemplateByUid(`${newMatch[1]}-${newMatch[2].padStart(3, '0')}`);
+      const found = getTemplateByUid(`${newMatch[1]}-${newMatch[2].padStart(3, "0")}`);
       if (found) {
         setActiveDemoTemplate(found);
-        setCurrentTab('demo');
+        setCurrentTab("demo");
         return;
       }
     }
@@ -224,30 +217,28 @@ export default function App() {
     // Legacy demo format: /demo/057 → birthday
     const legacyMatch = path.match(/\/demo\/([a-zA-Z0-9]+)/);
     if (legacyMatch) {
-      const rawNum = legacyMatch[1].replace('#', '');
-      const found = TEMPLATES.find(
-        (t) => t.category === 'birthday' && t.templateNumber === rawNum.padStart(3, '0')
-      );
+      const rawNum = legacyMatch[1].replace("#", "");
+      const found = TEMPLATES.find((t) => t.category === "birthday" && t.templateNumber === rawNum.padStart(3, "0"));
       if (found) {
         setActiveDemoTemplate(found);
-        setCurrentTab('demo');
+        setCurrentTab("demo");
         return;
       }
     }
 
-    if (path.includes('/categories')) {
-      setCurrentTab('categories');
+    if (path.includes("/categories")) {
+      setCurrentTab("categories");
       return;
     }
 
-    if (path.includes('/templates')) {
+    if (path.includes("/templates")) {
       setCatalogCategory(readCategoryFromUrl());
-      setCurrentTab('templates');
+      setCurrentTab("templates");
       return;
     }
 
     // Default: public homepage (root "/" and any other unknown path)
-    setCurrentTab('home');
+    setCurrentTab("home");
   };
 
   // Route URL handler — runs before first paint so opening /admin directly
@@ -259,59 +250,59 @@ export default function App() {
       syncRouteWithLocation();
     };
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
   const handleSelectTab = (tab: NavigationTab) => {
-    if (tab === 'how-it-works') {
+    if (tab === "how-it-works") {
       setHowItWorksModalOpen(true);
       return;
     }
-    if (tab === 'faq') {
+    if (tab === "faq") {
       setFaqModalOpen(true);
       return;
     }
-    if (tab === 'music-credits') {
+    if (tab === "music-credits") {
       setMusicCreditsModalOpen(true);
       return;
     }
-    if (tab === 'categories') {
-      setCurrentTab('categories');
-      window.history.pushState({}, '', '/categories');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (tab === "categories") {
+      setCurrentTab("categories");
+      window.history.pushState({}, "", "/categories");
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    if (tab === 'dashboard') {
+    if (tab === "dashboard") {
       goAdminDashboard();
       return;
     }
     setCurrentTab(tab);
-    if (tab === 'home') {
-      window.history.pushState({}, '', '/');
-    } else if (tab === 'templates') {
-      window.history.pushState({}, '', '/templates');
+    if (tab === "home") {
+      window.history.pushState({}, "", "/");
+    } else if (tab === "templates") {
+      window.history.pushState({}, "", "/templates");
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleOpenCategory = (category: CategoryKey | 'All') => {
-    const cat = category === 'All' ? 'All' : category;
+  const handleOpenCategory = (category: CategoryKey | "All") => {
+    const cat = category === "All" ? "All" : category;
     setCatalogCategory(cat);
-    setCurrentTab('templates');
+    setCurrentTab("templates");
     const params = new URLSearchParams(window.location.search);
-    if (cat === 'All') params.delete('category');
-    else params.set('category', cat);
+    if (cat === "All") params.delete("category");
+    else params.set("category", cat);
     const qs = params.toString();
-    window.history.pushState({}, '', qs ? `/templates?${qs}` : '/templates');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.history.pushState({}, "", qs ? `/templates?${qs}` : "/templates");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleOpenDemo = (template: Template) => {
     setActiveDemoTemplate(template);
-    setCurrentTab('demo');
-    window.history.pushState({}, '', template.demoUrl);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCurrentTab("demo");
+    window.history.pushState({}, "", template.demoUrl);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleOpenWhatsAppModal = (template?: Template | null) => {
@@ -324,46 +315,33 @@ export default function App() {
   };
 
   const handleBackToCatalog = () => {
-    setCurrentTab('templates');
+    setCurrentTab("templates");
     const params = new URLSearchParams(window.location.search);
-    if (catalogCategory !== 'All') params.set('category', catalogCategory);
-    else params.delete('category');
+    if (catalogCategory !== "All") params.set("category", catalogCategory);
+    else params.delete("category");
     const qs = params.toString();
-    window.history.pushState({}, '', qs ? `/templates?${qs}` : '/templates');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.history.pushState({}, "", qs ? `/templates?${qs}` : "/templates");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Reset social meta whenever we leave the invitation page
   useEffect(() => {
-    if (currentTab !== 'invitation') resetSocialMeta();
+    if (currentTab !== "invitation") resetSocialMeta();
   }, [currentTab]);
 
-  const isFullscreenPage =
-    currentTab === 'invitation' ||
-    currentTab === 'admin' ||
-    currentTab === 'admin-editor' ||
-    currentTab === 'admin-login' ||
-    currentTab === 'admin-checking' ||
-    currentTab === 'denied';
+  const isFullscreenPage = currentTab === "invitation" || currentTab === "admin" || currentTab === "admin-editor" || currentTab === "admin-login" || currentTab === "admin-checking" || currentTab === "denied";
 
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col font-body">
       {/* Top Navbar (hidden on customer invitation & admin pages for a clean fullscreen experience) */}
-      {!isFullscreenPage && (
-        <Navigation
-          currentTab={currentTab as NavigationTab}
-          onSelectTab={handleSelectTab}
-          onOpenWhatsApp={handleOpenWhatsAppModal}
-          onOpenAdminLogin={goAdminLogin}
-        />
-      )}
+      {!isFullscreenPage && <Navigation currentTab={currentTab as NavigationTab} onSelectTab={handleSelectTab} onOpenWhatsApp={handleOpenWhatsAppModal} />}
 
       {/* Main Views */}
       <main className="flex-grow flex flex-col">
-        {currentTab === 'home' && (
+        {currentTab === "home" && (
           <HomeHero
             onExploreTemplates={() => {
-              handleOpenCategory('All');
+              handleOpenCategory("All");
             }}
             onOpenWhatsApp={() => handleOpenWhatsAppModal(activeDemoTemplate)}
             onSelectCategory={(cat) => handleOpenCategory(cat)}
@@ -371,58 +349,28 @@ export default function App() {
           />
         )}
 
-        {currentTab === 'categories' && (
-          <CategoriesPage onSelectCategory={(cat) => handleOpenCategory(cat)} />
-        )}
+        {currentTab === "categories" && <CategoriesPage onSelectCategory={(cat) => handleOpenCategory(cat)} />}
 
-        {currentTab === 'templates' && (
-          <TemplateCatalog
-            initialCategory={catalogCategory}
-            onOpenDemo={handleOpenDemo}
-            onOpenWhatsApp={(template) => handleOpenWhatsAppModal(template)}
-            onOrder={handleOpenOrder}
-          />
-        )}
+        {currentTab === "templates" && <TemplateCatalog initialCategory={catalogCategory} onOpenDemo={handleOpenDemo} onOpenWhatsApp={(template) => handleOpenWhatsAppModal(template)} onOrder={handleOpenOrder} />}
 
-        {currentTab === 'demo' && (
-          <TemplateDemoView
-            template={activeDemoTemplate}
-            onOrder={handleOpenOrder}
-            onBackToCatalog={handleBackToCatalog}
-          />
-        )}
+        {currentTab === "demo" && <TemplateDemoView template={activeDemoTemplate} onOrder={handleOpenOrder} onBackToCatalog={handleBackToCatalog} />}
 
-        {currentTab === 'invitation' && invitationSlug && (
-          <InvitationView slug={invitationSlug} onGoHome={goHome} />
-        )}
+        {currentTab === "invitation" && invitationSlug && <InvitationView slug={invitationSlug} onGoHome={goHome} />}
 
-        {currentTab === 'admin-login' && (
-          <AdminLogin
-            title="Login Admin"
-            onSuccess={() => goAdminDashboard()}
-            onGoHome={goHome}
-          />
-        )}
+        {currentTab === "admin-login" && <AdminLogin title="Login Admin" onSuccess={() => goAdminDashboard()} onGoHome={goHome} />}
 
-        {currentTab === 'admin-checking' && (
+        {currentTab === "admin-checking" && (
           <div className="flex-grow w-full min-h-screen flex items-center justify-center px-4 bg-background">
             <div className="flex flex-col items-center gap-3">
-              <span
-                className="w-7 h-7 border-[3px] border-primary border-t-transparent rounded-full animate-spin"
-                aria-hidden="true"
-              />
-              <p className="font-body text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-                Memeriksa akses...
-              </p>
+              <span className="w-7 h-7 border-[3px] border-primary border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+              <p className="font-body text-xs font-bold uppercase tracking-wider text-on-surface-variant">Memeriksa akses...</p>
             </div>
           </div>
         )}
 
-        {currentTab === 'denied' && (
-          <AccessDenied onGoHome={goHome} onTryAdmin={goAdminLogin} />
-        )}
+        {currentTab === "denied" && <AccessDenied onGoHome={goHome} onTryAdmin={goAdminLogin} />}
 
-        {currentTab === 'admin' && (
+        {currentTab === "admin" && (
           <Dashboard
             onEditInvitation={(id) => openAdminEditorEdit(id)}
             onPreviewInvitation={(slug) => openInvitation(slug)}
@@ -432,7 +380,7 @@ export default function App() {
           />
         )}
 
-        {currentTab === 'admin-editor' && (
+        {currentTab === "admin-editor" && (
           <InvitationEditor
             templateUid={editorTemplateUid || undefined}
             invitationId={editorInvitationId || undefined}
@@ -445,49 +393,22 @@ export default function App() {
       </main>
 
       {/* Footer (hidden on customer invitation & admin pages) */}
-      {!isFullscreenPage && (
-        <Footer
-          onSelectTab={handleSelectTab}
-          onSelectCategory={handleOpenCategory}
-          onOpenWhatsApp={() => handleOpenWhatsAppModal()}
-          onOpenDashboard={goAdminDashboard}
-        />
-      )}
+      {!isFullscreenPage && <Footer onSelectTab={handleSelectTab} onSelectCategory={handleOpenCategory} onOpenWhatsApp={() => handleOpenWhatsAppModal()} onOpenDashboard={goAdminDashboard} />}
 
       {/* Floating WhatsApp Button (hidden in demo/invitation so it never covers the music player) */}
-      {currentTab !== 'demo' && !isFullscreenPage && <FloatingWhatsAppButton />}
+      {currentTab !== "demo" && !isFullscreenPage && <FloatingWhatsAppButton />}
 
       {/* WhatsApp Order Modal */}
-      {waModalOpen && (
-        <WhatsAppOrderModal
-          template={waTemplate}
-          onClose={() => setWaModalOpen(false)}
-        />
-      )}
+      {waModalOpen && <WhatsAppOrderModal template={waTemplate} onClose={() => setWaModalOpen(false)} />}
 
       {/* Customer Order Flow Modal */}
-      {orderTemplate && (
-        <OrderFlowModal
-          template={orderTemplate}
-          onClose={() => setOrderTemplate(null)}
-        />
-      )}
+      {orderTemplate && <OrderFlowModal template={orderTemplate} onClose={() => setOrderTemplate(null)} />}
 
       {/* How It Works Modal */}
-      {howItWorksModalOpen && (
-        <HowItWorksModal
-          onClose={() => setHowItWorksModalOpen(false)}
-          onExploreTemplates={() => handleOpenCategory('All')}
-        />
-      )}
+      {howItWorksModalOpen && <HowItWorksModal onClose={() => setHowItWorksModalOpen(false)} onExploreTemplates={() => handleOpenCategory("All")} />}
 
       {/* FAQ Modal */}
-      {faqModalOpen && (
-        <FAQModal
-          onClose={() => setFaqModalOpen(false)}
-          onOpenWhatsApp={() => handleOpenWhatsAppModal()}
-        />
-      )}
+      {faqModalOpen && <FAQModal onClose={() => setFaqModalOpen(false)} onOpenWhatsApp={() => handleOpenWhatsAppModal()} />}
 
       {/* Music Credits Modal */}
       {musicCreditsModalOpen && (
