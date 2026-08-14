@@ -79,11 +79,9 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab,
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Kelola Undangan — desktop only (secondary action) */}
           <a
-            href="/admin/login?force=1"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/login?force=1"
             className="hidden xl:inline-flex items-center gap-1.5 font-body text-[11px] font-extrabold uppercase tracking-wider text-primary border border-primary/40 rounded-full px-4 py-2.5 hover:bg-primary hover:text-white transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-            title="Buka halaman login admin di tab baru"
+            title="Buka halaman login admin MomenKita"
           >
             <span className="material-symbols-outlined text-sm">dashboard</span>
             Kelola Undangan
@@ -132,18 +130,16 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab,
             </button>
           ))}
           <a
-            href="/admin/login?force=1"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/login?force=1"
             onClick={() => setMobileMenuOpen(false)}
             className="text-left font-body text-sm font-bold uppercase tracking-wider py-3 px-3 rounded-xl transition-colors cursor-pointer flex items-center justify-between text-primary hover:bg-surface-container-high focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-            title="Buka halaman login admin di tab baru"
+            title="Buka halaman login admin MomenKita"
           >
             <span className="flex items-center gap-2">
               <span className="material-symbols-outlined text-base">dashboard</span>
               Kelola Undangan
             </span>
-            <span className="material-symbols-outlined text-base opacity-60">open_in_new</span>
+            <span className="material-symbols-outlined text-base opacity-60">arrow_forward</span>
           </a>
           <UiButton variant="primary" size="md" fullWidth href={waHref} external icon="chat" iconFilled className="mt-2" onClick={() => setMobileMenuOpen(false)}>
             Pesan via WhatsApp

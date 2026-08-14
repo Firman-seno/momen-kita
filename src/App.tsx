@@ -68,7 +68,7 @@ export default function App() {
   // ---- Admin routing ----
   const goAdminLogin = () => {
     setCurrentTab("admin-login");
-    window.history.pushState({}, "", "/admin/login");
+    window.history.pushState({}, "", "/login");
     window.scrollTo({ top: 0 });
   };
 
@@ -111,7 +111,7 @@ export default function App() {
   const handleLogout = () => {
     logoutAdmin();
     setCurrentTab("admin-login");
-    window.history.pushState({}, "", "/admin/login");
+    window.history.pushState({}, "", "/login");
     window.scrollTo({ top: 0 });
   };
 
@@ -132,7 +132,7 @@ export default function App() {
     //   ?force=1 (clicked via "KELOLA UNDANGAN") → ALWAYS show the login form
     //   direct visit with a valid session → straight to the dashboard
     //   otherwise → login form
-    if (path === "/admin/login") {
+    if (path === "/login" || path === "/admin/login") {
       const forceLogin = params.get("force") === "1";
       if (!forceLogin && isAdminAuthenticated()) {
         goAdminDashboard();
