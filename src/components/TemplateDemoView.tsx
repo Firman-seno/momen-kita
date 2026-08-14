@@ -209,10 +209,10 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   const musicStartRef = useRef<Promise<boolean> | null>(null);
 
   /**
-   * Start background music exactly once. If the browser blocks autoplay
-   * (mobile policies), the attempt resolves false and the ref is cleared so a
-   * later user gesture (opening the cover) can retry. No play button is ever
-   * shown to the guest.
+   * Best-effort background music start used by the mount autoplay and the
+   * first-gesture listener. Never shows a control. If the browser blocks the
+   * attempt (mobile autoplay policies) it resolves false and clears the ref so
+   * a later user gesture can retry.
    */
   const ensureMusicStarted = () => {
     if (!audioEngineRef.current || disableMusic) return Promise.resolve(false);
@@ -220,14 +220,7 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
       musicStartRef.current = audioEngineRef.current
         .startWithFade()
         .then((started) => {
-          if (started) {
-            setIsPlayingMusic(true);
-            setIsMuted(false);
-            setMusicVolume(audioEngineRef.current?.getVolume() ?? 0.6);
-            setMusicBlocked(false);
-          } else {
-            musicStartRef.current = null;
-          }
+          if (!started) musicStartRef.current = null;
           return started;
         })
         .catch(() => {
@@ -351,6 +344,29 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
     return () => clearInterval(timer);
   }, []);
 
+  // Public invitation: the FIRST user gesture anywhere on the page also starts
+  // the music, so autoplay-blocked browsers (mobile) reliably begin playing on
+  // the very first tap without any visible Play button.
+  useEffect(() => {
+    if (!isInvitation || disableMusic) return;
+
+    const startOnFirstGesture = () => {
+      document.removeEventListener('pointerdown', startOnFirstGesture);
+      document.removeEventListener('touchstart', startOnFirstGesture);
+      document.removeEventListener('keydown', startOnFirstGesture);
+      void ensureMusicStarted();
+    };
+
+    document.addEventListener('pointerdown', startOnFirstGesture, { passive: true });
+    document.addEventListener('touchstart', startOnFirstGesture, { passive: true });
+    document.addEventListener('keydown', startOnFirstGesture);
+    return () => {
+      document.removeEventListener('pointerdown', startOnFirstGesture);
+      document.removeEventListener('touchstart', startOnFirstGesture);
+      document.removeEventListener('keydown', startOnFirstGesture);
+    };
+  }, [isInvitation, disableMusic]);
+
   // Handle opening invitation & triggering background music immediately
   const showMusicError = (msg: string) => {
     setMusicError(msg);
@@ -361,16 +377,24 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   const handleOpenInvitation = async () => {
     setCoverOpened(true);
 
+    // Reuse any in-flight autoplay/first-gesture attempt (avoids two
+    // overlapping tracks when both the document listener and this handler
+    // fire on the same tap). If it failed because the browser blocked
+    // autoplay, retry once here — we are now inside a user gesture, so the
+    // audio starts reliably without any visible Play button.
     let started = await ensureMusicStarted();
-    // The mount autoplay may have been rejected by the browser even though we
-    // are now inside a user gesture (e.g. the attempt was still in flight when
-    // the guest tapped). Retry once within the gesture so music always starts
-    // on the first interaction without requiring a dedicated Play button.
-    if (!started && !disableMusic && audioEngineRef.current) {
+    const engine = audioEngineRef.current;
+    if (!started && engine && !disableMusic) {
       musicStartRef.current = null;
       started = await ensureMusicStarted();
     }
-    if (!started) {
+
+    if (started) {
+      setIsPlayingMusic(true);
+      setIsMuted(false);
+      setMusicVolume(engine?.getVolume() ?? 0.6);
+      setMusicBlocked(false);
+    } else {
       setIsPlayingMusic(false);
       setMusicBlocked(true);
     }

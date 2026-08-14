@@ -134,6 +134,7 @@ export class TemplateAudioEngine {
         finish(false);
       };
       const onPlaying = () => {
+        this.isPlaying = true;
         finish(true);
       };
       const onMetadata = () => {
@@ -162,21 +163,22 @@ export class TemplateAudioEngine {
       if (p !== undefined) {
         p.then(() => {
           // Some browsers resolve before 'playing' fires
+          this.isPlaying = true;
           setTimeout(() => finish(true), 50);
         }).catch(() => {
           finish(false);
         });
       } else {
+        this.isPlaying = true;
         finish(true);
       }
     });
   }
 
   public async startWithFade(): Promise<boolean> {
+    const wasPlaying = this.isPlaying;
     const ok = await this.start();
-    if (ok && this.audioCtx) {
-      await this.fadeVolume(0, this.masterVolume, 1200);
-    } else if (ok) {
+    if (ok && !wasPlaying) {
       await this.fadeVolume(0, this.masterVolume, 1200);
     }
     return ok;
@@ -194,6 +196,13 @@ export class TemplateAudioEngine {
 
       if (this.audioCtx.state === 'suspended') {
         await this.audioCtx.resume();
+      }
+
+      // Only report success when the context is actually running. Some mobile
+      // browsers resolve resume() while leaving the context suspended, which
+      // would make us think music is playing while it is silent.
+      if (this.audioCtx.state !== 'running') {
+        return false;
       }
 
       this.gainNode = this.audioCtx.createGain();
