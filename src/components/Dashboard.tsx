@@ -7,7 +7,6 @@ import {
   getAllInvitations,
   deleteInvitation,
   getInvitationUrl,
-  getInvitationTitle,
   getInvitationDisplayName,
   invitationStatusLabel,
 } from '../lib/invitations';
@@ -29,9 +28,9 @@ import {
 } from '../lib/orders';
 import {
   buildWaLink,
-  invitationShareMessage,
   deliveryMessage,
 } from '../lib/whatsapp';
+import { WhatsAppIcon } from './WhatsAppIcon';
 import {
   getAdminEmail,
   setAdminEmail,
@@ -295,6 +294,27 @@ export const Dashboard: React.FC<DashboardProps> = ({
       setCopiedSlug(inv.slug);
       window.setTimeout(() => setCopiedSlug(null), 2000);
     }
+  };
+
+  /** Admin → Customer: opens WhatsApp to the CUSTOMER's number (from the order). */
+  const handleWaCustomer = (inv: Invitation) => {
+    const shareable = inv.status === 'published' || inv.status === 'expired';
+    if (!shareable) {
+      setToast('Publikasikan undangan terlebih dahulu.');
+      return;
+    }
+    if (!inv.customerPhone) {
+      setToast('Nomor WhatsApp customer belum tersedia.');
+      return;
+    }
+    if (!inv.slug) {
+      setToast('Link undangan belum tersedia.');
+      return;
+    }
+    const url = getInvitationUrl(inv);
+    const template = getTemplateByUid(inv.templateUid);
+    const name = inv.customerName || getInvitationDisplayName(inv, template);
+    window.open(buildWaLink(deliveryMessage(name, url), inv.customerPhone), '_blank', 'noopener,noreferrer');
   };
 
   const handleDelete = () => {
@@ -672,8 +692,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 {filteredInvitations.map((inv) => {
                   const template = getTemplateByUid(inv.templateUid);
                   const displayName = getInvitationDisplayName(inv, template);
-                  const title = getInvitationTitle(inv, template);
-                  const url = getInvitationUrl(inv);
                   const shareable = inv.status === 'published' || inv.status === 'expired';
                   return (
                     <article key={inv.id} className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col lg:flex-row lg:items-center gap-4">
@@ -721,30 +739,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           <span className="material-symbols-outlined text-sm">{copiedSlug === inv.slug ? 'check' : 'content_copy'}</span>
                           {copiedSlug === inv.slug ? 'Tersalin' : 'Copy Link'}
                         </button>
-                        {inv.customerPhone && (
-                          <a
-                            href={buildWaLink(deliveryMessage(inv.customerName || displayName, url), inv.customerPhone)}
-                            target="_blank"
-                            rel="noreferrer"
-                            disabled={!shareable}
-                            className={`btn-micro min-h-[36px] px-3 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 cursor-pointer ${shareable ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-surface-container-low text-outline border border-outline-variant pointer-events-none'}`}
-                            title={shareable ? 'Kirim link ke customer via WhatsApp' : 'Publikasikan dulu'}
-                          >
-                            <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>send</span> Send
-                          </a>
-                        )}
-                        {inv.customerPhone && (
-                          <a
-                            href={buildWaLink(invitationShareMessage(title, url, inv.eventDate), inv.customerPhone)}
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-disabled={!shareable}
-                            className={`btn-micro min-h-[36px] px-3 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 cursor-pointer ${shareable ? 'bg-primary text-white hover:bg-[#1d2d54]' : 'bg-surface-container-low text-outline border border-outline-variant pointer-events-none'}`}
-                            title={shareable ? 'Bagikan link ke customer via WhatsApp' : 'Publikasikan dulu'}
-                          >
-                            <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>chat</span> WA
-                          </a>
-                        )}
+                        <button
+                          onClick={() => handleWaCustomer(inv)}
+                          className={`btn-micro min-h-[36px] px-3 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 cursor-pointer ${shareable && inv.customerPhone ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm' : 'bg-surface-container-low text-outline border border-outline-variant'}`}
+                          title={shareable ? 'Kirim link ke customer via WhatsApp' : 'Publikasikan dulu'}
+                        >
+                          <WhatsAppIcon size={14} /> WA
+                        </button>
                         <button onClick={() => setConfirmDelete({ kind: 'invitation', id: inv.id })} className="btn-micro min-h-[36px] px-3 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 cursor-pointer">
                           <span className="material-symbols-outlined text-sm">delete</span>
                         </button>

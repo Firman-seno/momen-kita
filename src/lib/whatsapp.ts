@@ -106,11 +106,93 @@ export const templateOrderMessage = (template: {
 /** Admin → Customer: invitation is finished & the unique link is live. */
 export const deliveryMessage = (customerName: string, url: string): string =>
   `Halo Kak ${customerName} 👋\n\n` +
-  `Undangan digital Kakak sudah selesai dibuat oleh MomenKita. ✨\n\n` +
-  `Silakan buka undangan melalui link berikut:\n\n` +
+  `Undangan digital Kakak sudah selesai dibuat.\n\n` +
+  `Berikut link undangannya:\n\n` +
   `${url}\n\n` +
-  `Semoga undangannya berkenan dan acaranya berjalan lancar. 🙏\n\n` +
-  `Terima kasih sudah menggunakan MomenKita.`;
+  `Silakan dicek terlebih dahulu ya.\n\n` +
+  `Terima kasih sudah menggunakan MomenKita 💕`;
+
+interface GuestInvitationParams {
+  /** Name typed by the customer (replaces [NAMA TAMU]); never empty. */
+  guestName: string;
+  /** Display title of the invitation, e.g. "Undangan Pernikahan Aditya & Nadia". */
+  title: string;
+  /** Public URL of the invitation, e.g. https://momenkita.com/i/miko-abc123. */
+  url: string;
+  /** Event category: wedding | birthday | sunatan | aqiqah | other. */
+  category: string;
+  eventDate?: string;
+  eventTime?: string;
+  venue?: string;
+}
+
+/**
+ * Customer → Guest: auto message used by the "KIRIM UNDANGAN" button on the
+ * public invitation. The message adapts to the event category and includes
+ * the real invitation data (names via title, date, time, venue, public URL).
+ * The only thing the customer edits is the guest name.
+ */
+export const guestInvitationMessage = ({
+  guestName,
+  title,
+  url,
+  category,
+  eventDate,
+  eventTime,
+  venue,
+}: GuestInvitationParams): string => {
+  const guest = guestName.trim();
+  const detailLines: string[] = [];
+  if (eventDate) detailLines.push(`📅 Tanggal: ${eventDate}`);
+  if (eventTime) detailLines.push(`🕐 Waktu: ${eventTime}`);
+  if (venue) detailLines.push(`📍 Lokasi: ${venue}`);
+  const details = detailLines.length ? `\n\n${detailLines.join('\n')}` : '';
+
+  let body: string;
+  switch (category) {
+    case 'wedding':
+      body =
+        `Dengan penuh kebahagiaan, kami mengundang Anda untuk hadir di acara pernikahan kami.\n\n` +
+        `Berikut undangan digital kami:\n\n` +
+        `💌 ${title}\n${url}${details}\n\n` +
+        `Kami sangat berharap ${guest} dapat hadir untuk memberikan doa dan restu.\n\n` +
+        `Sampai jumpa di hari bahagia kami ❤️`;
+      break;
+    case 'sunatan':
+      body =
+        `Dengan penuh kebahagiaan, kami mengundang Anda untuk hadir di acara khitanan / sunatan kami.\n\n` +
+        `Berikut undangan digitalnya:\n\n` +
+        `💌 ${title}\n${url}${details}\n\n` +
+        `Kami akan sangat senang jika ${guest} dapat hadir dan memberikan doa serta restunya.\n\n` +
+        `Sampai jumpa!`;
+      break;
+    case 'aqiqah':
+      body =
+        `Dengan penuh kebahagiaan, kami mengundang Anda untuk hadir di acara aqiqah kami.\n\n` +
+        `Berikut undangan digitalnya:\n\n` +
+        `💌 ${title}\n${url}${details}\n\n` +
+        `Kami akan sangat senang jika ${guest} dapat hadir dan memberikan doa serta restunya.\n\n` +
+        `Sampai jumpa!`;
+      break;
+    case 'birthday':
+      body =
+        `Dengan penuh kebahagiaan, kami mengundang Anda untuk hadir di acara ulang tahun kami.\n\n` +
+        `Berikut undangan digitalnya:\n\n` +
+        `💌 ${title}\n${url}${details}\n\n` +
+        `Kami akan sangat senang jika ${guest} dapat hadir dan merayakan momen spesial ini bersama kami 🎉\n\n` +
+        `Sampai jumpa!`;
+      break;
+    default:
+      body =
+        `Dengan penuh kebahagiaan, kami mengundang Anda untuk hadir di acara spesial kami.\n\n` +
+        `Berikut undangan digitalnya:\n\n` +
+        `💌 ${title}\n${url}${details}\n\n` +
+        `Kami akan sangat senang jika ${guest} dapat hadir.\n\n` +
+        `Sampai jumpa!`;
+  }
+
+  return `Halo ${guest} 👋\n\n${body}`;
+};
 
 /** Customer → Admin: request a change on an existing invitation. */
 export const changeRequestMessage = (url: string): string =>
