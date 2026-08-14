@@ -133,6 +133,11 @@ export const InvitationView: React.FC<InvitationViewProps> = ({ slug, onGoHome }
         wishesOverride={template.sampleWishes}
         musicOverride={invitation.music ? { title: invitation.music.title, url: invitation.music.url, startTime: invitation.music.startTime } : null}
         disableMusic={invitation.musicEnabled === false}
+        videoOverride={
+          invitation.videoUrl
+            ? { url: invitation.videoUrl, type: invitation.videoType, name: invitation.videoName }
+            : null
+        }
         onOpenWhatsApp={() => undefined}
         onBackToCatalog={onGoHome}
       />

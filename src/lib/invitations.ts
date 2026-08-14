@@ -37,6 +37,8 @@ export interface Invitation {
   templateUid: string; // e.g. "aqiqah-002"
   category: CategoryKey;
   templateNumber: string; // e.g. "002"
+  /** Template cover image (public URL) — used as og:image fallback by the server. */
+  templateImage?: string;
   customerName: string;
   customerPhone: string;
   eventDate: string;
@@ -51,6 +53,12 @@ export interface Invitation {
   music?: InvitationMusic | null;
   /** If false, the invitation plays no background music. */
   musicEnabled?: boolean;
+  /** Public HTTPS URL of the invitation video (hosted on Vercel Blob). */
+  videoUrl?: string;
+  /** MIME type of the video (e.g. "video/mp4"). */
+  videoType?: string;
+  /** Original filename, kept for display in the admin editor. */
+  videoName?: string;
   /** Template-specific + extra fields (birthdayPerson, groomName, photos, quotes…). */
   customData: Partial<EventDetails> & Record<string, unknown>;
   createdAt: number;

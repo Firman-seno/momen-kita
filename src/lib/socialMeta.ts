@@ -1,5 +1,6 @@
 import { Template } from '../types';
 import { Invitation, getInvitationTitle } from './invitations';
+import { resolveInvitationOgImage } from './imageStorage';
 
 /* ============================================================
    MomenKita — Dynamic Social Share Metadata
@@ -109,7 +110,7 @@ export const applyInvitationMeta = (
   applySocialMeta({
     title,
     description: descBits.join(' '),
-    image: template.image,
+    image: resolveInvitationOgImage(invitation, template) || template.image,
     url,
   });
 };

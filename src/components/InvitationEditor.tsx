@@ -14,6 +14,13 @@ import {
 import { getOrderById, updateOrder } from '../lib/orders';
 import { previewTrack, stopPreview } from '../lib/audioEngine';
 import { fileToOptimizedDataUrl, fileToDataUrl } from '../lib/imageUtils';
+import { uploadImageToPublic } from '../lib/imageStorage';
+import {
+  validateVideoFile,
+  isValidPublicVideoUrl,
+  uploadVideoToPublic,
+  deletePublicVideo,
+} from '../lib/videoStorage';
 import { UiButton } from './UiButton';
 import { Toast } from './Toast';
 import { SharePanel } from './SharePanel';
@@ -44,6 +51,9 @@ interface FormData {
   gallery2: string;
   gallery3: string;
   gallery4: string;
+  videoUrl: string;
+  videoType: string;
+  videoName: string;
   birthdayPerson: string;
   age: string;
   childName: string;
@@ -83,6 +93,9 @@ const emptyForm = (): FormData => ({
   gallery2: '',
   gallery3: '',
   gallery4: '',
+  videoUrl: '',
+  videoType: '',
+  videoName: '',
   birthdayPerson: '',
   age: '',
   childName: '',
@@ -164,6 +177,9 @@ const formFromInvitation = (inv: Invitation): FormData => {
     if (i === 2) f.gallery3 = g;
     if (i === 3) f.gallery4 = g;
   });
+  f.videoUrl = inv.videoUrl || '';
+  f.videoType = inv.videoType || '';
+  f.videoName = inv.videoName || '';
   if (inv.category === 'birthday') {
     f.birthdayPerson = d.birthdayPerson || '';
     f.age = d.age != null ? String(d.age) : '';
@@ -417,6 +433,8 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
   const [previewingTrack, setPreviewingTrack] = useState<string | null>(null);
   const previewTimerRef = useRef<number | null>(null);
   const [uploadingField, setUploadingField] = useState<string | null>(null);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videoProgress, setVideoProgress] = useState<number | null>(null);
   const [musicGenreFilter, setMusicGenreFilter] = useState<'All' | TrackGenre>('All');
   const [musicVocalFilter, setMusicVocalFilter] = useState<'all' | 'vocal' | 'instrumental'>('all');
   // Custom (admin-uploaded) music file — kept separate from library picks so
@@ -454,13 +472,68 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
     setUploadingField(field);
     try {
       const dataUrl = await fileToOptimizedDataUrl(file);
-      set(field)(dataUrl);
+      const folder = savedInvitation?.slug
+        ? `invitations/${savedInvitation.slug}`
+        : undefined;
+      const publicUrl = await uploadImageToPublic(dataUrl, folder);
+      if (publicUrl) {
+        set(field)(publicUrl);
+      } else {
+        set(field)(dataUrl);
+        setToast('Penyimpanan cloud belum aktif — foto disimpan lokal (pratinjau WhatsApp mungkin tidak menampilkan foto).');
+        setToastIcon('info');
+      }
     } catch {
       setToast('Gagal memproses foto.');
       setToastIcon('error');
     } finally {
       setUploadingField(null);
     }
+  };
+
+  const handleVideoUpload = async (file: File | null) => {
+    if (!file || uploadingVideo) return;
+    const validationError = validateVideoFile(file);
+    if (validationError) {
+      setToast(validationError);
+      setToastIcon('error');
+      return;
+    }
+    const previousUrl = form.videoUrl;
+    setUploadingVideo(true);
+    setVideoProgress(0);
+    try {
+      const folder = savedInvitation?.slug
+        ? `invitations/${savedInvitation.slug}`
+        : 'invitations';
+      const publicUrl = await uploadVideoToPublic(file, folder, (p) => setVideoProgress(Math.round(p)));
+      if (!publicUrl) {
+        throw new Error('Upload gagal');
+      }
+      const name = file.name || undefined;
+      const type = file.type || undefined;
+      // Only commit when the new upload succeeded — a failed replace keeps the old video.
+      setForm((prev) => ({ ...prev, videoUrl: publicUrl, videoType: type, videoName: name }));
+      if (previousUrl && previousUrl !== publicUrl) {
+        void deletePublicVideo(previousUrl);
+      }
+      setToast('Video berhasil diupload dan tersimpan.');
+      setToastIcon('success');
+    } catch {
+      setToast('Video gagal diupload. Silakan coba lagi.');
+      setToastIcon('error');
+    } finally {
+      setUploadingVideo(false);
+      setVideoProgress(null);
+    }
+  };
+
+  const handleRemoveVideo = () => {
+    const oldUrl = form.videoUrl;
+    setForm((prev) => ({ ...prev, videoUrl: '', videoType: '', videoName: '' }));
+    if (oldUrl) void deletePublicVideo(oldUrl);
+    setToast('Video dihapus dari undangan.');
+    setToastIcon('info');
   };
 
   const handleMusicUpload = async (file: File | null) => {
@@ -528,6 +601,9 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
     if (cat === 'sunatan' && !form.childName.trim()) return 'Nama anak wajib diisi.';
     if (cat === 'aqiqah' && !form.babyName.trim()) return 'Nama bayi wajib diisi.';
     if (cat === 'birthday' && !form.birthdayPerson.trim()) return 'Nama yang berulang tahun wajib diisi.';
+    if (form.videoUrl && !isValidPublicVideoUrl(form.videoUrl)) {
+      return 'Video gagal diupload. Silakan coba lagi.';
+    }
     return null;
   };
 
@@ -548,6 +624,7 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
       templateUid: template.uid,
       category: cat,
       templateNumber: template.templateNumber,
+      templateImage: template.image,
       customerName: form.customerName,
       customerPhone: form.customerPhone,
       eventDate: form.eventDate,
@@ -558,6 +635,9 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
       orderId: linkedOrder?.id || savedInvitation?.orderId || undefined,
       music: musicEnabled && music ? { ...music, startTime: musicStartTime } : null,
       musicEnabled,
+      videoUrl: form.videoUrl || undefined,
+      videoType: form.videoType || undefined,
+      videoName: form.videoName || undefined,
       customData,
       status: publish ? 'published' : 'draft',
     };
@@ -1038,6 +1118,78 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
             <PhotoField label="Foto Galeri 3" value={form.gallery3} onUpload={(file) => handlePhotoUpload('gallery3', file)} onRemove={() => set('gallery3')('')} uploading={uploadingField === 'gallery3'} />
             <PhotoField label="Foto Galeri 4" value={form.gallery4} onUpload={(file) => handlePhotoUpload('gallery4', file)} onRemove={() => set('gallery4')('')} uploading={uploadingField === 'gallery4'} />
           </div>
+
+          {/* Section: Video */}
+          <div className="md:col-span-2">
+            <h3 className="font-body text-[11px] font-bold uppercase tracking-widest text-on-surface-variant border-b border-outline-variant/40 pb-2 mb-4 mt-2 flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-sm">videocam</span> Video Undangan
+            </h3>
+          </div>
+          <div className="md:col-span-2">
+            <input
+              id="video-input"
+              type="file"
+              accept="video/*,.mp4,.m4v,.webm,.mov,.ogv"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                void handleVideoUpload(file);
+                e.currentTarget.value = '';
+              }}
+            />
+            {form.videoUrl ? (
+              <div className="rounded-xl border border-outline-variant/60 bg-surface-container-lowest p-3">
+                <video src={form.videoUrl} controls playsInline className="w-full max-h-64 rounded-lg bg-black/10 object-contain" />
+                {form.videoName && (
+                  <p className="mt-2 font-body text-[10px] text-on-surface-variant truncate">
+                    <span className="material-symbols-outlined text-[12px] align-text-bottom">movie</span> {form.videoName}
+                  </p>
+                )}
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <label
+                    htmlFor="video-input"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-on-primary font-body text-[11px] font-bold uppercase tracking-wider cursor-pointer hover:bg-[#1d2d54] transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-base">file_upload</span>
+                    Ganti Video
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleRemoveVideo}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-surface-container-highest text-on-surface font-body text-[11px] font-bold uppercase tracking-wider cursor-pointer hover:bg-outline-variant/60 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-base">delete</span>
+                    Hapus Video
+                  </button>
+                </div>
+              </div>
+            ) : uploadingVideo ? (
+              <div className="rounded-xl border border-outline-variant/60 bg-surface-container-lowest p-4 flex flex-col items-center gap-3 text-center">
+                <span className="material-symbols-outlined text-2xl animate-spin text-primary" style={{ animationDirection: 'reverse' }}>progress_activity</span>
+                <p className="font-body text-[11px] font-bold text-on-surface">Mengunggah video... {videoProgress != null ? `${videoProgress}%` : ''}</p>
+                <div className="w-full max-w-xs h-2 rounded-full bg-outline-variant/50 overflow-hidden">
+                  <div className="h-full bg-primary transition-all duration-200" style={{ width: `${videoProgress ?? 0}%` }} />
+                </div>
+                <p className="font-body text-[9px] sm:text-[10px] text-on-surface-variant">
+                  Jangan tutup halaman ini hingga upload selesai.
+                </p>
+              </div>
+            ) : (
+              <div>
+                <label
+                  htmlFor="video-input"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-on-primary font-body text-[11px] font-bold uppercase tracking-wider cursor-pointer hover:bg-[#1d2d54] transition-colors"
+                >
+                  <span className="material-symbols-outlined text-base">upload_file</span>
+                  Upload Video (MP4)
+                </label>
+                <p className="font-body text-[9px] sm:text-[10px] text-on-surface-variant mt-2">
+                  MP4/WebM/MOV/OGV maksimal 50 MB. Video tampil otomatis di undangan publik untuk semua tamu — di semua
+                  perangkat, termasuk ponsel, tanpa perlu login. Disarankan MP4.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Required name hint */}
@@ -1127,6 +1279,11 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
                 wishesOverride={template.sampleWishes}
                 musicOverride={musicEnabled ? { ...music, startTime: musicStartTime } : null}
                 disableMusic={!musicEnabled}
+                videoOverride={
+                  previewForm.videoUrl
+                    ? { url: previewForm.videoUrl, type: previewForm.videoType, name: previewForm.videoName }
+                    : null
+                }
                 onOpenWhatsApp={() => undefined}
                 onBackToCatalog={() => setPreviewOpen(false)}
               />

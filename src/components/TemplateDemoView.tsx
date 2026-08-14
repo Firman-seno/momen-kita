@@ -12,6 +12,8 @@ import { getInvitationUrl } from '../lib/invitations';
 import { WhatsAppIcon } from './WhatsAppIcon';
 import { getTemplatePrice } from '../lib/templatePricing';
 import { RatingSection } from './RatingSection';
+import { InvitationVideo } from './InvitationVideo';
+import { isValidPublicVideoUrl } from '../lib/videoStorage';
 
 interface TemplateDemoViewProps {
   template: Template;
@@ -38,6 +40,12 @@ interface TemplateDemoViewProps {
   } | null;
   /** When true, the invitation plays no background music. */
   disableMusic?: boolean;
+  /** Customer invitation video (public URL). Rendered for every template. */
+  videoOverride?: {
+    url?: string;
+    type?: string;
+    name?: string;
+  } | null;
   /** Optional custom back target label/action for invitation mode. */
   onBackLabel?: string;
 }
@@ -170,6 +178,7 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   isInvitation = false,
   musicOverride,
   disableMusic = false,
+  videoOverride,
   onBackLabel,
 }) => {
   // Admin-chosen music for customer invitations (falls back to template default)
@@ -185,6 +194,10 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
 
   // Cover opening state
   const [coverOpened, setCoverOpened] = useState(false);
+
+  // Customer invitation video — only ever a public https URL (never blob:/data:)
+  const activeVideoUrl =
+    videoOverride?.url && isValidPublicVideoUrl(videoOverride.url) ? videoOverride.url : undefined;
 
   // View mode for desktop (phone frame vs full screen)
   const [viewMode, setViewMode] = useState<'phone' | 'fullscreen'>(isInvitation ? 'fullscreen' : 'phone');
@@ -1075,6 +1088,28 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
                   ))}
                 </Stagger>
               </section>
+
+              {/* SECTION 5b: VIDEO (streamed from public storage — every template) */}
+              {activeVideoUrl && (
+                <section className="my-10">
+                  <Reveal profile={profile} variant="up">
+                    <h2
+                      className="text-2xl font-bold text-center mb-6 drop-shadow-sm"
+                      style={{ fontFamily: themeStyle.fontFamilyTitle, color: themeStyle.textColor }}
+                    >
+                      Video
+                    </h2>
+                  </Reveal>
+                  <Reveal profile={profile} variant="fade">
+                    <InvitationVideo
+                      url={activeVideoUrl}
+                      type={videoOverride?.type}
+                      poster={eventDetails.portraitImage || undefined}
+                      name={videoOverride?.name}
+                    />
+                  </Reveal>
+                </section>
+              )}
 
               {/* SECTION 6: LOCATION MAP */}
               <section className="my-10 text-center">
