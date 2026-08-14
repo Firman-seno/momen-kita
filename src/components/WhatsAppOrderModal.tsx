@@ -1,6 +1,7 @@
 import React from 'react';
 import { Template } from '../types';
 import { formatRupiah } from '../data/templates';
+import { getTemplatePrice } from '../lib/templatePricing';
 import { WHATSAPP_PRIMARY, WHATSAPP_ALTERNATE, buildWaLink, templateOrderMessage } from '../lib/whatsapp';
 import { UiButton } from './UiButton';
 
@@ -51,11 +52,21 @@ export const WhatsAppOrderModal: React.FC<WhatsAppOrderModalProps> = ({ template
               </span>
               <h4 className="font-headline text-base font-bold text-on-surface">{template.name}</h4>
               <p className="font-body text-sm font-extrabold text-primary mt-1">
-                {formatRupiah(template.price)}
+                {formatRupiah(getTemplatePrice(template))}
               </p>
             </div>
           </div>
         )}
+
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-2.5 flex items-start gap-2 mb-4">
+          <span className="material-symbols-outlined text-base text-amber-600 shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>
+            sync
+          </span>
+          <p className="font-body text-[10px] sm:text-[11px] text-amber-800 leading-relaxed">
+            <strong className="font-extrabold">Maksimal 3x Revisi.</strong>{' '}
+            Setiap pembelian undangan mendapatkan maksimal 3x revisi. Pastikan data yang diberikan sudah benar sebelum proses pembuatan dimulai.
+          </p>
+        </div>
 
         <div className="bg-surface-container-low border border-outline-variant/40 rounded-xl p-4 mb-6">
           <p className="font-body text-xs text-on-surface-variant leading-relaxed">

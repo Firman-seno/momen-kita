@@ -11,8 +11,13 @@ import {
   verifyOrderPayment,
   rejectOrderPayment,
   updateOrder,
+  getRevisionProgress,
+  canRequestRevision,
+  recordRevision,
+  completeOrderWithFinalLink,
 } from '../lib/orders';
-import { buildWaLink, paymentVerifiedMessage } from '../lib/whatsapp';
+import { getInvitationById, getInvitationUrl } from '../lib/invitations';
+import { buildWaLink, paymentVerifiedMessage, deliveryMessage } from '../lib/whatsapp';
 import { getAdminEmail } from '../lib/admin';
 import { OrderStatusBadge } from './OrderStatusBadge';
 
@@ -45,6 +50,12 @@ export const AdminOrderDetail: React.FC<AdminOrderDetailProps> = ({
   onNewInvitation,
 }) => {
   const [status, setStatus] = useState<OrderStatus>(order.status);
+  const [revisionNote, setRevisionNote] = useState('');
+  const [finalLink, setFinalLink] = useState(() => {
+    if (order.finalInvitationUrl) return order.finalInvitationUrl;
+    const inv = order.invitationId ? getInvitationById(order.invitationId) : undefined;
+    return inv ? getInvitationUrl(inv) : '';
+  });
   const admin = getAdminEmail();
 
   const handleVerify = () => {
@@ -71,6 +82,30 @@ export const AdminOrderDetail: React.FC<AdminOrderDetailProps> = ({
       setStatus(next);
       onChanged();
       onToast(`Status ${order.id} → ${ORDER_STATUS_LABELS[next]}.`);
+    }
+  };
+
+  const handleRecordRevision = () => {
+    const updated = recordRevision(order.id, revisionNote.trim());
+    if (updated) {
+      setRevisionNote('');
+      setStatus(updated.status);
+      onChanged();
+      onToast(`Revisi ${updated.id} dicatat (${getRevisionProgress(updated).used}/${getRevisionProgress(updated).max}).`);
+    }
+  };
+
+  const handleCompleteWithLink = () => {
+    const url = finalLink.trim();
+    if (!url) {
+      onToast('Masukkan link undangan final terlebih dahulu.');
+      return;
+    }
+    const updated = completeOrderWithFinalLink(order.id, url);
+    if (updated) {
+      setStatus(updated.status);
+      onChanged();
+      onToast(`Pesanan ${order.id} diselesaikan — rating customer aktif.`);
     }
   };
 
@@ -106,7 +141,21 @@ export const AdminOrderDetail: React.FC<AdminOrderDetailProps> = ({
             )}
             <div className="min-w-0">
               <p className="font-mono text-sm font-bold text-primary truncate">{order.id}</p>
-              <OrderStatusBadge status={order.status} />
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <OrderStatusBadge status={order.status} />
+                {order.hasRated && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
+                    <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                    Sudah dirating
+                  </span>
+                )}
+                {order.status === 'COMPLETED' && !order.hasRated && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold">
+                    <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                    Menunggu rating customer
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           <button onClick={onClose} className="text-outline hover:text-on-surface p-1 cursor-pointer" aria-label="Tutup">
@@ -211,6 +260,82 @@ export const AdminOrderDetail: React.FC<AdminOrderDetailProps> = ({
               <p className="font-body text-xs text-on-surface whitespace-pre-wrap">{order.notes}</p>
             </div>
           )}
+
+          {/* Revision tracking */}
+          <div className="bg-surface-container-low rounded-xl p-3.5 border border-outline-variant/40">
+            <div className="flex items-center justify-between mb-1.5">
+              <p className={`${FIELD_LABEL} text-primary !mb-0`}>🔄 Revisi</p>
+              <p className={`font-body text-[11px] font-extrabold ${canRequestRevision(order) ? 'text-on-surface' : 'text-rose-600'}`}>
+                {getRevisionProgress(order).used} / {getRevisionProgress(order).max}
+              </p>
+            </div>
+            <div className="h-2 rounded-full bg-surface-container-high overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${getRevisionProgress(order).used >= getRevisionProgress(order).max ? 'bg-rose-500' : 'bg-[#C9A45C]'}`}
+                style={{ width: `${Math.min((getRevisionProgress(order).used / getRevisionProgress(order).max) * 100, 100)}%` }}
+              />
+            </div>
+            <p className="font-body text-[10px] text-on-surface-variant mt-1.5 leading-relaxed">
+              Setiap pembelian undangan mendapatkan maksimal {getRevisionProgress(order).max}x revisi. Catat setiap permintaan revisi dari customer.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 mt-2.5">
+              <input
+                type="text"
+                value={revisionNote}
+                onChange={(e) => setRevisionNote(e.target.value)}
+                placeholder="Catatan revisi (mis. ubah warna, tambah foto, ganti nama)..."
+                className="flex-1 min-w-0 bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 font-body text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-outline/70 transition-colors"
+              />
+              <UiButton
+                variant="secondary"
+                size="md"
+                icon="sync"
+                iconFilled
+                onClick={handleRecordRevision}
+                disabled={!canRequestRevision(order)}
+                title={canRequestRevision(order) ? 'Catat permintaan revisi customer' : 'Batas revisi telah tercapai'}
+              >
+                Catat Revisi
+              </UiButton>
+            </div>
+          </div>
+
+          {/* Final delivery — completing the order activates the customer rating */}
+          <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5">
+            <div className="flex items-center justify-between mb-1.5">
+              <p className="font-body text-[9px] font-bold uppercase tracking-wider text-emerald-700 !mb-0">
+                📬 Undangan Final
+              </p>
+              {order.status === 'COMPLETED' && (
+                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-200 bg-emerald-100 text-emerald-700">
+                  {order.hasRated ? 'Sudah dirating' : 'Menunggu rating customer'}
+                </span>
+              )}
+            </div>
+            <p className="font-body text-[10px] text-emerald-800/80 leading-relaxed">
+              Kirim link undangan final ke customer, lalu selesaikan pesanan. Setelah selesai, customer wajib memberikan rating 1–5 sebelum dapat melanjutkan.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 mt-2.5">
+              <input
+                type="text"
+                value={finalLink}
+                onChange={(e) => setFinalLink(e.target.value)}
+                placeholder="https://momenkita.id/i/... (link undangan final)"
+                className="flex-1 min-w-0 bg-white border border-emerald-200 rounded-lg px-3 py-2 font-mono text-[11px] text-on-surface focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-400 placeholder:text-outline/70 transition-colors"
+              />
+              <UiButton
+                variant="whatsapp"
+                size="md"
+                icon="verified"
+                iconFilled
+                onClick={handleCompleteWithLink}
+                disabled={order.status === 'COMPLETED' && !!order.finalInvitationUrl}
+                title="Selesaikan pesanan & aktifkan rating customer"
+              >
+                Selesaikan Pesanan
+              </UiButton>
+            </div>
+          </div>
 
           {/* Meta */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 font-body text-[10px] text-outline">

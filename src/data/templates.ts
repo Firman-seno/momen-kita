@@ -1,5 +1,6 @@
 import { Template, ThemeStyle, EventDetails, WishItem, CategoryKey, TemplateBadge, FontStyleName, AnimationStyle, BackgroundType, FrameStyle, ButtonStyle } from '../types';
 import { getTemplateMusic } from '../lib/musicMatching';
+import { DEFAULT_TEMPLATE_PRICE } from '../lib/templatePricing';
 
 /* ============================================================
    CATEGORY DEFINITIONS
@@ -907,13 +908,6 @@ const AQIQAH_QUOTES = [
 ];
 const WEDDING_HASHTAGS = ['#EternalLove', '#OurWedding', '#SatuHatiSatuCinta', '#ForeverAndAlways', '#AkadDanResepsi', '#HappilyEverAfter'];
 
-const PRICE_BASE: Record<CategoryKey, number> = {
-  birthday: 59000,
-  sunatan: 79000,
-  wedding: 149000,
-  aqiqah: 79000,
-};
-
 const pick = <T,>(arr: T[], i: number): T => arr[i % arr.length];
 
 const buildEventDetails = (category: CategoryKey, idx: number, portrait: string): EventDetails => {
@@ -1093,7 +1087,7 @@ export const TEMPLATES: Template[] = (() => {
       const [name, , , , , , seedBadge] = seed;
       const palette = PALETTES[seed[3]] || pick(FALLBACK_PALETTES[catKey].map((k) => PALETTES[k]), i);
       const badge = seedBadge || ((i === 19 || i === 49 || i === 79) ? 'TRENDING' : undefined);
-      const price = PRICE_BASE[catKey] + ((i * 13) % 40) * 5000;
+      const price = DEFAULT_TEMPLATE_PRICE;
       const portrait = pick(IMAGE_POOLS[catKey], i * 7 + 3);
       const eventDetails = buildEventDetails(catKey, i, portrait);
       const themeStyle = buildThemeStyle(catKey, seed, i);

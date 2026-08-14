@@ -2,6 +2,9 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { TEMPLATES, formatRupiah, CATEGORY_EMOJIS, CATEGORY_LABELS, getCategoryTitle } from '../data/templates';
 import { Template, CategoryKey, TemplateBadge } from '../types';
 import { stopPreview, previewTrack } from '../lib/audioEngine';
+import { getTemplatePrice, useTemplatePrices } from '../lib/templatePricing';
+import { useReviews, getTemplateRating } from '../lib/reviews';
+import { RatingStars } from './RatingStars';
 import { Eye, MessageSquare, Play, Square } from 'lucide-react';
 import { TemplateImage } from './TemplateImage';
 
@@ -54,6 +57,10 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
   const [totalResults, setTotalResults] = useState(0);
   const gridRef = useRef<HTMLDivElement>(null);
   const [previewingUid, setPreviewingUid] = useState<string | null>(null);
+
+  // Re-render reactively when template prices or ratings change.
+  useTemplatePrices();
+  useReviews();
 
   // Stop any active music preview when the component unmounts
   useEffect(() => {
@@ -283,8 +290,18 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
                   {template.description}
                 </p>
 
-                <div className="font-body text-xs sm:text-sm font-extrabold text-on-surface-variant mb-3 whitespace-nowrap">
-                  {formatRupiah(template.price)}
+                {/* Rating (live average + count from real reviews) */}
+                <RatingRow templateUid={template.uid} />
+
+                {/* Price + revision allowance */}
+                <div className="flex items-center justify-between gap-2 mb-3 min-w-0">
+                  <span className="font-body text-xs sm:text-sm font-extrabold text-primary whitespace-nowrap">
+                    {formatRupiah(getTemplatePrice(template))}
+                  </span>
+                  <span className="shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider">
+                    <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>sync</span>
+                    Maks. 3x Revisi
+                  </span>
                 </div>
 
                 {/* Bottom action block — pushed down via mt-auto so every card
@@ -354,6 +371,28 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
           </button>
         </div>
       )}
+    </div>
+  );
+};
+
+/* Rating summary row shown on each template card (live data). */
+const RatingRow: React.FC<{ templateUid: string }> = ({ templateUid }) => {
+  const { average, count } = getTemplateRating(templateUid);
+  if (count === 0) {
+    return (
+      <div className="mb-2 flex items-center gap-1 min-w-0">
+        <span className="material-symbols-outlined text-[11px] text-outline" style={{ fontVariationSettings: "'FILL' 1" }}>
+          star
+        </span>
+        <span className="text-[9px] sm:text-[10px] text-on-surface-variant">Belum ada rating</span>
+      </div>
+    );
+  }
+  return (
+    <div className="mb-2 flex items-center gap-1.5 min-w-0">
+      <RatingStars value={average} size={13} />
+      <span className="text-[10px] sm:text-[11px] font-extrabold text-on-surface truncate">{average.toFixed(1)}</span>
+      <span className="text-[9px] sm:text-[10px] text-on-surface-variant truncate">({count} ulasan)</span>
     </div>
   );
 };

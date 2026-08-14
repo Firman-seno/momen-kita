@@ -7,9 +7,10 @@ interface NavigationProps {
   currentTab: NavigationTab;
   onSelectTab: (tab: NavigationTab) => void;
   onOpenWhatsApp: (templateInfo?: string) => void;
+  onOpenOrderStatus: () => void;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab, onOpenWhatsApp }) => {
+export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab, onOpenWhatsApp, onOpenOrderStatus }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems: { id: NavigationTab; label: string }[] = [
@@ -77,6 +78,16 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab,
 
         {/* Right actions — compact group that never forces overflow */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Status Pesanan — desktop only (secondary action) */}
+          <button
+            onClick={onOpenOrderStatus}
+            className="hidden xl:inline-flex items-center gap-1.5 font-body text-[11px] font-extrabold uppercase tracking-wider text-on-surface-variant hover:text-primary border border-outline-variant rounded-full px-4 py-2.5 transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            title="Lacak status pesanan Anda"
+          >
+            <span className="material-symbols-outlined text-sm">receipt_long</span>
+            Status Pesanan
+          </button>
+
           {/* Kelola Undangan — desktop only (secondary action) */}
           <a
             href="/login?force=1"
@@ -141,6 +152,20 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab,
             </span>
             <span className="material-symbols-outlined text-base opacity-60">arrow_forward</span>
           </a>
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false);
+              onOpenOrderStatus();
+            }}
+            className="text-left font-body text-sm font-bold uppercase tracking-wider py-3 px-3 rounded-xl transition-colors cursor-pointer flex items-center justify-between text-on-surface-variant hover:bg-surface-container-high focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            title="Lacak status pesanan Anda"
+          >
+            <span className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-base">receipt_long</span>
+              Status Pesanan
+            </span>
+            <span className="material-symbols-outlined text-base opacity-60">arrow_forward</span>
+          </button>
           <UiButton variant="primary" size="md" fullWidth href={waHref} external icon="chat" iconFilled className="mt-2" onClick={() => setMobileMenuOpen(false)}>
             Pesan via WhatsApp
           </UiButton>

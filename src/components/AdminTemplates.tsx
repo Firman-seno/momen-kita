@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { TEMPLATES, CATEGORY_LABELS } from '../data/templates';
+import { TEMPLATES, CATEGORY_LABELS, formatRupiah } from '../data/templates';
 import { Template } from '../types';
 import { UiButton } from './UiButton';
+import { getTemplatePrice, setTemplatePrice, resetTemplatePrice, hasPriceOverride, useTemplatePrices, DEFAULT_TEMPLATE_PRICE } from '../lib/templatePricing';
+import { motion, AnimatePresence } from 'motion/react';
+import { EASE_OUT } from './AnimationKit';
+import { Toast } from './Toast';
 
 /* ============================================================
    AdminTemplates — Template management panel for the admin
@@ -86,6 +90,11 @@ export const AdminTemplates: React.FC<AdminTemplatesProps> = ({
   const [category, setCategory] = useState<CategoryFilter>(() => readUrlState().category);
   const [search, setSearch] = useState<string>(() => readUrlState().search);
   const [sort, setSort] = useState<SortKey>('num-asc');
+  const [priceTarget, setPriceTarget] = useState<Template | null>(null);
+  const [toast, setToast] = useState('');
+
+  // Re-render reactively whenever a template price changes.
+  useTemplatePrices();
 
   // Persist category + search in the URL so refresh keeps the view.
   useEffect(() => {
@@ -161,20 +170,35 @@ export const AdminTemplates: React.FC<AdminTemplatesProps> = ({
     category === 'All' ? null : CATEGORY_FILTERS.find((f) => f.key === category)?.label || null;
 
   const renderCard = (t: Template) => (
-    <button
+    <div
       key={t.uid}
-      onClick={() => onNewInvitation(t.uid)}
-      className="text-left group bg-surface-container-lowest border border-outline-variant/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-md transition-all cursor-pointer flex flex-col min-w-0"
-      title={`Buat undangan dari ${t.categoryLabel} #${t.templateNumber}`}
+      className="group bg-surface-container-lowest border border-outline-variant/40 rounded-xl overflow-hidden hover:border-primary hover:shadow-md transition-all flex flex-col min-w-0"
     >
-      <div className="aspect-[3/4] overflow-hidden bg-surface-container-low">
-        <img src={t.image} alt={t.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+      <button
+        onClick={() => onNewInvitation(t.uid)}
+        className="text-left w-full cursor-pointer"
+        title={`Buat undangan dari ${t.categoryLabel} #${t.templateNumber}`}
+      >
+        <div className="aspect-[3/4] overflow-hidden bg-surface-container-low">
+          <img src={t.image} alt={t.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+        </div>
+        <div className="p-2.5">
+          <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider truncate">{t.categoryLabel} #{t.templateNumber}</p>
+          <p className="font-body text-[11px] font-bold text-on-surface truncate">{t.name}</p>
+        </div>
+      </button>
+      <div className="px-2.5 pb-2.5 mt-auto flex items-center justify-between gap-1.5">
+        <span className="font-body text-[11px] font-extrabold text-primary truncate">{formatRupiah(getTemplatePrice(t))}</span>
+        <button
+          onClick={() => setPriceTarget(t)}
+          className="btn-micro inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-outline-variant bg-surface-container-low text-on-surface-variant hover:text-primary hover:border-primary font-bold text-[9px] uppercase tracking-wider shrink-0 cursor-pointer"
+          title="Ubah harga template ini"
+        >
+          <span className="material-symbols-outlined text-[13px]">edit_square</span>
+          Ubah Harga
+        </button>
       </div>
-      <div className="p-2.5">
-        <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider truncate">{t.categoryLabel} #{t.templateNumber}</p>
-        <p className="font-body text-[11px] font-bold text-on-surface truncate">{t.name}</p>
-      </div>
-    </button>
+    </div>
   );
 
   return (
@@ -301,6 +325,105 @@ export const AdminTemplates: React.FC<AdminTemplatesProps> = ({
           {flatList.map(renderCard)}
         </div>
       )}
+
+      {/* Price editing modal */}
+      <AnimatePresence>
+        {priceTarget && (
+          <PriceModal
+            template={priceTarget}
+            onClose={() => setPriceTarget(null)}
+            onToast={setToast}
+          />
+        )}
+      </AnimatePresence>
+
+      <Toast open={!!toast} message={toast} onClose={() => setToast('')} />
     </div>
+  );
+};
+
+/* ============================================================
+   PriceModal — admin sets a per-template price override.
+   ============================================================ */
+const PriceModal: React.FC<{ template: Template; onClose: () => void; onToast: (msg: string) => void }> = ({ template, onClose, onToast }) => {
+  const current = getTemplatePrice(template);
+  const isDefault = !hasPriceOverride(template.uid);
+  const [value, setValue] = useState(String(current));
+
+  const inputCls =
+    'w-full bg-surface-container-low border border-outline-variant rounded-xl px-3.5 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-outline/70 transition-colors';
+
+  const save = () => {
+    const num = Number(String(value).replace(/[^\d]/g, ''));
+    if (!num || num < 1000) {
+      onToast('Masukkan harga yang valid (min. Rp 1.000).');
+      return;
+    }
+    setTemplatePrice(template.uid, num);
+    onToast(`Harga ${template.categoryLabel} #${template.templateNumber} diubah ke ${formatRupiah(num)}.`);
+    onClose();
+  };
+
+  const reset = () => {
+    resetTemplatePrice(template.uid);
+    onToast(`Harga ${template.categoryLabel} #${template.templateNumber} kembali ke default ${formatRupiah(DEFAULT_TEMPLATE_PRICE)}.`);
+    onClose();
+  };
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[95] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2, ease: EASE_OUT }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="bg-surface-container-lowest rounded-2xl max-w-md w-full p-6 shadow-2xl border border-outline-variant/40"
+        initial={{ opacity: 0, scale: 0.94, y: 14 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 8 }}
+        transition={{ duration: 0.3, ease: EASE_OUT }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-2.5 mb-4">
+          <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+            sell
+          </span>
+          <div className="min-w-0">
+            <h3 className="font-headline text-base font-bold text-on-surface">Ubah Harga Template</h3>
+            <p className="font-body text-[11px] text-on-surface-variant truncate">{template.categoryLabel} #{template.templateNumber} • {template.name}</p>
+          </div>
+        </div>
+
+        <label className="block font-body text-[10px] font-bold text-on-surface-variant mb-1 uppercase tracking-wider">Harga (IDR)</label>
+        <input
+          type="text"
+          inputMode="numeric"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="50000"
+          className={inputCls}
+        />
+        <p className="font-body text-[10px] text-outline mt-1.5">
+          Ditampilkan sebagai {formatRupiah(Number(String(value).replace(/[^\d]/g, '')) || 0)}. Default semua template: {formatRupiah(DEFAULT_TEMPLATE_PRICE)}.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-2 mt-4">
+          {!isDefault && (
+            <UiButton variant="ghost" size="md" icon="restart_alt" onClick={reset} className="sm:flex-1">
+              Reset
+            </UiButton>
+          )}
+          <UiButton variant="secondary" size="md" onClick={onClose} className="sm:flex-1">
+            Batal
+          </UiButton>
+          <UiButton variant="accent" size="md" icon="save" onClick={save} className="sm:flex-1">
+            Simpan
+          </UiButton>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 };

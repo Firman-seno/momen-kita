@@ -7,6 +7,7 @@ import { CategoriesPage } from "./components/CategoriesPage";
 import { TemplateDemoView } from "./components/TemplateDemoView";
 import { WhatsAppOrderModal } from "./components/WhatsAppOrderModal";
 import { OrderFlowModal } from "./components/OrderFlowModal";
+import { OrderStatusTracker } from "./components/OrderStatusTracker";
 import { HowItWorksModal } from "./components/HowItWorksModal";
 import { FAQModal } from "./components/FAQModal";
 import { MusicCreditsModal } from "./components/MusicCreditsModal";
@@ -51,6 +52,15 @@ export default function App() {
   const [howItWorksModalOpen, setHowItWorksModalOpen] = useState(false);
   const [faqModalOpen, setFaqModalOpen] = useState(false);
   const [musicCreditsModalOpen, setMusicCreditsModalOpen] = useState(false);
+
+  // Customer order tracker (status + mandatory rating)
+  const [trackerOpen, setTrackerOpen] = useState(false);
+  const [trackerInitial, setTrackerInitial] = useState<{ orderId?: string; phone?: string } | undefined>(undefined);
+
+  const openOrderStatus = (initial?: { orderId?: string; phone?: string }) => {
+    setTrackerInitial(initial);
+    setTrackerOpen(true);
+  };
 
   const goHome = () => {
     setCurrentTab("home");
@@ -334,7 +344,7 @@ export default function App() {
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col font-body">
       {/* Top Navbar (hidden on customer invitation & admin pages for a clean fullscreen experience) */}
-      {!isFullscreenPage && <Navigation currentTab={currentTab as NavigationTab} onSelectTab={handleSelectTab} onOpenWhatsApp={handleOpenWhatsAppModal} />}
+      {!isFullscreenPage && <Navigation currentTab={currentTab as NavigationTab} onSelectTab={handleSelectTab} onOpenWhatsApp={handleOpenWhatsAppModal} onOpenOrderStatus={() => openOrderStatus()} />}
 
       {/* Main Views */}
       <main className="flex-grow flex flex-col">
@@ -392,7 +402,7 @@ export default function App() {
       </main>
 
       {/* Footer (hidden on customer invitation & admin pages) */}
-      {!isFullscreenPage && <Footer onSelectTab={handleSelectTab} onSelectCategory={handleOpenCategory} onOpenWhatsApp={() => handleOpenWhatsAppModal()} onOpenDashboard={goAdminDashboard} />}
+      {!isFullscreenPage && <Footer onSelectTab={handleSelectTab} onSelectCategory={handleOpenCategory} onOpenWhatsApp={() => handleOpenWhatsAppModal()} onOpenDashboard={goAdminDashboard} onOpenOrderStatus={() => openOrderStatus()} />}
 
       {/* Floating WhatsApp Button (hidden in demo/invitation so it never covers the music player) */}
       {currentTab !== "demo" && !isFullscreenPage && <FloatingWhatsAppButton />}
@@ -401,7 +411,10 @@ export default function App() {
       {waModalOpen && <WhatsAppOrderModal template={waTemplate} onClose={() => setWaModalOpen(false)} />}
 
       {/* Customer Order Flow Modal */}
-      {orderTemplate && <OrderFlowModal template={orderTemplate} onClose={() => setOrderTemplate(null)} />}
+      {orderTemplate && <OrderFlowModal template={orderTemplate} onClose={() => setOrderTemplate(null)} onTrackOrder={(orderId, phone) => { setOrderTemplate(null); openOrderStatus({ orderId, phone }); }} />}
+
+      {/* Customer Order Status Tracker */}
+      {trackerOpen && <OrderStatusTracker initial={trackerInitial} onClose={() => setTrackerOpen(false)} />}
 
       {/* How It Works Modal */}
       {howItWorksModalOpen && <HowItWorksModal onClose={() => setHowItWorksModalOpen(false)} onExploreTemplates={() => handleOpenCategory("All")} />}

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Template } from '../types';
 import { TEMPLATES, getTemplateByUid, formatRupiah } from '../data/templates';
+import { getTemplatePrice } from '../lib/templatePricing';
 import {
   Invitation,
   getAllInvitations,
@@ -43,6 +44,7 @@ import { Mail, Eye } from 'lucide-react';
 import { UiButton } from './UiButton';
 import { AdminTemplates } from './AdminTemplates';
 import { AdminOrderDetail } from './AdminOrderDetail';
+import { AdminRatings } from './AdminRatings';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { Toast } from './Toast';
 import { AnimatePresence, motion } from 'motion/react';
@@ -56,7 +58,7 @@ interface DashboardProps {
   onLogout: () => void;
 }
 
-type AdminTab = 'overview' | 'templates' | 'orders' | 'invitations' | 'customers' | 'revenue' | 'settings';
+type AdminTab = 'overview' | 'templates' | 'orders' | 'invitations' | 'customers' | 'revenue' | 'ratings' | 'settings';
 
 const STATUS_STYLES: Record<string, string> = {
   draft: 'bg-amber-50 text-amber-700 border-amber-200',
@@ -71,6 +73,7 @@ const TABS: { key: AdminTab; label: string; icon: string }[] = [
   { key: 'invitations', label: 'Invitations', icon: 'mail' },
   { key: 'customers', label: 'Customers', icon: 'group' },
   { key: 'revenue', label: 'Revenue', icon: 'payments' },
+  { key: 'ratings', label: 'Ratings', icon: 'star' },
   { key: 'settings', label: 'Settings', icon: 'settings' },
 ];
 
@@ -134,7 +137,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({
       category: t.category,
       templateNumber: t.templateNumber,
       templateName: t.name,
-      price: t.price,
+      price: getTemplatePrice(t),
       source: 'admin',
       notes: notes.trim(),
       status,
@@ -206,7 +209,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({
             </select>
             {selectedTemplate && (
               <p className="font-body text-[10px] text-outline mt-1">
-                #{selectedTemplate.templateNumber} • {selectedTemplate.subcategory} • {formatRupiah(selectedTemplate.price)}
+                #{selectedTemplate.templateNumber} • {selectedTemplate.subcategory} • {formatRupiah(getTemplatePrice(selectedTemplate))}
               </p>
             )}
           </div>
@@ -904,6 +907,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
       /* ===================== SETTINGS ===================== */
       case 'settings':
         return <SettingsTab onLogout={onLogout} onGoHome={onGoHome} onToast={setToast} />;
+
+      /* ===================== RATINGS ===================== */
+      case 'ratings':
+        return <AdminRatings onToast={setToast} />;
 
       default:
         return null;

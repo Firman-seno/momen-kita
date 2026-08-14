@@ -102,14 +102,24 @@ export interface Order {
   status: OrderStatus;
   /** Where the order was created: customer checkout or admin form. */
   source: 'customer' | 'admin';
-  payment?: OrderPayment | null;
-  /** Set when the admin verifies the payment (status → PAID). */
-  verifiedAt?: number;
-  verifiedBy?: string;
-  /** Set when the admin creates an invitation from this order. */
-  invitationId?: string;
-  createdAt: number;
-  updatedAt: number;
+   payment?: OrderPayment | null;
+   /** Set when the admin verifies the payment (status → PAID). */
+   verifiedAt?: number;
+   verifiedBy?: string;
+   /** Set when the admin creates an invitation from this order. */
+   invitationId?: string;
+   /** Max revisions included with the order (default 3). */
+   maxRevision?: number;
+   /** Number of revisions already used/requested. */
+   revisionCount?: number;
+   /** Final invitation URL — set when the order is COMPLETED & invitation delivered. */
+   finalInvitationUrl?: string;
+   /** True once the order is COMPLETED with a final link → rating is required. */
+   isRatingRequired?: boolean;
+   /** True once the customer has submitted a rating for this order. */
+   hasRated?: boolean;
+   createdAt: number;
+   updatedAt: number;
 }
 
 const STORAGE_KEY = 'momenkita.orders.v1';
@@ -168,6 +178,11 @@ export const createOrder = (data: Partial<Order>): Order => {
     verifiedAt: data.verifiedAt,
     verifiedBy: data.verifiedBy,
     invitationId: data.invitationId,
+    maxRevision: data.maxRevision ?? 3,
+    revisionCount: data.revisionCount ?? 0,
+    finalInvitationUrl: data.finalInvitationUrl,
+    isRatingRequired: data.isRatingRequired ?? false,
+    hasRated: data.hasRated ?? false,
     createdAt: data.createdAt || now,
     updatedAt: data.updatedAt || now,
   };
@@ -295,3 +310,52 @@ export const getMonthlyRevenue = (list: Order[]): MonthRevenue[] => {
   });
   return Array.from(map.values()).sort((a, b) => (a.key < b.key ? 1 : -1));
 };
+
+/* -----------------------------------------------
+   Revisions & Rating flow
+   ----------------------------------------------- */
+
+export const REVISION_LIMIT = 3;
+
+/** Revision progress for an order with safe defaults for legacy data. */
+export const getRevisionProgress = (o: Order): { used: number; max: number } => ({
+  used: Math.min(o.revisionCount || 0, o.maxRevision || REVISION_LIMIT),
+  max: o.maxRevision || REVISION_LIMIT,
+});
+
+export const canRequestRevision = (o: Order): boolean =>
+  (o.revisionCount || 0) < (o.maxRevision || REVISION_LIMIT);
+
+/** Admin records a revision request (increments the counter, adds a note). */
+export const recordRevision = (id: string, note?: string): Order | undefined => {
+  const list = getAllOrders();
+  const idx = list.findIndex((o) => o.id === id);
+  if (idx === -1) return undefined;
+  const o = list[idx];
+  const max = o.maxRevision || REVISION_LIMIT;
+  const used = o.revisionCount || 0;
+  if (used >= max) return o;
+  const revisionLine = `[Revisi ${used + 1}/${max}]${note ? ` ${note}` : ''}`;
+  const next: Order = {
+    ...o,
+    revisionCount: used + 1,
+    notes: o.notes ? `${o.notes}\n${revisionLine}` : revisionLine,
+    updatedAt: Date.now(),
+  };
+  list[idx] = next;
+  saveAllOrders(list);
+  return next;
+};
+
+/** Admin delivers the final invitation & completes the order → rating required. */
+export const completeOrderWithFinalLink = (id: string, finalInvitationUrl: string): Order | undefined =>
+  updateOrder(id, {
+    status: 'COMPLETED',
+    finalInvitationUrl,
+    isRatingRequired: true,
+    hasRated: false,
+  });
+
+/** Customer submitted a rating for this order — the rating requirement is fulfilled. */
+export const markOrderRated = (id: string): Order | undefined =>
+  updateOrder(id, { hasRated: true, isRatingRequired: false });

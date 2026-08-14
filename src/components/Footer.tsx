@@ -9,9 +9,10 @@ interface FooterProps {
   onSelectCategory: (category: CategoryKey | "All") => void;
   onOpenWhatsApp: () => void;
   onOpenDashboard?: () => void;
+  onOpenOrderStatus?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onSelectTab, onSelectCategory, onOpenWhatsApp, onOpenDashboard }) => {
+export const Footer: React.FC<FooterProps> = ({ onSelectTab, onSelectCategory, onOpenWhatsApp, onOpenDashboard, onOpenOrderStatus }) => {
   const waHref = buildWaLink(homepageWaMessage);
 
   return (
@@ -68,6 +69,12 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, onSelectCategory, o
           <button onClick={() => onSelectTab("faq")} className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer">
             Kebijakan Privasi
           </button>
+          {onOpenOrderStatus && (
+            <button onClick={onOpenOrderStatus} className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-xs">receipt_long</span>
+              Status Pesanan
+            </button>
+          )}
         </div>
 
         {/* WhatsApp */}

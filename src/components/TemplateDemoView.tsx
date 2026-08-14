@@ -9,6 +9,8 @@ import { Reveal, Stagger, StaggerChild, getProfile, EASE_OUT } from './Animation
 import { UiButton } from './UiButton';
 import { buildWaLink, guestMessageToHost } from '../lib/whatsapp';
 import { getInvitationUrl } from '../lib/invitations';
+import { getTemplatePrice } from '../lib/templatePricing';
+import { RatingSection } from './RatingSection';
 
 interface TemplateDemoViewProps {
   template: Template;
@@ -1319,7 +1321,7 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
             className="btn-micro hidden sm:flex bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-full items-center gap-1.5 shadow-md cursor-pointer transition-colors shrink-0"
           >
             <span className="material-symbols-outlined text-base">payments</span>
-            Pesan Template #{template.templateNumber} ({formatRupiah(template.price)})
+            Pesan Template #{template.templateNumber} ({formatRupiah(getTemplatePrice(template))})
           </button>
         </div>
       </div>
@@ -1339,6 +1341,21 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
         </div>
       </div>
 
+      {/* Template info: revision allowance + Rating & Ulasan (demo mode only) */}
+      {!isInvitation && (
+        <div className="w-full max-w-[1280px] mx-auto mt-6 sm:mt-8 px-2 sm:px-6 flex flex-col gap-4">
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl px-4 py-3 flex items-start gap-2.5">
+            <span className="material-symbols-outlined text-lg text-amber-400 shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>
+              sync
+            </span>
+            <p className="font-body text-[11px] sm:text-xs text-slate-300 leading-relaxed">
+              <strong className="text-white">Maksimal 3x Revisi</strong> — Setiap pembelian undangan mendapatkan maksimal 3x revisi. Pastikan data yang diberikan sudah benar sebelum proses pembuatan dimulai.
+            </p>
+          </div>
+          <RatingSection templateUid={template.uid} />
+        </div>
+      )}
+
       {/* Floating Sticky Mobile Bar (Order in demo mode / Chat host in invitation mode) */}
       <div className="fixed bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-sm sm:hidden">
         {isInvitation ? (
@@ -1357,7 +1374,7 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
             className="btn-micro w-full bg-emerald-600 hover:bg-emerald-500 text-white font-headline text-[11px] min-[360px]:text-xs font-bold py-3.5 px-4 rounded-full shadow-2xl flex items-center justify-center gap-1.5 border border-white/20 cursor-pointer min-h-[44px]"
           >
             <span className="material-symbols-outlined text-base shrink-0">payments</span>
-            <span className="truncate">PESAN TEMPLATE #{template.templateNumber} ({formatRupiah(template.price)})</span>
+            <span className="truncate">PESAN TEMPLATE #{template.templateNumber} ({formatRupiah(getTemplatePrice(template))})</span>
           </button>
         )}
       </div>

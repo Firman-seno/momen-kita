@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Template } from '../types';
 import { formatRupiah } from '../data/templates';
+import { getTemplatePrice } from '../lib/templatePricing';
 import { createCustomerOrder, submitOrderPayment, Order } from '../lib/orders';
 import { getBankAccounts, ADMIN_WHATSAPP } from '../lib/payment';
 import { buildWaLink, paymentNotificationMessage } from '../lib/whatsapp';
@@ -62,9 +63,11 @@ type Step = 'form' | 'payment' | 'confirm' | 'success';
 interface OrderFlowModalProps {
   template: Template;
   onClose: () => void;
+  /** Opens the customer order tracker pre-filled with the created order. */
+  onTrackOrder?: (orderId: string, phone: string) => void;
 }
 
-export const OrderFlowModal: React.FC<OrderFlowModalProps> = ({ template, onClose }) => {
+export const OrderFlowModal: React.FC<OrderFlowModalProps> = ({ template, onClose, onTrackOrder }) => {
   const [step, setStep] = useState<Step>('form');
   const [order, setOrder] = useState<Order | null>(null);
   const [copiedBank, setCopiedBank] = useState<string | null>(null);
@@ -77,13 +80,14 @@ export const OrderFlowModal: React.FC<OrderFlowModalProps> = ({ template, onClos
   const [notes, setNotes] = useState('');
 
   const [bank, setBank] = useState('BSI');
-  const [amount, setAmount] = useState(String(template.price));
+  const [amount, setAmount] = useState(String(getTemplatePrice(template)));
   const [payDate, setPayDate] = useState(todayIso);
   const [payTime, setPayTime] = useState(nowTime);
   const [proof, setProof] = useState('');
   const [uploading, setUploading] = useState(false);
 
   const banks = getBankAccounts();
+  const templatePrice = getTemplatePrice(template);
 
   const handleCreateOrder = () => {
     if (!name.trim() || !phone.trim()) return;
@@ -97,7 +101,7 @@ export const OrderFlowModal: React.FC<OrderFlowModalProps> = ({ template, onClos
       category: template.category,
       templateNumber: template.templateNumber,
       templateName: template.name,
-      price: template.price,
+      price: templatePrice,
       notes: notes.trim() || undefined,
     });
     setOrder(created);
@@ -120,7 +124,7 @@ export const OrderFlowModal: React.FC<OrderFlowModalProps> = ({ template, onClos
     if (!proof) return;
     const paid = submitOrderPayment(order.id, {
       bank,
-      amount: Number(amount) || template.price,
+      amount: Number(amount) || templatePrice,
       paymentDate: payDate,
       paymentTime: payTime,
       proofUrl: proof,
@@ -139,7 +143,7 @@ export const OrderFlowModal: React.FC<OrderFlowModalProps> = ({ template, onClos
           customerName: order.customerName,
           customerPhone: order.customerPhone,
           templateLabel: `${template.categoryLabel} #${template.templateNumber} — ${template.name}`,
-          amount: order.payment?.amount || template.price,
+          amount: order.payment?.amount || templatePrice,
           bank: order.payment?.bank || bank,
         }),
         ADMIN_WHATSAPP
@@ -200,8 +204,18 @@ export const OrderFlowModal: React.FC<OrderFlowModalProps> = ({ template, onClos
                   {template.categoryLabel} #{template.templateNumber}
                 </p>
                 <p className="font-headline text-sm font-bold text-on-surface truncate">{template.name}</p>
-                <p className="font-body text-xs font-extrabold text-primary mt-0.5">{formatRupiah(template.price)}</p>
+                <p className="font-body text-xs font-extrabold text-primary mt-0.5">{formatRupiah(templatePrice)}</p>
               </div>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-2.5 flex items-start gap-2">
+              <span className="material-symbols-outlined text-base text-amber-600 shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>
+                sync
+              </span>
+              <p className="font-body text-[10px] sm:text-[11px] text-amber-800 leading-relaxed">
+                <strong className="font-extrabold">Maksimal 3x Revisi.</strong>{' '}
+                Setiap pembelian undangan mendapatkan maksimal 3x revisi. Pastikan data yang diberikan sudah benar sebelum proses pembuatan dimulai.
+              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -258,7 +272,7 @@ export const OrderFlowModal: React.FC<OrderFlowModalProps> = ({ template, onClos
           <div className="flex flex-col gap-3.5">
             <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 text-center">
               <p className="font-body text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Total Pembayaran</p>
-              <p className="font-headline text-2xl font-extrabold text-on-surface">{formatRupiah(template.price)}</p>
+              <p className="font-headline text-2xl font-extrabold text-on-surface">{formatRupiah(templatePrice)}</p>
               <p className="font-body text-[10px] text-on-surface-variant mt-1">Order ID: <span className="font-mono font-bold text-primary">{order.id}</span></p>
             </div>
 
@@ -408,7 +422,12 @@ export const OrderFlowModal: React.FC<OrderFlowModalProps> = ({ template, onClos
             <p className="font-body text-[10px] text-on-surface-variant">
               Membuka WhatsApp admin dengan pesan otomatis berisi detail pesanan. Admin akan memverifikasi bukti pembayaran Anda.
             </p>
-            <UiButton variant="secondary" size="md" fullWidth icon="close" onClick={onClose}>
+            {onTrackOrder && (
+              <UiButton variant="secondary" size="md" fullWidth icon="receipt_long" onClick={() => onTrackOrder(order.id, order.customerPhone)}>
+                Lacak Status Pesanan
+              </UiButton>
+            )}
+            <UiButton variant="ghost" size="md" fullWidth icon="close" onClick={onClose}>
               Tutup
             </UiButton>
           </div>
