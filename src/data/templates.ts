@@ -57,6 +57,86 @@ export const CATEGORIES: CategoryInfo[] = [
     count: 100,
     image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=600&q=80',
   },
+  {
+    key: 'education',
+    label: 'Pendidikan',
+    emoji: '🎓',
+    icon: 'school',
+    tagline: 'Wisuda, kelulusan & prom night',
+    description: 'Undangan wisuda, kelulusan, hingga acara sekolah dengan desain akademik yang berkesan.',
+    count: 100,
+    image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    key: 'religious',
+    label: 'Keagamaan',
+    emoji: '🕌',
+    icon: 'mosque',
+    tagline: 'Kajian, maulid & peringatan hari besar',
+    description: 'Undangan acara keagamaan: pengajian, maulid, Isra Mi\'raj, dan hari besar Islam.',
+    count: 100,
+    image: 'https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    key: 'tasyakuran',
+    label: 'Tasyakuran',
+    emoji: '🏠',
+    icon: 'home',
+    tagline: 'Syukuran rumah baru & keluarga',
+    description: 'Undangan syukuran dan tasyakuran keluarga yang hangat dan penuh rasa syukur.',
+    count: 100,
+    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    key: 'gathering',
+    label: 'Acara & Gathering',
+    emoji: '🎉',
+    icon: 'groups',
+    tagline: 'Reuni, arisan & gathering komunitas',
+    description: 'Undangan reuni, family gathering, arisan, dan acara komunitas yang seru.',
+    count: 100,
+    image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    key: 'business',
+    label: 'Bisnis',
+    emoji: '🏢',
+    icon: 'business_center',
+    tagline: 'Grand opening, launching & seminar',
+    description: 'Undangan profesional untuk grand opening, product launching, seminar, dan acara bisnis.',
+    count: 100,
+    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    key: 'anniversary',
+    label: 'Anniversary',
+    emoji: '❤️',
+    icon: 'favorite',
+    tagline: 'Romantis, elegan & penuh cinta',
+    description: 'Rayakan anniversary pernikahan dan hubungan dengan undangan yang romantis.',
+    count: 100,
+    image: 'https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    key: 'family',
+    label: 'Keluarga',
+    emoji: '👨‍👩‍👧‍👦',
+    icon: 'family_restroom',
+    tagline: 'Berkumpul, hangat & menyenangkan',
+    description: 'Undangan acara keluarga: kumpul keluarga, reuni, dan perayaan sederhana bersama.',
+    count: 100,
+    image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    key: 'doa-haul',
+    label: 'Doa & Haul',
+    emoji: '🕊️',
+    icon: 'volunteer_activism',
+    tagline: 'Tahlilan, haul & peringatan wafat',
+    description: 'Undangan tahlilan, haul, dan peringatan wafat yang khidmat dan penuh doa.',
+    count: 100,
+    image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?auto=format&fit=crop&w=600&q=80',
+  },
 ];
 
 export const CATEGORY_LABELS: Record<CategoryKey, string> = {
@@ -64,6 +144,14 @@ export const CATEGORY_LABELS: Record<CategoryKey, string> = {
   sunatan: 'Sunatan',
   wedding: 'Wedding',
   aqiqah: 'Aqiqah',
+  education: 'Pendidikan',
+  religious: 'Keagamaan',
+  tasyakuran: 'Tasyakuran',
+  gathering: 'Acara & Gathering',
+  business: 'Bisnis',
+  anniversary: 'Anniversary',
+  family: 'Keluarga',
+  'doa-haul': 'Doa & Haul',
 };
 
 export const CATEGORY_EMOJIS: Record<CategoryKey, string> = {
@@ -71,9 +159,30 @@ export const CATEGORY_EMOJIS: Record<CategoryKey, string> = {
   sunatan: '✂️',
   wedding: '💍',
   aqiqah: '👶',
+  education: '🎓',
+  religious: '🕌',
+  tasyakuran: '🏠',
+  gathering: '🎉',
+  business: '🏢',
+  anniversary: '❤️',
+  family: '👨‍👩‍👧‍👦',
+  'doa-haul': '🕊️',
 };
 
-export const CATEGORY_KEYS: CategoryKey[] = ['birthday', 'sunatan', 'wedding', 'aqiqah'];
+export const CATEGORY_KEYS: CategoryKey[] = [
+  'birthday',
+  'sunatan',
+  'wedding',
+  'aqiqah',
+  'education',
+  'religious',
+  'tasyakuran',
+  'gathering',
+  'business',
+  'anniversary',
+  'family',
+  'doa-haul',
+];
 
 /* ============================================================
    PALETTES
@@ -187,6 +296,14 @@ const FALLBACK_PALETTES: Record<CategoryKey, string[]> = {
   sunatan: ['emerald-gold', 'navy-royal', 'maroon-gold', 'royalblue', 'turquoise', 'dustyblue', 'sage-gold', 'brown-gold', 'charcoal-gold', 'white-gold'],
   wedding: ['ivory-gold', 'champagne', 'sage', 'dustyrose', 'navy', 'emerald', 'burgundy', 'terracotta', 'blush', 'lavender'],
   aqiqah: ['skyblue', 'dusty-pink', 'pastel-pink', 'beige', 'pastel-mint', 'pastel-purple', 'peach', 'watercolor', 'navy-royal', 'monochrome'],
+  education: ['navy', 'royalblue', 'emerald', 'gold-lux', 'monochrome', 'midnight', 'charcoal-gold', 'dustyblue', 'ivory-gold', 'purple-royal'],
+  religious: ['emerald-gold', 'islamic-green', 'gold-lux', 'maroon-gold', 'navy-royal', 'teal-gold', 'cream-gold', 'white-gold', 'black-gold', 'turquoise'],
+  tasyakuran: ['emerald-green', 'cream-gold', 'brown-gold', 'islamic-green', 'sage', 'gold-lux', 'beige', 'maroon-gold', 'charcoal-gold', 'ivory-gold'],
+  gathering: ['candy-pop', 'ocean-teal', 'yellow-sun', 'orange-warm', 'jungle-green', 'rainbow', 'candy-pastel', 'pastel-mint', 'space-navy', 'purple-royal'],
+  business: ['adult-charcoal', 'navy', 'royalblue', 'black-gold', 'monochrome', 'modern', 'geometric', 'midnight', 'emerald', 'blue-white'],
+  anniversary: ['rosegold', 'champagne', 'ivory-gold', 'crimson', 'dustyrose', 'blush', 'black-gold', 'purple-royal', 'gold-lux', 'navy'],
+  family: ['brown-cream', 'beige', 'sage', 'terracotta', 'dustyblue', 'pastel-peach', 'emerald-green', 'yellow-sun', 'cream-gold', 'ocean-teal'],
+  'doa-haul': ['islamic-green', 'emerald-gold', 'midnight', 'navy-royal', 'sage', 'black-gold', 'brown-gold', 'maroon-gold', 'dustyblue', 'cream-gold'],
 };
 
 /* ============================================================
@@ -213,6 +330,14 @@ const ANIM_POOLS: Record<CategoryKey, AnimationStyle[]> = {
   sunatan: ['islamic-glow', 'twinkling-stars', 'sparkle', 'subtle-drift'],
   wedding: ['sparkle', 'butterflies', 'subtle-drift', 'petals-fall'],
   aqiqah: ['twinkling-stars', 'sparkle', 'subtle-drift', 'floating-moon'],
+  education: ['sparkle', 'twinkling-stars', 'subtle-drift', 'petals-fall'],
+  religious: ['islamic-glow', 'twinkling-stars', 'sparkle', 'subtle-drift'],
+  tasyakuran: ['islamic-glow', 'sparkle', 'subtle-drift', 'twinkling-stars'],
+  gathering: ['floating-balloons', 'sparkle', 'neon-pulse', 'twinkling-stars', 'subtle-drift'],
+  business: ['subtle-drift', 'sparkle', 'neon-pulse', 'twinkling-stars'],
+  anniversary: ['sparkle', 'butterflies', 'petals-fall', 'subtle-drift'],
+  family: ['sparkle', 'floating-balloons', 'butterflies', 'subtle-drift'],
+  'doa-haul': ['islamic-glow', 'sparkle', 'subtle-drift', 'twinkling-stars'],
 };
 
 const LAYOUT_POOLS: Record<CategoryKey, string[]> = {
@@ -220,6 +345,14 @@ const LAYOUT_POOLS: Record<CategoryKey, string[]> = {
   sunatan: ['Centered Arch', 'Vertical Story Scroll', 'Golden Frame', 'Split Panel', 'Hero Mosque', 'Serene Single Column', 'Ornamental Border', 'Timeline Layout', 'Elegant Banner', 'Calligraphy Focus'],
   wedding: ['Centered Arch', 'Vertical Story Scroll', 'Split Panel', 'Gallery Focus', 'Hero Banner', 'Timeline Layout', 'Elegant Columns', 'Fullscreen Hero', 'Polaroid Collage', 'Minimal Grid'],
   aqiqah: ['Centered Cover', 'Vertical Story Scroll', 'Polaroid Grid', 'Soft Cards', 'Hero Banner', 'Moon Arch', 'Card Stack', 'Split Panel', 'Timeline Layout', 'Rounded Grid'],
+  education: ['Academic Hero', 'Vertical Story Scroll', 'Diploma Frame', 'Split Panel', 'Graduation Collage', 'Timeline Layout', 'Toga Focus', 'Elegant Banner', 'Fullscreen Hero', 'Minimal Grid'],
+  religious: ['Centered Arch', 'Serene Single Column', 'Ornamental Border', 'Calligraphy Focus', 'Hero Mosque', 'Vertical Story Scroll', 'Golden Frame', 'Timeline Layout', 'Elegant Banner', 'Split Panel'],
+  tasyakuran: ['Warm Centered', 'Vertical Story Scroll', 'Family Banner', 'Soft Cards', 'Timeline Layout', 'Split Panel', 'Golden Frame', 'Hero Banner', 'Rounded Grid', 'Single Column'],
+  gathering: ['Party Hero', 'Vertical Story Scroll', 'Polaroid Grid', 'Gallery Focus', 'Timeline Layout', 'Card Stack', 'Split Panel', 'Fullscreen Hero', 'Two Column', 'Collage Grid'],
+  business: ['Corporate Hero', 'Split Panel', 'Minimal Grid', 'Timeline Layout', 'Fullscreen Banner', 'Vertical Story Scroll', 'Elegant Columns', 'Two Column', 'Hero Statement', 'Gallery Focus'],
+  anniversary: ['Romantic Hero', 'Vertical Story Scroll', 'Polaroid Collage', 'Split Panel', 'Timeline Layout', 'Gallery Focus', 'Elegant Columns', 'Fullscreen Hero', 'Centered Arch', 'Photo Story'],
+  family: ['Warm Hero', 'Vertical Story Scroll', 'Polaroid Grid', 'Family Banner', 'Timeline Layout', 'Split Panel', 'Gallery Focus', 'Rounded Grid', 'Card Stack', 'Single Column'],
+  'doa-haul': ['Serene Centered', 'Calligraphy Focus', 'Ornamental Border', 'Vertical Story Scroll', 'Golden Frame', 'Hero Mosque', 'Timeline Layout', 'Elegant Banner', 'Single Column', 'Split Panel'],
 };
 
 const BG_POOLS: Record<CategoryKey, BackgroundType[]> = {
@@ -227,6 +360,14 @@ const BG_POOLS: Record<CategoryKey, BackgroundType[]> = {
   sunatan: ['islamic-gold', 'marble-gold', 'luxury-emerald', 'wedding-royal', 'minimalist-lines', 'baby-moon'],
   wedding: ['wedding-garden', 'wedding-royal', 'marble-gold', 'floral-lace', 'luxury-emerald', 'minimalist-lines', 'wine-jazz', 'watercolor'],
   aqiqah: ['baby-moon', 'pastel-clouds', 'baby-animal', 'watercolor', 'wedding-garden', 'minimalist-lines'],
+  education: ['minimalist-lines', 'marble-gold', 'wedding-royal', 'watercolor', 'floral-lace', 'luxury-emerald'],
+  religious: ['islamic-gold', 'marble-gold', 'luxury-emerald', 'wedding-royal', 'minimalist-lines'],
+  tasyakuran: ['islamic-gold', 'marble-gold', 'luxury-emerald', 'wedding-garden', 'minimalist-lines', 'watercolor'],
+  gathering: ['celebration-confetti', 'neon-glow', 'pastel-clouds', 'comic-doodles', 'watercolor', 'floral-lace'],
+  business: ['minimalist-lines', 'marble-gold', 'neon-glow', 'wine-jazz', 'luxury-emerald'],
+  anniversary: ['wedding-garden', 'wedding-royal', 'marble-gold', 'wine-jazz', 'floral-lace', 'watercolor'],
+  family: ['wedding-garden', 'watercolor', 'pastel-clouds', 'minimalist-lines', 'floral-lace', 'marble-gold'],
+  'doa-haul': ['islamic-gold', 'marble-gold', 'luxury-emerald', 'minimalist-lines', 'wedding-royal'],
 };
 
 const FRAME_POOLS: Record<CategoryKey, FrameStyle[]> = {
@@ -234,6 +375,14 @@ const FRAME_POOLS: Record<CategoryKey, FrameStyle[]> = {
   sunatan: ['islamic-arch', 'arch', 'gold-border', 'minimal-circle', 'royal-crest', 'glass-frame'],
   wedding: ['arch', 'gold-border', 'floral-ring', 'minimal-line', 'royal-crown', 'glass-frame', 'polaroid'],
   aqiqah: ['moon-arch', 'cute-ribbon', 'glass-frame', 'polaroid', 'minimal-circle', 'floral-wreath', 'gold-border'],
+  education: ['arch', 'gold-border', 'minimal-line', 'glass-frame', 'polaroid', 'minimal-circle'],
+  religious: ['islamic-arch', 'gold-border', 'royal-crest', 'arch', 'minimal-circle'],
+  tasyakuran: ['gold-border', 'arch', 'glass-frame', 'floral-ring', 'minimal-circle'],
+  gathering: ['polaroid', 'comic-frame', 'glass-frame', 'neon-border', 'minimal-circle'],
+  business: ['minimal-line', 'gold-border', 'glass-frame', 'minimal-circle'],
+  anniversary: ['arch', 'gold-border', 'floral-ring', 'glass-frame', 'polaroid', 'minimal-line'],
+  family: ['polaroid', 'arch', 'glass-frame', 'floral-ring', 'minimal-circle'],
+  'doa-haul': ['islamic-arch', 'gold-border', 'royal-crest', 'arch', 'minimal-circle'],
 };
 
 const BUTTON_POOLS: Record<CategoryKey, ButtonStyle[]> = {
@@ -241,6 +390,14 @@ const BUTTON_POOLS: Record<CategoryKey, ButtonStyle[]> = {
   sunatan: ['islamic-gold', 'gold-luxury', 'emerald-glass', 'minimal-dark', 'rose-gold'],
   wedding: ['gold-luxury', 'emerald-glass', 'rose-gold', 'minimal-dark', 'garden-rose'],
   aqiqah: ['pastel-pill', 'rose-gold', 'minimal-dark', 'cartoon-pop', 'islamic-gold'],
+  education: ['gold-luxury', 'minimal-dark', 'emerald-glass', 'rose-gold', 'neon-glow'],
+  religious: ['islamic-gold', 'gold-luxury', 'emerald-glass', 'minimal-dark'],
+  tasyakuran: ['gold-luxury', 'emerald-glass', 'islamic-gold', 'minimal-dark'],
+  gathering: ['playful', 'pastel-pill', 'cartoon-pop', 'neon-glow', 'rose-gold'],
+  business: ['minimal-dark', 'gold-luxury', 'emerald-glass', 'neon-glow'],
+  anniversary: ['rose-gold', 'gold-luxury', 'minimal-dark', 'garden-rose', 'emerald-glass'],
+  family: ['pastel-pill', 'minimal-dark', 'garden-rose', 'emerald-glass'],
+  'doa-haul': ['islamic-gold', 'gold-luxury', 'emerald-glass', 'minimal-dark'],
 };
 
 const DECO_POOLS: Record<CategoryKey, string[][]> = {
@@ -267,6 +424,54 @@ const DECO_POOLS: Record<CategoryKey, string[][]> = {
     ['🐰', '🥕', '🌷', '✨', '☁️'], ['👶', '🌟', '☁️', '🌙', '✨'], ['🍼', '👶', '🧸', '☁️', '✨'],
     ['🌙', '☁️', '⭐', '👶', '🕊️'], ['🧸', '👶', '☁️', '⭐', '🌸'], ['👶', '🌷', '🐰', '✨', '☁️'],
     ['⭐', '🌙', '👶', '✨', '🍼'],
+  ],
+  education: [
+    ['🎓', '📚', '✏️', '✨', '⭐'], ['🎓', '🏛️', '📜', '✨', '⭐'], ['📖', '🖋️', '🎓', '✨', '⭐'],
+    ['🎓', '🎉', '📚', '✨', '🎊'], ['🏫', '📚', '🎓', '✨', '⭐'], ['🎓', '🌠', '✨', '📜', '🏆'],
+    ['🎒', '📚', '🎓', '✏️', '✨'], ['🎓', '🥂', '🎉', '✨', '💫'], ['📐', '🧮', '🔭', '✨', '⭐'],
+    ['🎓', '🕊️', '✨', '📜', '🌻'],
+  ],
+  religious: [
+    ['🕌', '☪️', '⭐', '🌙', '✨'], ['📖', '🌙', '☪️', '⭐', '✨'], ['🕌', '✨', '🌙', '⭐', '📿'],
+    ['☪️', '🌙', '⭐', '✨', '🕌'], ['🌙', '⭐', '📖', '☪️', '✨'], ['🕋', '📿', '✨', '🌙', '⭐'],
+    ['🕌', '🌙', '⭐', '☪️', '🌸'], ['📖', '🕌', '✨', '🌙', '⭐'], ['🌙', '☪️', '🕌', '✨', '⭐'],
+    ['⭐', '☪️', '🌙', '✨', '🕌'],
+  ],
+  tasyakuran: [
+    ['🏠', '🌿', '✨', '🍃', '🕊️'], ['🏡', '🌺', '✨', '🍽️', '☕'], ['🙏', '✨', '🌿', '🏠', '🍵'],
+    ['🏠', '🔑', '✨', '🌼', '🕊️'], ['🌾', '🏠', '✨', '🍃', '🙏'], ['🏠', '🎀', '✨', '🌿', '🧡'],
+    ['🏡', '☕', '✨', '🍰', '🌸'], ['🏠', '🕊️', '✨', '🌿', '🙏'], ['🏠', '🎉', '✨', '🍽️', '🌺'],
+    ['🏠', '✨', '🍵', '🌼', '🕊️'],
+  ],
+  gathering: [
+    ['🎉', '🥳', '🎈', '✨', '🎊'], ['🎪', '🎉', '🎈', '✨', '🎶'], ['🏕️', '🔥', '✨', '🌲', '🎶'],
+    ['🎤', '🎶', '🎉', '✨', '🥂'], ['🏀', '🎉', '🎈', '✨', '⚽'], ['🎊', '🥳', '🎉', '✨', '🍽️'],
+    ['🎼', '🎶', '🎉', '✨', '💃'], ['🌴', '🏖️', '🎉', '✨', '🎶'], ['🍢', '🎉', '🎈', '✨', '🧺'],
+    ['🎉', '🎈', '🎊', '✨', '🥳'],
+  ],
+  business: [
+    ['🏢', '✨', '💼', '🚀', '📈'], ['🏢', '🚀', '✨', '💡', '💼'], ['🏛️', '💼', '✨', '📊', '🏢'],
+    ['💻', '🚀', '✨', '📈', '🏢'], ['🎯', '🏢', '✨', '💼', '🚀'], ['🏢', '🥂', '✨', '💼', '🎉'],
+    ['📈', '🏢', '✨', '💡', '🚀'], ['🏢', '🎉', '✨', '🚀', '💼'], ['🤝', '🏢', '✨', '💼', '📊'],
+    ['🏢', '💡', '✨', '🚀', '📈'],
+  ],
+  anniversary: [
+    ['❤️', '🌹', '✨', '🥂', '💍'], ['💕', '🌹', '✨', '🕊️', '❤️'], ['❤️', '🥂', '✨', '🌹', '💐'],
+    ['💖', '🌷', '✨', '💍', '❤️'], ['❤️', '✨', '🌹', '🥂', '💐'], ['💞', '🌹', '✨', '❤️', '🥂'],
+    ['❤️', '🕊️', '✨', '🌹', '💕'], ['💗', '🌹', '✨', '❤️', '🥂'], ['❤️', '🥂', '✨', '💐', '🌹'],
+    ['❤️', '🌷', '✨', '💕', '🥂'],
+  ],
+  family: [
+    ['👨‍👩‍👧‍👦', '🏡', '✨', '🌻', '🧡'], ['👨‍👩‍👧', '🌷', '✨', '🏡', '💛'], ['👨‍👩‍👦', '🏕️', '✨', '🌿', '🧡'],
+    ['👨‍👩‍👧‍👦', '🍽️', '✨', '🏡', '🌸'], ['👨‍👩‍👧‍👦', '🎈', '✨', '🏡', '🥳'], ['👨‍👩‍👦', '🔥', '✨', '🌲', '🧡'],
+    ['👨‍👩‍👧‍👦', '☕', '✨', '🏡', '🌼'], ['👨‍👩‍👧‍👦', '🎉', '✨', '🏡', '💚'], ['👴', '👵', '✨', '🏡', '🧡'],
+    ['👨‍👩‍👧‍👦', '🕊️', '✨', '🏡', '🌸'],
+  ],
+  'doa-haul': [
+    ['🕊️', '🌙', '✨', '⭐', '🕌'], ['🌷', '🕊️', '✨', '📖', '🌙'], ['🕌', '🕊️', '✨', '🌙', '⭐'],
+    ['📖', '🕊️', '✨', '🌙', '⭐'], ['🌿', '🕊️', '✨', '🌙', '🙏'], ['🕊️', '⭐', '✨', '🌙', '📿'],
+    ['🌙', '🕊️', '✨', '🕌', '⭐'], ['🙏', '🕊️', '✨', '🌙', '📖'], ['🕊️', '🌷', '✨', '🌙', '⭐'],
+    ['🕌', '📿', '✨', '🌙', '🕊️'],
   ],
 };
 
@@ -690,6 +895,109 @@ const AQIQAH_SEEDS: Seed[] = [
   ['Aqiqah Little One', 'Modern Islamic', 'Little Blessing', 'emerald-gold', 'elegant', 'Mubarak Blessing', 'TRENDING'],
 ];
 
+const EDUCATION_SEEDS: Seed[] = [
+  ['Golden Toga', 'Graduation', 'Majestic Graduation', 'gold-lux', 'luxury', 'Toga & Gold Laurel', 'POPULAR'],
+  ['Navy Academic', 'Graduation', 'Formal Academic', 'navy', 'elegant', 'Academic Seal'],
+  ['Wisuda Istimewa', 'Wisuda', 'Indonesian Graduation', 'royalblue', 'elegant', 'Toga & Scarf', 'POPULAR'],
+  ['Minimal Graduation', 'Minimalist', 'Clean Diploma', 'monochrome', 'minimal', 'Line Diploma'],
+  ['Royal College', 'University', 'Campus Royalty', 'midnight', 'luxury', 'Crown & Seal'],
+  ['Emerald Scholar', 'Academic', 'Scholar Green', 'emerald', 'elegant', 'Emerald Laurel'],
+  ['Classy Ceremony', 'Classy', 'Refined Ceremony', 'champagne', 'luxury', 'Champagne Confetti'],
+  ['Modern Graduate', 'Modern', 'Contemporary Toga', 'modern', 'minimal', 'Geometric Toga'],
+  ['SMA Graduation', 'School', 'High School Grad', 'candy-pop', 'playful', 'Caps & Balloons', 'TRENDING'],
+  ['Kampus Merdeka', 'University', 'Freedom Campus', 'emerald-green', 'playful', 'Campus Skyline'],
+  ['Senja Wisuda', 'Wisuda', 'Golden Hour Grad', 'orange-warm', 'hand', 'Sunset Toga'],
+  ['Graduation Party', 'Graduation Party', 'Party Caps', 'space-navy', 'playful', 'Party Confetti'],
+  ['Prom Night', 'Prom Night', 'Gala Dance', 'rosegold', 'elegant', 'Prom Glam', 'FEATURED'],
+  ['Prom Elegance', 'Prom Night', 'Evening Gala', 'black-gold', 'luxury', 'Black Tie'],
+  ['Prom Star', 'Prom Night', 'Star of the Night', 'purple-royal', 'elegant', 'Prom Stars'],
+  ['Prom Glow', 'Prom Night', 'Neon Dance', 'neon-cyan', 'neon', 'Neon Prom'],
+  ['Farewell Class', 'Farewell', 'Goodbye Friends', 'retro-90s', 'retro', 'Retro Farewell'],
+  ['Perpisahan Kelas', 'Farewell', 'Indonesian Farewell', 'orange-warm', 'playful', 'Waving Friends'],
+  ['Farewell Night', 'Farewell', 'Last Dance', 'midnight', 'elegant', 'Night Stars'],
+  ['Wisuda TKA', 'Wisuda', 'Kindergarten Grad', 'pastel-mint', 'cute', 'Little Toga', 'NEW'],
+  ['Graduation TKA', 'School', 'TK Celebration', 'candy-pastel', 'cute', 'Caps & Smiles'],
+  ['TK Merdeka', 'School', 'Playgroup Grad', 'yellow-sun', 'cute', 'Little Graduates'],
+  ['SMP Graduation', 'School', 'Junior High Grad', 'ocean-teal', 'playful', 'Teen Caps'],
+  ['SMA Wisuda', 'Wisuda', 'Senior Grad', 'royalblue', 'elegant', 'Blue Toga'],
+  ['Campus Freshman', 'University', 'New Beginnings', 'skyblue', 'playful', 'Backpacks & Books'],
+  ['Academic Honors', 'Academic', 'Honors & Awards', 'gold-lux', 'luxury', 'Honor Medal'],
+  ['Formal Academic', 'Formal', 'Serene Ceremony', 'navy', 'elegant', 'Formal Lines'],
+  ['Formal Graduation', 'Formal', 'Strict Protocol', 'charcoal-gold', 'elegant', 'Protocol Ribbon'],
+  ['Classy University', 'Classy', 'Elite Campus', 'ivory-gold', 'elegant', 'Ivory Seal'],
+  ['Elegant Scholar', 'Elegant', 'Grace Academic', 'ivory-gold', 'hand', 'Elegant Laurel'],
+  ['Youth Graduation', 'Youth', 'Young Grad', 'candy-pop', 'playful', 'Youth Energy', 'TRENDING'],
+  ['Youthful Class', 'Youth', 'Fresh Grad', 'pastel-blue', 'playful', 'Fresh Colors'],
+  ['Modern Scholar', 'Modern', 'Sleek Grad', 'monochrome', 'minimal', 'Sleek Lines'],
+  ['Modern Ceremony', 'Modern', 'New Age Grad', 'geometric', 'minimal', 'Geometric Shapes'],
+  ['Colorful Graduation', 'Colorful', 'Rainbow Grad', 'rainbow', 'playful', 'Rainbow Caps'],
+  ['Colorful Diploma', 'Colorful', 'Bright Day', 'candy-pop', 'playful', 'Bright Confetti'],
+  ['Professional Graduate', 'Professional', 'Career Ready', 'adult-charcoal', 'minimal', 'Corporate Seal'],
+  ['Professional Class', 'Professional', 'Work Ready', 'grey-neutral', 'minimal', 'Business Lines'],
+  ['Duta Wisuda', 'Wisuda', 'Ambassador Grad', 'navy-royal', 'elegant', 'Duta Scarf'],
+  ['Graduation Deluxe', 'Graduation', 'Premium Toga', 'black-gold', 'luxury', 'Gold Monogram'],
+  ['Diploma Day', 'Graduation', 'Paper & Seal', 'ivory-gold', 'elegant', 'Diploma Scroll'],
+  ['Graduation Classic', 'Graduation', 'Timeless Grad', 'emerald', 'elegant', 'Classic Laurel'],
+  ['Graduation Royal', 'Graduation', 'Regal Caps', 'royalblue', 'luxury', 'Royal Seal'],
+  ['Graduation Trend', 'Graduation', 'Trendy Grad', 'pink-white', 'playful', 'Trendy Colors', 'NEW'],
+  ['Wisuda Pintar', 'Wisuda', 'Smart Grad', 'yellow-sun', 'cute', 'Smart Stars'],
+  ['Wisuda Prestasi', 'Wisuda', 'Achievement Grad', 'emerald-gold', 'elegant', 'Achievement Trophy'],
+  ['Wisuda Bahagia', 'Wisuda', 'Happy Day', 'pastel-peach', 'hand', 'Happy Flowers'],
+  ['Wisuda Islami', 'Wisuda', 'Islamic Grad', 'islamic-green', 'elegant', 'Crescent & Toga'],
+  ['Sekolah Quran', 'School', 'Quranic School', 'emerald-gold', 'elegant', 'Quran & Toga'],
+  ['Pesantren Graduate', 'University', 'Boarding Grad', 'sage-gold', 'elegant', 'Pesantren Motif'],
+  ['Santri Wisuda', 'Wisuda', 'Santri Grad', 'islamic-green', 'elegant', 'Santri & Toga'],
+  ['Arts Academy', 'University', 'Creative Arts', 'candy-pastel', 'hand', 'Palette & Brush'],
+  ['Music Academy', 'University', 'Melody Grad', 'kpop-pink', 'neon', 'Music Notes'],
+  ['Dance Academy', 'University', 'Move & Grad', 'neon-cyan', 'neon', 'Dance Silhouettes'],
+  ['Design School', 'School', 'Creative Class', 'purple-royal', 'minimal', 'Design Grid'],
+  ['IT Campus', 'University', 'Tech Grad', 'gaming-neon', 'neon', 'Code & Laptop'],
+  ['Engineering Grad', 'University', 'Engineer Cap', 'space-navy', 'minimal', 'Gears & Formula'],
+  ['Medical School', 'University', 'Future Doctor', 'emerald', 'elegant', 'Stethoscope & Caps'],
+  ['Law School Grad', 'University', 'Justice Grad', 'navy', 'elegant', 'Scales & Gavel'],
+  ['Economics Graduate', 'University', 'Finance Grad', 'adult-charcoal', 'minimal', 'Graph & Cap'],
+  ['Business School', 'University', 'MBA Grad', 'black-gold', 'luxury', 'Lapel & Cap'],
+  ['Architecture Grad', 'University', 'Blueprint Grad', 'royalblue', 'minimal', 'Blueprints'],
+  ['Journalism Grad', 'University', 'News Cap', 'charcoal-gold', 'minimal', 'Microphone & Pen'],
+  ['Psychology Grad', 'University', 'Mind Grad', 'purple-royal', 'elegant', 'Brain & Cap'],
+  ['Nursing Graduation', 'University', 'Caring Grad', 'pastel-blue', 'elegant', 'Heart & Cross'],
+  ['Veterinary Grad', 'University', 'Animal Doctor', 'jungle-green', 'playful', 'Paw & Cap'],
+  ['Agriculture Grad', 'University', 'Green Harvest', 'emerald-green', 'elegant', 'Wheat & Cap'],
+  ['Fashion Graduate', 'University', 'Style Cap', 'rosegold', 'hand', 'Sewing & Cap'],
+  ['Culinary School', 'University', 'Chef Cap', 'orange-warm', 'playful', 'Chef & Toque'],
+  ['Sport Science Grad', 'University', 'Athlete Cap', 'safari-earth', 'playful', 'Whistle & Cap'],
+  ['Accounting Grad', 'University', 'Numbers Cap', 'dustyblue', 'minimal', 'Calculator & Cap'],
+  ['Teacher Graduation', 'University', 'Educator Cap', 'emerald', 'elegant', 'Apple & Cap'],
+  ['Primary School Grad', 'School', 'Elementary Grad', 'pastel-mint', 'cute', 'Little Caps'],
+  ['Elementary Grad', 'School', 'SD Celebration', 'yellow-sun', 'cute', 'Cheering Kids'],
+  ['Junior Scholar', 'School', 'Smart Junior', 'sky-cloud', 'cute', 'Stars & Caps'],
+  ['High School Party', 'School', 'Grad Bash', 'candy-pop', 'playful', 'Party Caps'],
+  ['Boarding School Grad', 'School', 'Asrama Grad', 'maroon-gold', 'elegant', 'Dorm & Cap'],
+  ['International School', 'School', 'Global Grad', 'royalblue', 'minimal', 'Globe & Cap'],
+  ['Bilingual Grad', 'School', 'Two Worlds', 'dustyblue', 'elegant', 'Language & Cap'],
+  ['STEM Graduation', 'Academic', 'Science Grad', 'space-navy', 'minimal', 'Atom & Cap'],
+  ['STEM Girls', 'Academic', 'Women in Science', 'purple-royal', 'elegant', 'Microscope & Cap'],
+  ['Robotics Grad', 'Academic', 'Robo Cap', 'gaming-neon', 'neon', 'Robot & Gear'],
+  ['Coding Class Grad', 'Academic', 'Code & Cap', 'pixel', 'neon', 'Pixel Code'],
+  ['Graduation Blue', 'Graduation', 'Blue Sky Caps', 'bluesilver', 'elegant', 'Silver Stars'],
+  ['Graduation White', 'Graduation', 'White Purity', 'white-gold', 'elegant', 'White Laurel'],
+  ['Graduation Silver', 'Graduation', 'Silver Shine', 'bluesilver', 'luxury', 'Silver Sparkle'],
+  ['Graduation Gold', 'Graduation', 'Golden Achieve', 'gold-lux', 'luxury', 'Gold Sparkle'],
+  ['Graduation Emerald', 'Graduation', 'Green Success', 'emerald', 'elegant', 'Emerald Cap'],
+  ['Graduation Purple', 'Graduation', 'Purple Honor', 'purple-royal', 'elegant', 'Purple Laurel'],
+  ['Graduation Peach', 'Graduation', 'Warm Success', 'peach', 'hand', 'Peach Petals'],
+  ['Graduation Sage', 'Graduation', 'Calm Scholar', 'sage', 'minimal', 'Sage Branch'],
+  ['Graduation Navy', 'Graduation', 'Deep Success', 'navy', 'elegant', 'Navy Seal'],
+  ['Graduation Ivory', 'Graduation', 'Ivory Grace', 'ivory-gold', 'hand', 'Ivory Flowers'],
+  ['Last Day School', 'Farewell', 'Final Bell', 'retro-90s', 'retro', 'School Bell'],
+  ['Graduation Day', 'Graduation', 'The Big Day', 'champagne', 'luxury', 'Cap & Champagne', 'FEATURED'],
+  ['Milestone Grad', 'Graduation', 'Big Step', 'navy-royal', 'elegant', 'Stairway & Cap'],
+  ['New Chapter Grad', 'Graduation', 'Fresh Page', 'emerald-green', 'minimal', 'Open Book'],
+  ['Bright Future Grad', 'Graduation', 'Future Ready', 'yellow-sun', 'playful', 'Sunrise & Cap'],
+  ['Study Abroad Grad', 'University', 'Overseas Grad', 'royalblue', 'minimal', 'Plane & Cap'],
+  ['Digital Graduation', 'Modern', 'Virtual Grad', 'neon-cyan', 'neon', 'Screen & Cap'],
+];
+
 /* ============================================================
    EVENT DATA POOLS
    ============================================================ */
@@ -751,6 +1059,53 @@ const IMAGE_POOLS: Record<CategoryKey, string[]> = {
     'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80',
     'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80',
   ],
+  education: [
+    'https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=600&q=80',
+  ],
+  religious: [
+    'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=600&q=80',
+  ],
+  tasyakuran: [
+    'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+  ],
+  gathering: [
+    'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80',
+  ],
+  business: [
+    'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&w=600&q=80',
+  ],
+  anniversary: [
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80',
+  ],
+  family: [
+    'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1544415033-29406be6e3eb?auto=format&fit=crop&w=600&q=80',
+  ],
+  'doa-haul': [
+    'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=600&q=80',
+  ],
 };
 
 const GALLERY_POOLS: Record<CategoryKey, string[]> = {
@@ -779,6 +1134,40 @@ const GALLERY_POOLS: Record<CategoryKey, string[]> = {
     'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=600&q=80',
     'https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=600&q=80',
     'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=600&q=80',
+  ],
+  education: [
+    'https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80',
+  ],
+  religious: [
+    'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=600&q=80',
+  ],
+  tasyakuran: [
+    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+  ],
+  gathering: [
+    'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80',
+  ],
+  business: [
+    'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&w=600&q=80',
+  ],
+  anniversary: [
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
+  ],
+  family: [
+    'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1544415033-29406be6e3eb?auto=format&fit=crop&w=600&q=80',
+  ],
+  'doa-haul': [
+    'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=600&q=80',
   ],
 };
 
@@ -908,6 +1297,62 @@ const AQIQAH_QUOTES = [
 ];
 const WEDDING_HASHTAGS = ['#EternalLove', '#OurWedding', '#SatuHatiSatuCinta', '#ForeverAndAlways', '#AkadDanResepsi', '#HappilyEverAfter'];
 
+const GRADUATE_NAMES = [
+  { name: 'Adi Pratama', degree: 'S1 Teknik Informatika' },
+  { name: 'Nadia Ayu', degree: 'S1 Kedokteran Umum' },
+  { name: 'Rizky Ramadhan', degree: 'S1 Hukum' },
+  { name: 'Sarah Putri', degree: 'S1 Psikologi' },
+  { name: 'Dimas Arya', degree: 'S1 Arsitektur' },
+  { name: 'Aisyah Rahma', degree: 'S1 Akuntansi' },
+  { name: 'Bayu Saputra', degree: 'S1 Manajemen Bisnis' },
+  { name: 'Dinda Lestari', degree: 'S1 Desain Komunikasi Visual' },
+  { name: 'Gilang Mahesa', degree: 'S1 Sistem Informasi' },
+  { name: 'Putri Amelia', degree: 'S1 Gizi' },
+  { name: 'Reza Firmansyah', degree: 'S1 Teknik Sipil' },
+  { name: 'Naila Fitri', degree: 'S1 Ilmu Komunikasi' },
+  { name: 'Aji Santoso', degree: 'S1 Teknik Mesin' },
+  { name: 'Salsabila Zahra', degree: 'S1 Farmasi' },
+  { name: 'Bima Satria', degree: 'S1 Teknik Elektro' },
+  { name: 'Keysha Anindya', degree: 'S1 Pendidikan Bahasa Inggris' },
+  { name: 'Arga Pratama', degree: 'S1 Statistika' },
+  { name: 'Maharani Dewi', degree: 'S1 Hubungan Internasional' },
+  { name: 'Fajar Nugroho', degree: 'S1 Teknik Industri' },
+  { name: 'Rara Kirana', degree: 'S1 Perhotelan' },
+];
+const UNIVERSITIES = [
+  { name: 'Universitas Indonesia', short: 'UI' },
+  { name: 'Institut Teknologi Bandung', short: 'ITB' },
+  { name: 'Universitas Gadjah Mada', short: 'UGM' },
+  { name: 'Universitas Airlangga', short: 'UNAIR' },
+  { name: 'Universitas Brawijaya', short: 'UB' },
+  { name: 'Institut Teknologi Sepuluh Nopember', short: 'ITS' },
+  { name: 'Universitas Padjadjaran', short: 'UNPAD' },
+  { name: 'Universitas Diponegoro', short: 'UNDIP' },
+  { name: 'Universitas Telkom', short: 'Telkom University' },
+  { name: 'Universitas Islam Indonesia', short: 'UII' },
+  { name: 'Universitas Negeri Jakarta', short: 'UNJ' },
+  { name: 'Universitas Bina Nusantara', short: 'BINUS' },
+];
+const GRADUATION_QUOTES = [
+  '"Pendidikan adalah tiket menuju masa depan, hari ini kita merayakan hasil kerja keras yang membanggakan."',
+  '"Ilmu tanpa amal adalah pohon tanpa buah. Selamat atas kelulusan yang penuh berkah."',
+  '"Tiap langkah belajar adalah investasi masa depan. Semoga kesuksesan selalu menyertai langkahmu."',
+  '"Pegang erat mimpimu, karena hari ini satu pintu telah terbuka menuju impian yang lebih besar."',
+  '"Kesuksesan bukanlah akhir, melainkan awal dari petualangan baru yang lebih indah."',
+  '"Dari sabar dan usaha, lahirlah prestasi. Teruslah berkarya, dunia menantimu."',
+];
+const GRADUATION_EVENT_TITLES = ['Wisuda', 'Graduation', 'Prosesi Wisuda', 'Graduation Ceremony', 'Sidang Wisuda', 'Wisuda & Syukuran'];
+const EDUCATION_VENUES = [
+  { venue: 'Balai Sidang Universitas Indonesia', address: 'Kampus UI, Depok, Jawa Barat' },
+  { venue: 'Gedung Serba Guna ITB', address: 'Jl. Ganesha No.10, Bandung' },
+  { venue: 'Balairung UGM', address: 'Bulaksumur, Yogyakarta' },
+  { venue: 'Aula Serbaguna Universitas Airlangga', address: 'Kampus C, Surabaya, Jawa Timur' },
+  { venue: 'Graha Sepuluh Nopember ITS', address: 'Jl. Teknik Kimia, Sukolilo, Surabaya' },
+  { venue: 'Gedung Rektorat UNPAD', address: 'Jl. Dipati Ukur No.35, Bandung' },
+  { venue: 'Auditorium Universitas Telkom', address: 'Jl. Telekomunikasi Terusan Buah Batu, Bandung' },
+  { venue: 'Convention Hall Universitas Bina Nusantara', address: 'Jl. K.H. Syahdan No.9, Jakarta Barat' },
+];
+
 const pick = <T,>(arr: T[], i: number): T => arr[i % arr.length];
 
 const buildEventDetails = (category: CategoryKey, idx: number, portrait: string): EventDetails => {
@@ -993,10 +1438,33 @@ const buildEventDetails = (category: CategoryKey, idx: number, portrait: string)
   };
 };
 
+const buildEducationDetails = (idx: number, portrait: string): EventDetails => {
+  const graduate = pick(GRADUATE_NAMES, idx);
+  const university = pick(UNIVERSITIES, idx);
+  const eduVenue = pick(EDUCATION_VENUES, idx);
+  return {
+    date: `Sabtu, ${12 + (idx % 10)} ${['September', 'Oktober', 'November', 'Desember'][idx % 4]} 2026`,
+    time: '08.00 WIB - Selesai',
+    venue: eduVenue.venue,
+    address: eduVenue.address,
+    portraitImage: portrait,
+    galleryImages: [pick(GALLERY_POOLS.education, idx * 2 + 1), pick(GALLERY_POOLS.education, idx * 2 + 3), pick(GALLERY_POOLS.education, idx * 2 + 5)],
+    eventTitle: pick(GRADUATION_EVENT_TITLES, idx),
+    graduateName: graduate.name,
+    degreeName: graduate.degree,
+    institutionName: university.name,
+    universityShort: university.short,
+    parentsName: pick(PARENTS_LIST, idx),
+    messageQuote: pick(GRADUATION_QUOTES, idx),
+    hashtag: `#Wisuda${university.short}#${graduate.name.split(' ')[0]}Lulus`,
+  };
+};
+
 const buildWishes = (category: CategoryKey, name: string): WishItem[] => {
   const label = CATEGORY_LABELS[category];
+  const greet = category === 'education' ? `Selamat wisuda ${name}!` : `Selamat ${label} ${name}!`;
   const common: WishItem[] = [
-    { id: 'w1', name: 'Siti & Keluarga', message: `Selamat ${label} ${name}! Semoga sehat selalu, makin sukses, dan panjang umur! 🎉`, date: '2 jam yang lalu', attendance: 'Hadir' },
+    { id: 'w1', name: 'Siti & Keluarga', message: `${greet} Semoga sehat selalu, makin sukses, dan panjang umur! 🎉`, date: '2 jam yang lalu', attendance: 'Hadir' },
     { id: 'w2', name: 'Budi Raharjo', message: `Semoga hari spesial ini menjadi kenangan indah. Barakallahu fik! ✨✨`, date: '5 jam yang lalu', attendance: 'Hadir' },
     { id: 'w3', name: 'Clara & Friends', message: `Tidak sabar hadir di acaranya! Sukses selalu untuk keluarga besar. ❤️🥂`, date: '1 hari yang lalu', attendance: 'Hadir' },
   ];
@@ -1004,13 +1472,21 @@ const buildWishes = (category: CategoryKey, name: string): WishItem[] => {
 };
 
 /* ============================================================
-   BUILDER — generate all 400 templates
+   BUILDER — generate templates from seed pools (per category)
    ============================================================ */
 const ALL_SEEDS: Record<CategoryKey, Seed[]> = {
   birthday: BIRTHDAY_SEEDS,
   sunatan: SUNATAN_SEEDS,
   wedding: WEDDING_SEEDS,
   aqiqah: AQIQAH_SEEDS,
+  education: EDUCATION_SEEDS,
+  religious: [],
+  tasyakuran: [],
+  gathering: [],
+  business: [],
+  anniversary: [],
+  family: [],
+  'doa-haul': [],
 };
 
 const buildThemeStyle = (category: CategoryKey, seed: Seed, idx: number): ThemeStyle => {
@@ -1068,6 +1544,14 @@ const CATEGORY_TITLES: Record<CategoryKey, string> = {
   sunatan: 'Template Undangan Sunatan',
   wedding: 'Template Undangan Wedding',
   aqiqah: 'Template Undangan Aqiqah',
+  education: 'Template Undangan Wisuda & Graduation',
+  religious: 'Template Undangan Keagamaan',
+  tasyakuran: 'Template Undangan Tasyakuran',
+  gathering: 'Template Undangan Acara & Gathering',
+  business: 'Template Undangan Bisnis',
+  anniversary: 'Template Undangan Anniversary',
+  family: 'Template Undangan Keluarga',
+  'doa-haul': 'Template Undangan Doa & Haul',
 };
 
 export const getCategoryTitle = (category: CategoryKey | 'All'): string => {
@@ -1089,7 +1573,7 @@ export const TEMPLATES: Template[] = (() => {
       const badge = seedBadge || ((i === 19 || i === 49 || i === 79) ? 'TRENDING' : undefined);
       const price = DEFAULT_TEMPLATE_PRICE;
       const portrait = pick(IMAGE_POOLS[catKey], i * 7 + 3);
-      const eventDetails = buildEventDetails(catKey, i, portrait);
+      const eventDetails = catKey === 'education' ? buildEducationDetails(i, portrait) : buildEventDetails(catKey, i, portrait);
       const themeStyle = buildThemeStyle(catKey, seed, i);
       const music = getTemplateMusic(catKey, i, {
         subcategory: seed[1],
@@ -1137,6 +1621,11 @@ export const TEMPLATES: Template[] = (() => {
 export const getTemplateByUid = (uid: string): Template | undefined => {
   return TEMPLATES.find((t) => t.uid === uid);
 };
+
+export const getCategoryCount = (category: string): number =>
+  TEMPLATES.filter((t) => t.category === category).length;
+
+export const getTotalTemplateCount = (): number => TEMPLATES.length;
 
 export const formatRupiah = (number: number): string => {
   return new Intl.NumberFormat('id-ID', {

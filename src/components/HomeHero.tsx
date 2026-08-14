@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavigationTab, CategoryKey } from '../types';
-import { CATEGORIES, TEMPLATES } from '../data/templates';
+import { CATEGORIES, TEMPLATES, getCategoryCount } from '../data/templates';
 import { buildWaLink, homepageWaMessage } from '../lib/whatsapp';
 import { UiButton } from './UiButton';
 
@@ -21,7 +21,7 @@ const FEATURES: { icon: string; title: string; description: string }[] = [
 ];
 
 const STEPS: { icon: string; title: string; description: string }[] = [
-  { icon: 'web', title: 'Pilih Template', description: 'Pilih salah satu dari 400 template sesuai momenmu.' },
+  { icon: 'web', title: 'Pilih Template', description: 'Pilih dari 1.200 template sesuai momenmu.' },
   { icon: 'edit_note', title: 'Kirim Data', description: 'Kirim nama, tanggal, foto, lokasi & request via WhatsApp.' },
   { icon: 'brush', title: 'Kami Siapkan Undangan', description: 'Tim kami membuat undangan personalmu dalam 1–3 jam.' },
   { icon: 'send', title: 'Bagikan ke Tamu', description: 'Terima link & QR code, lalu bagikan ke tamu undanganmu.' },
@@ -150,7 +150,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
                 <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
                   <h3 className="font-headline text-xl font-extrabold text-white drop-shadow">{cat.label}</h3>
                   <span className="shrink-0 bg-secondary text-on-secondary font-body text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-lg">
-                    {cat.count} Template
+                    {getCategoryCount(cat.key)} Template
                   </span>
                 </div>
               </div>

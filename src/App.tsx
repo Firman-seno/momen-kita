@@ -214,7 +214,7 @@ export default function App() {
     }
 
     // New demo format: /demo/{category}/{number}
-    const newMatch = path.match(/\/demo\/(birthday|sunatan|wedding|aqiqah)\/(\d+)/);
+    const newMatch = path.match(/\/demo\/([a-zA-Z0-9-]+)\/(\d+)/);
     if (newMatch) {
       const found = getTemplateByUid(`${newMatch[1]}-${newMatch[2].padStart(3, "0")}`);
       if (found) {

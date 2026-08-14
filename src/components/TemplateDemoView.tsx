@@ -140,6 +140,29 @@ const getDemoContent = (template: Template, eventDetails: EventDetails): DemoCon
     };
   }
 
+  if (cat === 'education') {
+    return {
+      mainTitle: eventDetails.graduateName || '',
+      eventSubtitle: eventDetails.degreeName || 'Wisuda & Graduation',
+      messageHeading: 'Ucapan & Doa',
+      messageText: eventDetails.messageQuote || '',
+      messageBy: eventDetails.parentsName || '',
+      countdownTitle: 'Countdown Menuju Wisuda',
+      galleryHeading: 'Momen Perjalanan',
+      galleryNote: 'Perjalanan panjang menuju hari ini',
+      mapHeading: 'Lokasi Acara',
+      rsvpHeading: 'Konfirmasi Kehadiran',
+      rsvpNote: 'Mohon konfirmasi kehadiran Anda',
+      wishesHeading: 'Kirim Ucapan & Doa',
+      wishesNote: 'Tulis ucapan untuk sang lulusan',
+      wishesPlaceholder: `Tulis ucapan untuk ${eventDetails.graduateName}...`,
+      wishButton: 'Kirim Ucapan',
+      closingTitle: 'Terima Kasih',
+      closingQuote: eventDetails.messageQuote || '',
+      closingBy: eventDetails.parentsName || '',
+    };
+  }
+
   // birthday (default)
   return {
     mainTitle: `${eventDetails.birthdayPerson}'s ${eventDetails.age}th`,
@@ -979,6 +1002,42 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
                           Orang Tua
                         </h3>
                         <p className="text-sm font-bold mt-0.5">{eventDetails.parentsName}</p>
+                      </div>
+                    </StaggerChild>
+                  </Stagger>
+                </section>
+              )}
+
+              {/* SECTION 2d: EDUCATION GRADUATE + INSTITUTION */}
+              {template.category === 'education' && (
+                <section className="my-10">
+                  <Stagger profile={profile}>
+                    <StaggerChild variant="up" className="mb-4">
+                      <div className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md flex items-start gap-4">
+                        <div className="p-3 rounded-xl bg-white/15 text-amber-300 shrink-0">
+                          <span className="material-symbols-outlined text-2xl">school</span>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200">
+                            Nama Lulusan
+                          </h3>
+                          <p className="text-base font-bold mt-0.5">{eventDetails.graduateName}</p>
+                          <p className="text-xs opacity-85 mt-0.5">{eventDetails.degreeName}</p>
+                        </div>
+                      </div>
+                    </StaggerChild>
+                    <StaggerChild variant="up">
+                      <div className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md flex items-start gap-4">
+                        <div className="p-3 rounded-xl bg-white/15 text-amber-300 shrink-0">
+                          <span className="material-symbols-outlined text-2xl">account_balance</span>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200">
+                            Perguruan Tinggi
+                          </h3>
+                          <p className="text-sm font-bold mt-0.5">{eventDetails.institutionName}</p>
+                          <p className="text-xs opacity-85 mt-0.5">{eventDetails.parentsName}</p>
+                        </div>
                       </div>
                     </StaggerChild>
                   </Stagger>

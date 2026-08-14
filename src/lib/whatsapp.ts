@@ -182,6 +182,14 @@ export const guestInvitationMessage = ({
         `Kami akan sangat senang jika ${guest} dapat hadir dan merayakan momen spesial ini bersama kami 🎉\n\n` +
         `Sampai jumpa!`;
       break;
+    case 'education':
+      body =
+        `Dengan penuh kebanggaan, kami mengundang Anda untuk hadir di acara wisuda / kelulusan kami.\n\n` +
+        `Berikut undangan digitalnya:\n\n` +
+        `💌 ${title}\n${url}${details}\n\n` +
+        `Kami akan sangat senang jika ${guest} dapat hadir dan memberikan doa serta dukungannya 🎓\n\n` +
+        `Sampai jumpa!`;
+      break;
     default:
       body =
         `Dengan penuh kebahagiaan, kami mengundang Anda untuk hadir di acara spesial kami.\n\n` +

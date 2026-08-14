@@ -12,7 +12,7 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({ onClose, onExp
       step: '01',
       title: 'Pilih Template',
       description:
-        'Jelajahi 400 template undangan digital untuk Birthday, Sunatan, Wedding & Aqiqah, dan lihat langsung demo interaktifnya.',
+        'Jelajahi template undangan digital untuk 12 kategori dan lihat langsung demo interaktifnya.',
       icon: 'touch_app',
     },
     {

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { TEMPLATES, CATEGORY_LABELS, formatRupiah } from '../data/templates';
-import { Template } from '../types';
+import { Template, CategoryKey } from '../types';
 import { UiButton } from './UiButton';
 import { getTemplatePrice, setTemplatePrice, resetTemplatePrice, hasPriceOverride, useTemplatePrices, DEFAULT_TEMPLATE_PRICE } from '../lib/templatePricing';
 import { motion, AnimatePresence } from 'motion/react';
@@ -15,17 +15,14 @@ import { Toast } from './Toast';
    survives a page refresh without touching the existing routing.
    ============================================================ */
 
-type CategoryFilter = 'All' | 'birthday' | 'wedding' | 'sunatan' | 'aqiqah' | 'Other';
+type CategoryFilter = CategoryKey | 'All' | 'Other';
 type SortKey = 'num-asc' | 'num-desc' | 'name-asc' | 'name-desc';
 
-const KNOWN_CATEGORIES: CategoryFilter[] = ['birthday', 'sunatan', 'wedding', 'aqiqah'];
+const KNOWN_CATEGORIES: CategoryKey[] = ['birthday', 'sunatan', 'wedding', 'aqiqah', 'education', 'religious', 'tasyakuran', 'gathering', 'business', 'anniversary', 'family', 'doa-haul'];
 
 const CATEGORY_FILTERS: { key: CategoryFilter; label: string }[] = [
   { key: 'All', label: 'All' },
-  { key: 'birthday', label: 'Birthday' },
-  { key: 'wedding', label: 'Wedding' },
-  { key: 'sunatan', label: 'Sunatan' },
-  { key: 'aqiqah', label: 'Aqiqah' },
+  ...KNOWN_CATEGORIES.map((k) => ({ key: k, label: CATEGORY_LABELS[k] })),
   { key: 'Other', label: 'Other' },
 ];
 
@@ -109,14 +106,8 @@ export const AdminTemplates: React.FC<AdminTemplatesProps> = ({
 
   // Live counts per category (computed from real data).
   const counts = useMemo(() => {
-    const map: Record<CategoryFilter, number> = {
-      All: TEMPLATES.length,
-      birthday: 0,
-      wedding: 0,
-      sunatan: 0,
-      aqiqah: 0,
-      Other: 0,
-    };
+    const map: Record<string, number> = { All: TEMPLATES.length, Other: 0 };
+    KNOWN_CATEGORIES.forEach((k) => (map[k] = 0));
     TEMPLATES.forEach((t) => {
       const c = KNOWN_CATEGORIES.includes(t.category) ? t.category : 'Other';
       map[c] += 1;

@@ -1,6 +1,6 @@
 import React from "react";
 import { NavigationTab, CategoryKey } from "../types";
-import { CATEGORIES } from "../data/templates";
+import { CATEGORIES, getCategoryCount, getTotalTemplateCount } from "../data/templates";
 import { buildWaLink, homepageWaMessage, WHATSAPP_ALTERNATE, WHATSAPP_ALTERNATE_DISPLAY, WHATSAPP_PRIMARY_DISPLAY } from "../lib/whatsapp";
 import { UiButton } from "./UiButton";
 
@@ -45,7 +45,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, onSelectCategory, o
             >
               <span>{cat.emoji}</span>
               {cat.label}
-              <span className="text-white/40 font-semibold">({cat.count})</span>
+              <span className="text-white/40 font-semibold">({getCategoryCount(cat.key)})</span>
             </button>
           ))}
         </div>
@@ -61,7 +61,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, onSelectCategory, o
           </button>
           <button onClick={() => onSelectTab("music-credits")} className="text-left font-body text-xs font-bold text-secondary hover:text-white transition-colors hover:underline underline-offset-4 cursor-pointer flex items-center gap-1">
             <span className="material-symbols-outlined text-xs">music_note</span>
-            Lisensi Musik (400 Template)
+            Lisensi Musik ({getTotalTemplateCount()} Template)
           </button>
           <button onClick={() => onSelectTab("faq")} className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer">
             Ketentuan Layanan

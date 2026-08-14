@@ -16,7 +16,8 @@
 //   - licenseUrl : link to the Pixabay license summary
 // ============================================================================
 
-import type { CategoryKey } from '../types';
+import type { BaseCategory, CategoryKey } from '../types';
+import { CATEGORY_BASE } from './categoryBase';
 
 export type TrackGenre =
   | 'Nasheed'
@@ -281,7 +282,7 @@ const tr = (
   };
 };
 
-export const MUSIC_LIBRARY: Record<CategoryKey, MusicLibraryTrack[]> = {
+export const MUSIC_LIBRARY: Record<BaseCategory, MusicLibraryTrack[]> = {
 
   birthday: [
     tr('96e671dd5f', 'Happy Birthday', 'The_Mountain', 'https://cdn.pixabay.com/audio/2026/07/29/audio_96e671dd5f.mp3', '/music/happy-childrens-tunes-happy-birthday-576570/', 'classic', 123),
@@ -446,7 +447,7 @@ export const MUSIC_LIBRARY: Record<CategoryKey, MusicLibraryTrack[]> = {
 // Lookup helpers used by the editor & preview overlays.
 // ---------------------------------------------------------------------------
 export const getTrackByUid = (uid: string): MusicLibraryTrack | undefined => {
-  for (const key of Object.keys(MUSIC_LIBRARY) as CategoryKey[]) {
+  for (const key of Object.keys(MUSIC_LIBRARY) as BaseCategory[]) {
     const found = MUSIC_LIBRARY[key].find((t) => t.uid === uid);
     if (found) return found;
   }
@@ -454,7 +455,7 @@ export const getTrackByUid = (uid: string): MusicLibraryTrack | undefined => {
 };
 
 export const getTrackByUrl = (url: string): MusicLibraryTrack | undefined => {
-  for (const key of Object.keys(MUSIC_LIBRARY) as CategoryKey[]) {
+  for (const key of Object.keys(MUSIC_LIBRARY) as BaseCategory[]) {
     const found = MUSIC_LIBRARY[key].find((t) => t.url === url);
     if (found) return found;
   }
@@ -462,8 +463,9 @@ export const getTrackByUrl = (url: string): MusicLibraryTrack | undefined => {
 };
 
 export const getCategoryRecommendation = (category: CategoryKey): { title: string; tracks: MusicLibraryTrack[] } => {
-  const pool = MUSIC_LIBRARY[category];
-  if (category === 'birthday') {
+  const base = CATEGORY_BASE[category];
+  const pool = MUSIC_LIBRARY[base];
+  if (base === 'birthday') {
     const vocal = pool.filter((t) => t.isVocal);
     return {
       title: vocal.length > 0 ? 'Rekomendasi: lagu happy birthday dengan vokal' : 'Rekomendasi: lagu ceria',

@@ -1,8 +1,8 @@
 export interface MusicCredit {
-  templateNumber: string; // unique key: b001..b100, s001..s100, w001..w100, a001..a100
+  templateNumber: string; // unique key: b001..b100, s001..s100, w001..w100, a001..a100, e001..e100, r001.., t001.., g001.., u001.., v001.., f001.., h001..
   musicTitle: string;
   artist: string;
-  category: string; // Birthday | Sunatan | Wedding | Aqiqah
+  category: string; // Birthday | Sunatan | Wedding | Aqiqah | Pendidikan | …
   source: string;
   sourceUrl: string;
   license: string;
@@ -33,7 +33,7 @@ export interface MusicCredit {
 }
 
 // Royalty-Free & Commercial Use Licensed Music Database
-// Covers 400 templates: 100 Birthday, 100 Sunatan, 100 Wedding, 100 Aqiqah
+// Covers 12 categories, 100 templates each (1.200 total planned).
 // Sourced from Pixabay Music (Pixabay Content License, Commercial Use Allowed).
 // Every musicUrl/fallbackUrl above was curl-verified HTTP 200. All audio is
 // also backed by a built-in Web Audio Synthesizer fallback so every demo

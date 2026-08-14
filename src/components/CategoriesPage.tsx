@@ -12,6 +12,14 @@ const GRADIENTS: Record<CategoryKey, string> = {
   sunatan: 'from-[#A8B5A2] via-[#7f8f78] to-[#5a6b53]',
   wedding: 'from-[#14213D] via-[#1d2d54] to-[#3b4f7d]',
   aqiqah: 'from-[#C9A45C] via-[#b08a3e] to-[#8a6a2c]',
+  education: 'from-[#1f3a5f] via-[#2c5282] to-[#4a6fa5]',
+  religious: 'from-[#14532d] via-[#166534] to-[#3f8c5f]',
+  tasyakuran: 'from-[#92400e] via-[#b45309] to-[#d97706]',
+  gathering: 'from-[#831843] via-[#be185d] to-[#ec4899]',
+  business: 'from-[#1e293b] via-[#334155] to-[#64748b]',
+  anniversary: 'from-[#7f1d1d] via-[#b91c1c] to-[#ef4444]',
+  family: 'from-[#365314] via-[#4d7c0f] to-[#84cc16]',
+  'doa-haul': 'from-[#3f3f46] via-[#52525b] to-[#a1a1aa]',
 };
 
 export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onSelectCategory }) => {
@@ -25,7 +33,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onSelectCategory
           Kategori Undangan
         </h1>
         <p className="font-body text-xs sm:text-base md:text-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
-          {TEMPLATES.length} template undangan digital dalam 4 kategori: Birthday, Sunatan, Wedding, dan Aqiqah. Pilih kategori untuk melihat katalognya.
+          {TEMPLATES.length} template undangan digital dalam 12 kategori. Pilih kategori untuk melihat katalognya.
         </p>
       </header>
 

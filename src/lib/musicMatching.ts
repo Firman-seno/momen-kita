@@ -1,13 +1,15 @@
-import type { CategoryKey } from '../types';
+import type { BaseCategory, CategoryKey } from '../types';
 import type { MusicCredit } from '../data/musicCredits';
 import { MUSIC_LIBRARY, MusicLibraryTrack } from '../data/musicLibrary';
+import { CATEGORY_BASE } from '../data/categoryBase';
 
 // ============================================================================
 // Deterministic Music Matching Engine
-// Assigns each of the 400 templates a distinct, theme-appropriate royalty-free
-// track from the curated library. Selection is a pure function of
+// Assigns each template a distinct, theme-appropriate royalty-free track from
+// the curated library. Selection is a pure function of
 // (category, template index, seed keywords) so results are stable across
 // builds and two templates never share the same primary song by design.
+// Extended categories resolve to a base category's library via CATEGORY_BASE.
 // ============================================================================
 
 export interface MusicSeedInfo {
@@ -18,26 +20,55 @@ export interface MusicSeedInfo {
   fontStyle: string;
 }
 
-const CAT_CODE: Record<CategoryKey, string> = {
+const CAT_CODE: Record<BaseCategory, string> = {
   birthday: 'b',
   sunatan: 's',
   wedding: 'w',
   aqiqah: 'a',
 };
 
-const CATEGORY_LABEL: Record<CategoryKey, string> = {
+/** Unique per-category number code (used for music credit template numbers). */
+const CAT_CODE_ALL: Record<CategoryKey, string> = {
+  ...CAT_CODE,
+  education: 'e',
+  religious: 'r',
+  tasyakuran: 't',
+  gathering: 'g',
+  business: 'u',
+  anniversary: 'v',
+  family: 'f',
+  'doa-haul': 'h',
+};
+
+const CODE_TO_CATEGORY: Record<string, CategoryKey> = Object.fromEntries(
+  (Object.entries(CAT_CODE_ALL) as [CategoryKey, string][]).map(([k, v]) => [v, k])
+);
+
+export const categoryFromCode = (code: string): CategoryKey =>
+  CODE_TO_CATEGORY[code] || 'birthday';
+
+const CATEGORY_LABEL: Record<BaseCategory, string> = {
   birthday: 'Birthday',
   sunatan: 'Sunatan',
   wedding: 'Wedding',
   aqiqah: 'Aqiqah',
 };
 
-// Stable per-category fallback tracks (used when the primary CDN URL fails).
-// All four now point to VERIFIED VOCAL tracks (vocal-first defaults):
-//   birthday → sung "Happy Birthday" (STAROSTIN, featuring lyrics)
-//   sunatan/wedding → Islamic nasheed with vocals (Peaceful Reflection)
-//   aqiqah → Sholawat Nabi with vocals
-export const CATEGORY_FALLBACK: Record<CategoryKey, MusicLibraryTrack> = {
+const CATEGORY_LABEL_ALL: Record<CategoryKey, string> = {
+  ...CATEGORY_LABEL,
+  education: 'Pendidikan',
+  religious: 'Keagamaan',
+  tasyakuran: 'Tasyakuran',
+  gathering: 'Acara & Gathering',
+  business: 'Bisnis',
+  anniversary: 'Anniversary',
+  family: 'Keluarga',
+  'doa-haul': 'Doa & Haul',
+};
+
+// Stable per-base-category fallback tracks (used when the primary CDN URL
+// fails). All point to VERIFIED VOCAL tracks (vocal-first defaults).
+export const CATEGORY_FALLBACK: Record<BaseCategory, MusicLibraryTrack> = {
   birthday: MUSIC_LIBRARY.birthday.find((t) => t.uid === '50b8be7252') || MUSIC_LIBRARY.birthday[0],
   sunatan: MUSIC_LIBRARY.sunatan.find((t) => t.uid === 'dd8c111e4f') || MUSIC_LIBRARY.sunatan[0],
   wedding: MUSIC_LIBRARY.wedding.find((t) => t.uid === 'dd8c111e4f') || MUSIC_LIBRARY.wedding[0],
@@ -96,21 +127,21 @@ const AQIQAH_MOOD_MAP: MoodMap = [
   [['baby', 'joy', 'smile', 'happy', 'sweet', 'cute', 'little', 'princess', 'prince', 'boy', 'girl', 'cloud', 'beige', 'cream', 'watercolor', 'botanical', 'floral', 'minimal', 'elegant', 'luxury', 'neutral', 'pastel', 'dusty', 'sage', 'gold'], 'baby'],
 ];
 
-const MOOD_MAPS: Record<CategoryKey, MoodMap> = {
+const MOOD_MAPS: Record<BaseCategory, MoodMap> = {
   birthday: BIRTHDAY_MOOD_MAP,
   sunatan: SUNATAN_MOOD_MAP,
   wedding: WEDDING_MOOD_MAP,
   aqiqah: AQIQAH_MOOD_MAP,
 };
 
-const DEFAULT_MOOD: Record<CategoryKey, string> = {
+const DEFAULT_MOOD: Record<BaseCategory, string> = {
   birthday: 'classic',
   sunatan: 'islamic',
   wedding: 'classic',
   aqiqah: 'lullaby',
 };
 
-const MOOD_ORDER: Record<CategoryKey, string[]> = {
+const MOOD_ORDER: Record<BaseCategory, string[]> = {
   birthday: ['classic', 'party', 'celebration', 'kids', 'cartoon', 'ukulele', 'space', 'superhero', 'teen', 'elegant', 'luxury', 'chill'],
   sunatan: ['islamic', 'nasheed', 'sholawat', 'oud', 'arabic', 'ramadan', 'peaceful', 'meditation'],
   wedding: ['nasheed', 'islamic', 'sholawat', 'classic', 'invitation', 'romantic', 'garden', 'vow', 'piano', 'cinematic', 'classical', 'violin', 'quartet', 'guitar', 'acoustic'],
@@ -167,14 +198,14 @@ const MOOD_PAD: Record<string, string[]> = {
   'aqiqah:piano': ['352e040c19', 'b816f864f0', '234c9b05d8'],
 };
 
-const CATEGORY_OFFSET: Record<CategoryKey, number> = {
+const CATEGORY_OFFSET: Record<BaseCategory, number> = {
   birthday: 3,
   sunatan: 5,
   wedding: 7,
   aqiqah: 11,
 };
 
-const pickMood = (category: CategoryKey, seedInfo: MusicSeedInfo, index: number): string => {
+const pickMood = (base: BaseCategory, seedInfo: MusicSeedInfo, index: number): string => {
   const haystack = [
     seedInfo.subcategory,
     seedInfo.designStyle,
@@ -184,12 +215,12 @@ const pickMood = (category: CategoryKey, seedInfo: MusicSeedInfo, index: number)
     .join(' ')
     .toLowerCase();
 
-  const moodMap = MOOD_MAPS[category];
+  const moodMap = MOOD_MAPS[base];
   for (const [keywords, mood] of moodMap) {
     if (keywords.some((k) => haystack.includes(k))) return mood;
   }
 
-  const order = MOOD_ORDER[category];
+  const order = MOOD_ORDER[base];
   return order[(index * 5 + 2) % order.length];
 };
 
@@ -198,23 +229,25 @@ export const getTemplateMusic = (
   index: number,
   seedInfo: MusicSeedInfo
 ): MusicCredit => {
-  const pool = MUSIC_LIBRARY[category];
-  const mood = pickMood(category, seedInfo, index);
+  const base = CATEGORY_BASE[category];
+  const pool = MUSIC_LIBRARY[base];
+  const mood = pickMood(base, seedInfo, index);
   const bucket = pool.filter((t) => t.mood === mood);
-  const pad = (MOOD_PAD[`${category}:${mood}`] ?? [])
+  const pad = (MOOD_PAD[`${base}:${mood}`] ?? [])
     .map((uid) => pool.find((t) => t.uid === uid))
     .filter((t): t is MusicLibraryTrack => Boolean(t) && !bucket.some((b) => b.uid === t.uid));
   const candidates = bucket.length > 0 ? [...bucket, ...pad] : pool;
-  const offset = CATEGORY_OFFSET[category];
+  const offset = CATEGORY_OFFSET[base];
 
   // ---- Vocal-first selection ---------------------------------------------
-  // Wedding / Sunatan / Aqiqah prioritize Islamic vocal music (nasheed /
-  // sholawat); Birthday prioritizes cheerful vocal tracks. When at least two
-  // vocal tracks are available the primary pool is vocal-only, so templates
-  // stay vocal WITHOUT falling back to a single shared song (variety kept by
-  // index rotation). With exactly one vocal track it is mixed into the pool
-  // so it still appears regularly while preserving overall variety.
-  const isIslamic = category !== 'birthday';
+  // Wedding / Sunatan / Aqiqah (and their derived categories) prioritize
+  // Islamic vocal music (nasheed / sholawat); Birthday-derived categories
+  // prioritize cheerful vocal tracks. When at least two vocal tracks are
+  // available the primary pool is vocal-only, so templates stay vocal WITHOUT
+  // falling back to a single shared song (variety kept by index rotation). With
+  // exactly one vocal track it is mixed into the pool so it still appears
+  // regularly while preserving overall variety.
+  const isIslamic = base !== 'birthday';
   const vocal = candidates.filter(
     (t) => t.isVocal && (isIslamic ? t.genre === 'Nasheed' || t.genre === 'Sholawat' || t.genre === 'Islamic' : true)
   );
@@ -227,14 +260,14 @@ export const getTemplateMusic = (
   const track = finalCandidates[(index * 13 + offset) % finalCandidates.length];
   const alternative = finalCandidates[(index * 13 + offset + 7) % finalCandidates.length];
   const fallback =
-    alternative && alternative.uid !== track.uid ? alternative : CATEGORY_FALLBACK[category];
+    alternative && alternative.uid !== track.uid ? alternative : CATEGORY_FALLBACK[base];
   const num = String(index + 1).padStart(3, '0');
 
   return {
-    templateNumber: `${CAT_CODE[category]}${num}`,
+    templateNumber: `${CAT_CODE_ALL[category]}${num}`,
     musicTitle: track.title,
     artist: track.artist,
-    category: CATEGORY_LABEL[category],
+    category: CATEGORY_LABEL_ALL[category],
     source: track.source,
     sourceUrl: `https://pixabay.com${track.href}`,
     license: track.license,

@@ -3,6 +3,7 @@ import { Eye } from 'lucide-react';
 import { MusicCredit, displayMusicNumber } from '../data/musicCredits';
 import { TEMPLATES } from '../data/templates';
 import { stopPreview, previewTrack } from '../lib/audioEngine';
+import { categoryFromCode } from '../lib/musicMatching';
 
 interface MusicCreditsModalProps {
   onClose: () => void;
@@ -17,7 +18,13 @@ export const MusicCreditsModal: React.FC<MusicCreditsModalProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [previewingNumber, setPreviewingNumber] = useState<string | null>(null);
 
-  const categories = ['All', 'Birthday', 'Sunatan', 'Wedding', 'Aqiqah'];
+  const categories = useMemo(() => {
+    const seen: string[] = [];
+    for (const t of TEMPLATES) {
+      if (!seen.includes(t.categoryLabel)) seen.push(t.categoryLabel);
+    }
+    return ['All', ...seen];
+  }, []);
 
   const credits: MusicCredit[] = useMemo(
     () => TEMPLATES.map((t) => t.music),
@@ -66,10 +73,10 @@ export const MusicCreditsModal: React.FC<MusicCreditsModalProps> = ({
             </div>
             <div>
               <h2 className="font-headline text-lg font-bold text-amber-300">
-                Katalog & Lisensi Musik Royalty-Free (400 Template)
+                Katalog & Lisensi Musik Royalty-Free ({TEMPLATES.length} Template)
               </h2>
               <p className="text-xs text-slate-400">
-                400 Audio Terlisensi Komersial untuk Birthday, Sunatan, Wedding & Aqiqah
+                {TEMPLATES.length} Audio Terlisensi Komersial untuk {categories.length - 1} Kategori
               </p>
             </div>
           </div>
@@ -115,7 +122,7 @@ export const MusicCreditsModal: React.FC<MusicCreditsModalProps> = ({
         {/* Track List */}
         <div className="flex-grow overflow-y-auto p-4 space-y-3">
           <div className="text-xs text-slate-400 mb-2 flex justify-between items-center px-1">
-            <span>Menampilkan {filteredCredits.length} dari 400 Musik</span>
+            <span>Menampilkan {filteredCredits.length} dari {TEMPLATES.length} Musik</span>
             <span className="text-emerald-400 font-semibold">✓ Safe for Commercial Use</span>
           </div>
 
@@ -176,7 +183,7 @@ export const MusicCreditsModal: React.FC<MusicCreditsModalProps> = ({
                       onClick={() => {
                         stopPreview();
                         const num = credit.templateNumber.slice(1);
-                        const catKey = CAT_KEY_MAP[credit.templateNumber[0]];
+                        const catKey = categoryFromCode(credit.templateNumber[0]);
                         onSelectTemplate(catKey, num);
                         onClose();
                       }}
@@ -194,16 +201,9 @@ export const MusicCreditsModal: React.FC<MusicCreditsModalProps> = ({
 
         {/* Footer info */}
         <div className="p-4 bg-slate-950/80 border-t border-slate-800 text-center text-xs text-slate-400">
-          Semua trek disesuaikan dengan tema visual template di 4 kategori: Birthday, Sunatan, Wedding & Aqiqah (total 400 template). Setiap template memiliki lagu yang cocok dengan desainnya.
+          Semua trek disesuaikan dengan tema visual template di setiap kategori. Setiap template memiliki lagu yang cocok dengan desainnya.
         </div>
       </div>
     </div>
   );
-};
-
-const CAT_KEY_MAP: Record<string, string> = {
-  b: 'birthday',
-  s: 'sunatan',
-  w: 'wedding',
-  a: 'aqiqah',
 };

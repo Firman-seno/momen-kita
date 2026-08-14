@@ -346,6 +346,10 @@ export const getInvitationTitle = (
   if (invitation.category === 'aqiqah') {
     return cd.babyName ? `Undangan Aqiqah ${cd.babyName}` : `Undangan Aqiqah`;
   }
+  if (invitation.category === 'education') {
+    const person = cd.graduateName;
+    return person ? `Undangan Wisuda ${person}` : `Undangan Wisuda & Graduation`;
+  }
   const person = cd.birthdayPerson;
   return person ? `Undangan Ulang Tahun ${person}` : `Undangan Ulang Tahun`;
 };
@@ -360,6 +364,7 @@ export const getInvitationDisplayName = (
   }
   if (invitation.category === 'sunatan') return cd.childName || invitation.customerName;
   if (invitation.category === 'aqiqah') return cd.babyName || invitation.customerName;
+  if (invitation.category === 'education') return cd.graduateName || invitation.customerName;
   return cd.birthdayPerson || invitation.customerName;
 };
 

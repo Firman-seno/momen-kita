@@ -92,7 +92,23 @@ export interface ThemeStyle {
   paperTexture?: boolean;
 }
 
-export type CategoryKey = 'birthday' | 'sunatan' | 'wedding' | 'aqiqah';
+/** Core categories that ship with their own curated music library. */
+export type BaseCategory = 'birthday' | 'sunatan' | 'wedding' | 'aqiqah';
+
+/**
+ * All 12 invitation categories. New categories (education and beyond) reuse a
+ * base category's music library and audio engine (see CATEGORY_BASE).
+ */
+export type CategoryKey =
+  | BaseCategory
+  | 'education'
+  | 'religious'
+  | 'tasyakuran'
+  | 'gathering'
+  | 'business'
+  | 'anniversary'
+  | 'family'
+  | 'doa-haul';
 
 export type TemplateBadge = 'POPULAR' | 'NEW' | 'TRENDING' | 'FEATURED';
 
@@ -131,6 +147,19 @@ export interface EventDetails {
   babyGender?: string;
   babyBirthDate?: string;
   doaText?: string;
+
+  // Generic fields for the extended categories (Education, Religious,
+  // Tasyakuran, Gathering, Business, Anniversary, Family, Doa & Haul).
+  eventTitle?: string; // e.g. "Wisuda", "Grand Opening", "Reuni Akbar"
+  hostName?: string; // host / organizer / host family name
+  institutionName?: string; // school / university / company
+  universityShort?: string; // short name e.g. "UI", "ITB"
+  graduateName?: string; // education honoree
+  degreeName?: string; // e.g. "S1 Teknik Informatika"
+  companyName?: string; // business events
+  coupleName?: string; // anniversary couple
+  anniversaryYear?: number; // e.g. 10 (years together)
+  deceasedName?: string; // doa & haul honoree
 }
 
 export interface Template {

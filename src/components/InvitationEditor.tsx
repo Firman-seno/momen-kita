@@ -3,6 +3,7 @@ import { ArrowLeft, Eye } from 'lucide-react';
 import { EventDetails, Template } from '../types';
 import { getTemplateByUid } from '../data/templates';
 import { MUSIC_LIBRARY, TrackGenre, TRACK_GENRES, getCategoryRecommendation, getTrackByUrl } from '../data/musicLibrary';
+import { CATEGORY_BASE } from '../data/categoryBase';
 import {
   Invitation,
   InvitationMusic,
@@ -69,6 +70,10 @@ interface FormData {
   resepsiDate: string;
   coupleStory: string;
   hashtag: string;
+  eventTitle: string;
+  graduateName: string;
+  degreeName: string;
+  institutionName: string;
 }
 
 const START_TIME_OPTIONS = [0, 15, 30, 45, 60];
@@ -111,6 +116,10 @@ const emptyForm = (): FormData => ({
   resepsiDate: '',
   coupleStory: '',
   hashtag: '',
+  eventTitle: '',
+  graduateName: '',
+  degreeName: '',
+  institutionName: '',
 });
 
 /** Initialize form from a template's sample data (nice defaults). */
@@ -153,6 +162,12 @@ const formFromTemplate = (template: Template): FormData => {
     f.resepsiDate = d.resepsiDate || '';
     f.coupleStory = d.coupleStory || '';
     f.hashtag = d.hashtag || '';
+  }
+  if (template.category === 'education') {
+    f.eventTitle = d.eventTitle || '';
+    f.graduateName = d.graduateName || '';
+    f.degreeName = d.degreeName || '';
+    f.institutionName = d.institutionName || '';
   }
   return f;
 };
@@ -204,6 +219,12 @@ const formFromInvitation = (inv: Invitation): FormData => {
     f.coupleStory = d.coupleStory || '';
     f.hashtag = d.hashtag || '';
   }
+  if (inv.category === 'education') {
+    f.eventTitle = d.eventTitle || '';
+    f.graduateName = d.graduateName || '';
+    f.degreeName = d.degreeName || '';
+    f.institutionName = d.institutionName || '';
+  }
   return f;
 };
 
@@ -239,6 +260,13 @@ const buildCustomData = (category: string, f: FormData): Partial<EventDetails> =
     data.resepsiDate = f.resepsiDate;
     data.coupleStory = f.coupleStory;
     data.hashtag = f.hashtag;
+  }
+  if (category === 'education') {
+    data.eventTitle = f.eventTitle;
+    data.graduateName = f.graduateName;
+    data.degreeName = f.degreeName;
+    data.institutionName = f.institutionName;
+    data.parentsName = f.parentsName;
   }
   return data;
 };
@@ -583,7 +611,7 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
   const categoryLabel = template.categoryLabel;
 
   const filteredTracks = useMemo(() => {
-    let list = MUSIC_LIBRARY[cat];
+    let list = MUSIC_LIBRARY[CATEGORY_BASE[cat]];
     if (musicGenreFilter !== 'All') list = list.filter((t) => t.genre === musicGenreFilter);
     if (musicVocalFilter === 'vocal') list = list.filter((t) => t.isVocal);
     if (musicVocalFilter === 'instrumental') list = list.filter((t) => !t.isVocal);
@@ -601,6 +629,7 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
     if (cat === 'sunatan' && !form.childName.trim()) return 'Nama anak wajib diisi.';
     if (cat === 'aqiqah' && !form.babyName.trim()) return 'Nama bayi wajib diisi.';
     if (cat === 'birthday' && !form.birthdayPerson.trim()) return 'Nama yang berulang tahun wajib diisi.';
+    if (cat === 'education' && !form.graduateName.trim()) return 'Nama lulusan wajib diisi.';
     if (form.videoUrl && !isValidPublicVideoUrl(form.videoUrl)) {
       return 'Video gagal diupload. Silakan coba lagi.';
     }
@@ -686,7 +715,7 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
     ? getInvitationTitle(savedInvitation, template)
     : (form.customerName ? `Undangan ${form.customerName}` : `Undangan ${categoryLabel}`);
 
-  const requiredName = cat === 'wedding' ? 'Nama Mempelai' : cat === 'sunatan' ? 'Nama Anak' : cat === 'aqiqah' ? 'Nama Bayi' : 'Nama Yang Berulang Tahun';
+  const requiredName = cat === 'wedding' ? 'Nama Mempelai' : cat === 'sunatan' ? 'Nama Anak' : cat === 'aqiqah' ? 'Nama Bayi' : cat === 'education' ? 'Nama Lulusan' : 'Nama Yang Berulang Tahun';
 
   return (
     <div className="flex-grow w-full max-w-[1080px] mx-auto px-4 sm:px-6 py-8 pt-24 pb-32">
@@ -793,6 +822,15 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
                 <Field label="Kisah Cinta / Love Story" value={form.coupleStory} onChange={set('coupleStory')} textarea placeholder="Kisah singkat perjalanan cinta..." />
               </div>
               <Field label="Hashtag" value={form.hashtag} onChange={set('hashtag')} placeholder="e.g. #OurWedding" />
+            </>
+          )}
+          {cat === 'education' && (
+            <>
+              <Field label="Nama Lulusan" value={form.graduateName} onChange={set('graduateName')} placeholder="e.g. Adi Pratama" required />
+              <Field label="Gelar / Program Studi" value={form.degreeName} onChange={set('degreeName')} placeholder="e.g. S1 Teknik Informatika" />
+              <Field label="Perguruan Tinggi" value={form.institutionName} onChange={set('institutionName')} placeholder="e.g. Universitas Indonesia" />
+              <Field label="Judul Acara" value={form.eventTitle} onChange={set('eventTitle')} placeholder="e.g. Wisuda / Graduation" />
+              <Field label="Nama Orang Tua" value={form.parentsName} onChange={set('parentsName')} placeholder="e.g. Bpk. Rudi & Ibu Siti" />
             </>
           )}
 

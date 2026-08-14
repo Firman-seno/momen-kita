@@ -21,6 +21,14 @@ export const CATEGORY_FILTERS: { key: string; label: string }[] = [
   { key: 'sunatan', label: 'SUNATAN' },
   { key: 'wedding', label: 'WEDDING' },
   { key: 'aqiqah', label: 'AQIQAH' },
+  { key: 'education', label: 'WISUDA & GRADUATION' },
+  { key: 'religious', label: 'KEAGAMAAN' },
+  { key: 'tasyakuran', label: 'TASYAKURAN' },
+  { key: 'gathering', label: 'ACARA & GATHERING' },
+  { key: 'business', label: 'BISNIS' },
+  { key: 'anniversary', label: 'ANNIVERSARY' },
+  { key: 'family', label: 'KELUARGA' },
+  { key: 'doa-haul', label: 'DOA & HAUL' },
 ];
 
 const BADGE_STYLES: Record<TemplateBadge, string> = {
@@ -35,12 +43,20 @@ const CATEGORY_CHIP_STYLES: Record<string, string> = {
   sunatan: 'bg-[#5a6b53]/90 text-white',
   wedding: 'bg-[#C9A45C]/95 text-[#14213D]',
   aqiqah: 'bg-[#8a6a2c]/90 text-white',
+  education: 'bg-[#2c5282]/90 text-white',
+  religious: 'bg-[#166534]/90 text-white',
+  tasyakuran: 'bg-[#b45309]/90 text-white',
+  gathering: 'bg-[#be185d]/90 text-white',
+  business: 'bg-[#334155]/90 text-white',
+  anniversary: 'bg-[#b91c1c]/90 text-white',
+  family: 'bg-[#4d7c0f]/90 text-white',
+  'doa-haul': 'bg-[#52525b]/90 text-white',
 };
 
 const readCategoryFromUrl = (): string => {
   const params = new URLSearchParams(window.location.search);
   const cat = params.get('category');
-  if (cat && ['birthday', 'sunatan', 'wedding', 'aqiqah'].includes(cat)) return cat;
+  if (cat && CATEGORY_FILTERS.some((f) => f.key === cat)) return cat;
   return 'All';
 };
 
@@ -98,8 +114,9 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { All: TEMPLATES.length };
-    (['birthday', 'sunatan', 'wedding', 'aqiqah'] as CategoryKey[]).forEach((k) => {
-      counts[k] = TEMPLATES.filter((t) => t.category === k).length;
+    CATEGORY_FILTERS.forEach((f) => {
+      if (f.key === 'All') return;
+      counts[f.key] = TEMPLATES.filter((t) => t.category === f.key).length;
     });
     return counts;
   }, []);
@@ -153,7 +170,7 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
           {selectedCategory === 'All' ? 'Undangan Digital Premium' : `${CATEGORY_EMOJIS[selectedCategory as CategoryKey] || ''} ${getCategoryTitle(selectedCategory as CategoryKey)}`}
         </h1>
         <p className="font-body text-xs sm:text-base md:text-lg text-on-surface-variant max-w-2xl mx-auto mb-4 sm:mb-6 leading-relaxed">
-          Pilih dari {TEMPLATES.length} template undangan digital untuk {CATEGORY_LABELS.birthday}, {CATEGORY_LABELS.sunatan}, {CATEGORY_LABELS.wedding}, dan {CATEGORY_LABELS.aqiqah}. Setiap template memiliki desain, animasi, musik, dan demo interaktif tersendiri.
+          Pilih dari {TEMPLATES.length} template undangan digital untuk 12 kategori — dari Birthday, Sunatan, Wedding, Aqiqah, hingga Wisuda, Keagamaan, Bisnis, dan lainnya. Setiap template memiliki desain, animasi, musik, dan demo interaktif tersendiri.
         </p>
         <div className="inline-flex items-center gap-2 bg-surface-container-high px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full font-body text-[11px] sm:text-xs font-bold uppercase tracking-wider text-on-surface-variant shadow-sm border border-outline-variant/30">
           <span className="material-symbols-outlined text-primary text-base">auto_awesome</span>

@@ -30,6 +30,14 @@ export const PROFILES: Record<CategoryKey, AnimProfile> = {
   sunatan: { ease: [0.22, 1, 0.36, 1], stagger: 0.18, duration: 0.75, heroDuration: 1.0 },
   wedding: { ease: [0.22, 1, 0.36, 1], stagger: 0.2, duration: 0.8, heroDuration: 1.1 },
   aqiqah: { ease: [0.2, 0.9, 0.3, 1], stagger: 0.15, duration: 0.7, heroDuration: 0.95 },
+  education: { ease: [0.22, 1, 0.36, 1], stagger: 0.18, duration: 0.75, heroDuration: 1.0 },
+  religious: { ease: [0.22, 1, 0.36, 1], stagger: 0.2, duration: 0.8, heroDuration: 1.05 },
+  tasyakuran: { ease: [0.22, 1, 0.36, 1], stagger: 0.18, duration: 0.75, heroDuration: 1.0 },
+  gathering: { ease: [0.16, 1, 0.3, 1], stagger: 0.12, duration: 0.65, heroDuration: 0.9 },
+  business: { ease: [0.22, 1, 0.36, 1], stagger: 0.14, duration: 0.7, heroDuration: 0.95 },
+  anniversary: { ease: [0.22, 1, 0.36, 1], stagger: 0.2, duration: 0.8, heroDuration: 1.1 },
+  family: { ease: [0.2, 0.9, 0.3, 1], stagger: 0.15, duration: 0.7, heroDuration: 0.95 },
+  'doa-haul': { ease: [0.22, 1, 0.36, 1], stagger: 0.2, duration: 0.8, heroDuration: 1.05 },
 };
 
 export const getProfile = (category: CategoryKey): AnimProfile =>
