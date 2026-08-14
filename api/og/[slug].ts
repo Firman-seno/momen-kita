@@ -1,13 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getClient, getDataset, setDataset } from '../_kv';
+import { getClient, getDataset, setDataset } from '../_kv.js';
 import {
   buildInvitationMeta,
   DEFAULT_META,
   getCategoryFallbackImage,
   renderOgShell,
   withOgImageParams,
-} from '../_og';
-import { migrateOgImage } from '../_blob';
+} from '../_og.js';
+import { migrateOgImage } from '../_blob.js';
 
 /* ============================================================
    Server-rendered invitation page (/i/:slug)
@@ -92,8 +92,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 
     if (!invitation) {
       sendShell(res, 404, {
-        title: DEFAULT_META.title,
-        description: DEFAULT_META.description,
+        title: 'Undangan Tidak Ditemukan',
+        description:
+          'Maaf, link undangan ini tidak tersedia atau sudah tidak aktif. Silakan hubungi pemilik undangan.',
         image: `${siteBase}${LOGO_IMAGE}`,
         canonical,
         robots,

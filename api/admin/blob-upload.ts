@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
-import { isAdminTokenValid } from '../_kv';
-import { isBlobConfigured } from '../_blob';
+import { isAdminTokenValid } from '../_kv.js';
+import { isBlobConfigured } from '../_blob.js';
 
 /* ============================================================
    Admin video upload → Vercel Blob client upload

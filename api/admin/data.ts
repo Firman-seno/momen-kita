@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getClient, getDataset, setDataset, isAdminTokenValid } from '../_kv';
+import { getClient, getDataset, setDataset, isAdminTokenValid } from '../_kv.js';
 
 /* ============================================================
    Admin dataset API — GET pulls the full dataset, PUT replaces it.

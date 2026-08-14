@@ -1,5 +1,5 @@
 import { put } from '@vercel/blob';
-import { isDataUrl, resolveStoredImage } from './_og';
+import { isDataUrl, resolveStoredImage } from './_og.js';
 
 /* ============================================================
    MomenKita — Vercel Blob helpers (serverless)

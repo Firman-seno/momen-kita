@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getClient, getDataset } from '../_kv';
+import { getClient, getDataset } from '../_kv.js';
 
 /* ============================================================
    Public invitation API — lets /i/<slug> pages load the invite

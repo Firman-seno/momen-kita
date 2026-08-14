@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { del } from '@vercel/blob';
-import { isAdminTokenValid } from '../_kv';
-import { isBlobConfigured } from '../_blob';
+import { isAdminTokenValid } from '../_kv.js';
+import { isBlobConfigured } from '../_blob.js';
 
 /* ============================================================
    Admin blob delete — removes an old video/photo from storage.

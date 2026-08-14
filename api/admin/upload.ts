@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { isAdminTokenValid } from '../_kv';
-import { isBlobConfigured, parseDataUrl, uploadDataUrl } from '../_blob';
+import { isAdminTokenValid } from '../_kv.js';
+import { isBlobConfigured, parseDataUrl, uploadDataUrl } from '../_blob.js';
 
 /* ============================================================
    Admin photo upload → public Vercel Blob URL
