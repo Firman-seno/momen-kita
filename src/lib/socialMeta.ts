@@ -3,11 +3,14 @@ import { Invitation, getInvitationTitle } from './invitations';
 
 /* ============================================================
    MomenKita — Dynamic Social Share Metadata
-   ------------------------------------------------
+   ------------------------------------------------------------
    When an invitation link is shared on WhatsApp / social media,
    the title, description and image must come from the customer's
    actual invitation data — never the homepage.
    ============================================================ */
+
+const SITE_URL = 'https://momen-kita-sigma.vercel.app/';
+const OG_IMAGE = 'https://momen-kita-sigma.vercel.app/og-image.png';
 
 interface MetaOptions {
   title: string;
@@ -21,7 +24,10 @@ const setMeta = (selector: string, attribute: 'content' | 'href', value: string)
   let el = document.head.querySelector<HTMLElement>(selector);
   if (!el) {
     el = document.createElement('meta');
-    el.setAttribute(attribute === 'content' ? 'name' : 'rel', selector.split('[')[0]);
+    const match = selector.match(/\[(property|name)="([^"]+)"\]/);
+    if (match) {
+      el.setAttribute(match[1], match[2]);
+    }
     document.head.appendChild(el);
   }
   el.setAttribute(attribute, value);
@@ -30,16 +36,11 @@ const setMeta = (selector: string, attribute: 'content' | 'href', value: string)
 export const applySocialMeta = ({
   title,
   description,
-  image,
-  url,
+  image = OG_IMAGE,
+  url = SITE_URL,
   type = 'website',
 }: MetaOptions): void => {
   document.title = title;
-
-  const update = (attr: string, value: string) =>
-    document.head
-      .querySelectorAll(`meta[${attr}="${value}"]`)
-      .forEach((m) => m.setAttribute('content', value));
 
   // Standard
   setMeta('meta[name="description"]', 'content', description);
@@ -47,23 +48,22 @@ export const applySocialMeta = ({
   setMeta('meta[property="og:title"]', 'content', title);
   setMeta('meta[property="og:description"]', 'content', description);
   setMeta('meta[property="og:type"]', 'content', type);
-  if (url) setMeta('meta[property="og:url"]', 'content', url);
-  if (image) setMeta('meta[property="og:image"]', 'content', image);
-  // Twitter
+  setMeta('meta[property="og:site_name"]', 'content', 'MomenKita');
+  setMeta('meta[property="og:url"]', 'content', url);
+  setMeta('meta[property="og:image"]', 'content', image);
+  // Twitter Card
   setMeta('meta[name="twitter:card"]', 'content', 'summary_large_image');
   setMeta('meta[name="twitter:title"]', 'content', title);
   setMeta('meta[name="twitter:description"]', 'content', description);
-  if (image) setMeta('meta[name="twitter:image"]', 'content', image);
-
-  // Keep react-helmet-like links in sync if present
-  update('property', 'og:site_name');
-  update('name', 'description');
+  setMeta('meta[name="twitter:image"]', 'content', image);
 };
 
 const DEFAULT_HOME = {
   title: 'MomenKita — Undangan Digital untuk Setiap Momen',
   description:
     'MomenKita menyediakan undangan digital modern, elegan, dan interaktif untuk Birthday, Sunatan, Wedding, Aqiqah, dan berbagai momen spesial lainnya.',
+  image: OG_IMAGE,
+  url: SITE_URL,
 };
 
 export const resetSocialMeta = (): void => {
