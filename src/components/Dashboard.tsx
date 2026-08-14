@@ -39,7 +39,7 @@ import {
   DEFAULT_ADMIN_PASSWORD,
 } from '../lib/admin';
 import { getPaymentSettings, setPaymentSettings, PaymentSettings, PAYMENT_HOLDER } from '../lib/payment';
-import { fetchDataFromServer, mergeServerDataIntoLocal } from '../lib/serverApi';
+import { fetchDataFromServer, mergeServerDataIntoLocal, flushDataSync } from '../lib/serverApi';
 import { Mail, Eye } from 'lucide-react';
 import { UiButton } from './UiButton';
 import { AdminTemplates } from './AdminTemplates';
@@ -254,6 +254,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [invitations, setInvitations] = useState<Invitation[]>(() => getAllInvitations());
   const [orders, setOrders] = useState<Order[]>(() => getAllOrders());
   const [toast, setToast] = useState('');
+  const [syncing, setSyncing] = useState(false);
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ kind: 'invitation' | 'order'; id: string } | null>(null);
   const [orderModal, setOrderModal] = useState<{ open: boolean; initial?: Order | null; templateUid?: string }>({ open: false });
@@ -329,6 +330,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
       refreshOrders();
     }
     setConfirmDelete(null);
+  };
+
+  /** Push the full localStorage dataset (invitations + orders) to the server. */
+  const handleSync = async () => {
+    setSyncing(true);
+    setToast('Mengirim data ke server...');
+    try {
+      const ok = await flushDataSync();
+      setToast(ok ? 'Data berhasil disinkronkan ke server.' : 'Sinkronisasi gagal. Pastikan penyimpanan server aktif, lalu coba lagi.');
+    } finally {
+      setSyncing(false);
+    }
   };
 
   const filteredInvitations = useMemo(() => {
@@ -413,7 +426,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         return (
           <div className="flex flex-col gap-6">
             {/* Quick actions */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <UiButton variant="accent" size="lg" icon="receipt_long" iconFilled onClick={() => setOrderModal({ open: true })}>
                 Buat Pesanan
               </UiButton>
@@ -422,6 +435,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </UiButton>
               <UiButton variant="secondary" size="lg" icon="group" onClick={() => setTab('customers')}>
                 Lihat Customer
+              </UiButton>
+              <UiButton
+                variant="secondary"
+                size="lg"
+                icon={syncing ? 'progress_activity' : 'cloud_upload'}
+                disabled={syncing}
+                onClick={() => void handleSync()}
+              >
+                {syncing ? 'Menyinkronkan...' : 'Sync Data'}
               </UiButton>
             </div>
 
