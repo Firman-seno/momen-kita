@@ -7,9 +7,6 @@ import { TemplateBackground } from './TemplateBackground';
 import { MotionConfig, motion, AnimatePresence } from 'motion/react';
 import { Reveal, Stagger, StaggerChild, getProfile, EASE_OUT } from './AnimationKit';
 import { UiButton } from './UiButton';
-import { buildWaLink, guestMessageToHost, guestInvitationMessage } from '../lib/whatsapp';
-import { getInvitationUrl } from '../lib/invitations';
-import { WhatsAppIcon } from './WhatsAppIcon';
 import { getTemplatePrice } from '../lib/templatePricing';
 import { RatingSection } from './RatingSection';
 import { InvitationVideo } from './InvitationVideo';
@@ -172,9 +169,6 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   onBackToCatalog,
   eventDetailsOverride,
   wishesOverride,
-  invitationPhone,
-  invitationSlug,
-  invitationTitle,
   isInvitation = false,
   musicOverride,
   disableMusic = false,
@@ -210,6 +204,39 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   const [musicError, setMusicError] = useState('');
   const audioEngineRef = useRef<TemplateAudioEngine | null>(null);
   const errorTimerRef = useRef<number | null>(null);
+  // Single-flight guard so autoplay and the first-interaction retry never
+  // start two overlapping tracks.
+  const musicStartRef = useRef<Promise<boolean> | null>(null);
+
+  /**
+   * Start background music exactly once. If the browser blocks autoplay
+   * (mobile policies), the attempt resolves false and the ref is cleared so a
+   * later user gesture (opening the cover) can retry. No play button is ever
+   * shown to the guest.
+   */
+  const ensureMusicStarted = () => {
+    if (!audioEngineRef.current || disableMusic) return Promise.resolve(false);
+    if (!musicStartRef.current) {
+      musicStartRef.current = audioEngineRef.current
+        .startWithFade()
+        .then((started) => {
+          if (started) {
+            setIsPlayingMusic(true);
+            setIsMuted(false);
+            setMusicVolume(audioEngineRef.current?.getVolume() ?? 0.6);
+            setMusicBlocked(false);
+          } else {
+            musicStartRef.current = null;
+          }
+          return started;
+        })
+        .catch(() => {
+          musicStartRef.current = null;
+          return false;
+        });
+    }
+    return musicStartRef.current;
+  };
 
   // Live countdown state
   const [countdown, setCountdown] = useState({
@@ -238,10 +265,6 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   const [mapModalOpen, setMapModalOpen] = useState(false);
   const [galleryImage, setGalleryImage] = useState<string | null>(null);
   const [musicInfoModalOpen, setMusicInfoModalOpen] = useState(false);
-  // "Kirim Undangan" (customer → guest) share modal
-  const [shareGuestOpen, setShareGuestOpen] = useState(false);
-  const [guestName, setGuestName] = useState('');
-  const [shareError, setShareError] = useState('');
 
   const effectiveEventDetails: EventDetails = eventDetailsOverride
     ? { ...template.eventDetails, ...eventDetailsOverride }
@@ -253,41 +276,6 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   const catLabel = CATEGORY_LABELS[template.category];
   const catEmoji = CATEGORY_EMOJIS[template.category];
   const profile = getProfile(template.category);
-
-  // "Kirim Undangan" (customer → guest): modal asks for the guest name, then
-  // opens WhatsApp with an auto-generated, category-aware message + the real
-  // public URL. The customer only edits the guest name.
-  const openGuestShare = () => {
-    setShareError('');
-    setGuestName('');
-    setShareGuestOpen(true);
-  };
-
-  const handleSendGuestInvitation = () => {
-    const name = guestName.trim();
-    if (!name) {
-      setShareError('Mohon isi nama tamu terlebih dahulu.');
-      return;
-    }
-    if (!invitationSlug || invitationSlug === 'preview') {
-      setShareError('Link undangan belum tersedia.');
-      return;
-    }
-    const url = getInvitationUrl({ slug: invitationSlug });
-    const msg = guestInvitationMessage({
-      guestName: name,
-      title: invitationTitle || template.name,
-      url,
-      category: template.category,
-      eventDate: eventDetails.date,
-      eventTime: eventDetails.time,
-      venue: eventDetails.venue,
-    });
-    window.open(buildWaLink(msg, ''), '_blank', 'noopener,noreferrer');
-    setShareGuestOpen(false);
-    setGuestName('');
-    setShareError('');
-  };
 
   // Keep wishes in sync if the override changes (e.g. editor preview remounts).
   useEffect(() => {
@@ -332,13 +320,21 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
       startTime: activeMusic.startTime,
     });
 
+    // Public invitation: attempt to autoplay the background music as soon as
+    // the engine is ready. If autoplay is blocked, the first user interaction
+    // (opening the cover) starts it — handled by ensureMusicStarted().
+    if (isInvitation) {
+      void ensureMusicStarted();
+    }
+
     return () => {
       if (audioEngineRef.current) {
         audioEngineRef.current.stop();
         audioEngineRef.current = null;
       }
+      musicStartRef.current = null;
     };
-  }, [template, activeMusic.url, activeMusic.fallbackUrl, activeMusic.startTime, disableMusic]);
+  }, [template, activeMusic.url, activeMusic.fallbackUrl, activeMusic.startTime, disableMusic, isInvitation]);
 
   // Ticking countdown interval
   useEffect(() => {
@@ -365,19 +361,18 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   const handleOpenInvitation = async () => {
     setCoverOpened(true);
 
-    if (audioEngineRef.current) {
-      const started = await audioEngineRef.current.startWithFade();
-      if (started) {
-        setIsPlayingMusic(true);
-        setIsMuted(false);
-        setMusicVolume(audioEngineRef.current.getVolume());
-        setMusicBlocked(false);
-      } else {
-        setIsPlayingMusic(false);
-        setMusicBlocked(true);
-      }
-    } else {
+    let started = await ensureMusicStarted();
+    // The mount autoplay may have been rejected by the browser even though we
+    // are now inside a user gesture (e.g. the attempt was still in flight when
+    // the guest tapped). Retry once within the gesture so music always starts
+    // on the first interaction without requiring a dedicated Play button.
+    if (!started && !disableMusic && audioEngineRef.current) {
+      musicStartRef.current = null;
+      started = await ensureMusicStarted();
+    }
+    if (!started) {
       setIsPlayingMusic(false);
+      setMusicBlocked(true);
     }
   };
 
@@ -457,8 +452,10 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
     return (
       <TemplateBackground themeStyle={themeStyle}>
         <div className="w-full relative min-h-screen flex flex-col items-center">
-          {/* Floating Music Player (bottom-right, safe spacing) */}
-          <div className={`fixed right-2.5 sm:right-5 z-40 flex flex-col items-end gap-2 ${isInvitation ? 'bottom-[160px] sm:bottom-24' : 'bottom-[84px] sm:bottom-6'}`}>
+          {/* Floating Music Player (demo/catalog mode only — never shown to guests).
+              Public invitations play background music with no visible controls. */}
+          {!isInvitation && (
+          <div className="fixed right-2.5 sm:right-5 z-40 flex flex-col items-end gap-2 bottom-[84px] sm:bottom-6">
             {musicError && (
               <div className="max-w-[260px] px-3 py-1.5 rounded-full bg-red-600/95 border border-red-300/40 text-white text-[10px] font-bold shadow-xl animate-fade-in">
                 {musicError}
@@ -550,6 +547,7 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
               </div>
             )}
           </div>
+          )}
 
           {/* SECTION 1: COVER VIEW / HERO */}
           {!coverOpened ? (
@@ -1431,28 +1429,10 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
         </div>
       )}
 
-      {/* Floating Sticky Mobile Bar (Order in demo mode / Share + RSVP in invitation mode) */}
-      <div className="fixed bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-sm sm:hidden">
-        {isInvitation ? (
-          <div className="flex gap-2">
-            <button
-              onClick={openGuestShare}
-              className="btn-micro flex-1 min-w-0 bg-emerald-600 hover:bg-emerald-500 text-white font-headline text-[11px] font-bold py-3.5 px-3 rounded-full shadow-2xl flex items-center justify-center gap-1.5 border border-white/20 cursor-pointer min-h-[44px]"
-            >
-              <WhatsAppIcon size={15} className="shrink-0" />
-              <span className="truncate">Kirim Undangan</span>
-            </button>
-            <a
-              href={buildWaLink(guestMessageToHost(invitationTitle || template.name, getInvitationUrl({ slug: invitationSlug || 'invitation' })), invitationPhone || '')}
-              target="_blank"
-              rel="noreferrer"
-              className="btn-micro flex-1 min-w-0 bg-white/10 hover:bg-white/20 text-white font-headline text-[11px] font-bold py-3.5 px-3 rounded-full shadow-2xl flex items-center justify-center gap-1.5 border border-white/20 cursor-pointer min-h-[44px]"
-            >
-              <span className="material-symbols-outlined text-base shrink-0">event_available</span>
-              <span className="truncate">Konfirmasi</span>
-            </a>
-          </div>
-        ) : (
+      {/* Floating Sticky Mobile Bar — demo/catalog mode only (order CTA).
+          Guests never see "Kirim Undangan" / "Konfirmasi" here. */}
+      {!isInvitation && (
+        <div className="fixed bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-sm sm:hidden">
           <button
             onClick={() => onOrder(template)}
             className="btn-micro w-full bg-emerald-600 hover:bg-emerald-500 text-white font-headline text-[11px] min-[360px]:text-xs font-bold py-3.5 px-4 rounded-full shadow-2xl flex items-center justify-center gap-1.5 border border-white/20 cursor-pointer min-h-[44px]"
@@ -1460,8 +1440,8 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
             <span className="material-symbols-outlined text-base shrink-0">payments</span>
             <span className="truncate">PESAN TEMPLATE #{template.templateNumber} ({formatRupiah(getTemplatePrice(template))})</span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Google Maps Modal */}
       <AnimatePresence>
@@ -1639,105 +1619,6 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
             />
             <p className="text-center text-white/70 text-xs font-body mt-3">
               Tap anywhere to close
-            </p>
-          </motion.div>
-        </motion.div>
-      )}
-      </AnimatePresence>
-
-      {/* Desktop "Kirim Undangan" button (public invitation only) */}
-      {isInvitation && (
-        <button
-          onClick={openGuestShare}
-          className="hidden sm:inline-flex fixed bottom-6 left-3 sm:left-5 z-[60] items-center gap-1.5 btn-micro bg-emerald-600 hover:bg-emerald-500 text-white font-headline text-[11px] sm:text-xs font-bold rounded-full px-4 py-2.5 sm:px-4 sm:py-2.5 shadow-xl border border-white/20 cursor-pointer"
-          title="Bagikan undangan ke tamu via WhatsApp"
-        >
-          <WhatsAppIcon size={15} />
-          Kirim Undangan
-        </button>
-      )}
-
-      {/* "Kirim Undangan" Modal — customer only types the guest name */}
-      <AnimatePresence>
-      {shareGuestOpen && (
-        <motion.div
-          className="fixed inset-0 z-[95] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3, ease: EASE_OUT }}
-        >
-          <motion.div
-            className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative"
-            initial={{ opacity: 0, scale: 0.92, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 8 }}
-            transition={{ duration: 0.4, ease: EASE_OUT }}
-          >
-            <button
-              onClick={() => setShareGuestOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
-              aria-label="Tutup"
-            >
-              <span className="material-symbols-outlined text-xl">close</span>
-            </button>
-
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-11 h-11 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
-                <WhatsAppIcon size={22} />
-              </div>
-              <div className="min-w-0">
-                <h3 className="font-headline text-lg font-extrabold text-slate-900 leading-tight">
-                  Kirim Undangan
-                </h3>
-                <p className="font-body text-[11px] text-slate-500">
-                  {invitationTitle || template.name}
-                </p>
-              </div>
-            </div>
-
-            <label className="block mb-4">
-              <span className="block font-body text-[11px] sm:text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
-                Nama Tamu
-              </span>
-              <input
-                type="text"
-                value={guestName}
-                onChange={(e) => {
-                  setGuestName(e.target.value);
-                  if (shareError) setShareError('');
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSendGuestInvitation();
-                }}
-                placeholder="Contoh: Budi dan Keluarga"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3 font-body text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder:text-slate-400 transition-colors box-border"
-              />
-              {shareError && (
-                <span className="block font-body text-[11px] font-bold text-rose-600 mt-1.5">
-                  {shareError}
-                </span>
-              )}
-            </label>
-
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShareGuestOpen(false)}
-                className="btn-micro flex-1 min-h-[44px] rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-bold text-[11px] uppercase tracking-wider cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleSendGuestInvitation}
-                className="btn-micro flex-[2] min-h-[44px] rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
-              >
-                <WhatsAppIcon size={15} />
-                Kirim via WhatsApp
-              </button>
-            </div>
-
-            <p className="mt-4 font-body text-[10px] text-slate-400 text-center leading-relaxed">
-              Pesan undangan akan dibuat otomatis — Anda hanya perlu mengganti nama tamu.
             </p>
           </motion.div>
         </motion.div>

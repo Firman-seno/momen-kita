@@ -141,18 +141,6 @@ export const InvitationView: React.FC<InvitationViewProps> = ({ slug, onGoHome }
         onOpenWhatsApp={() => undefined}
         onBackToCatalog={onGoHome}
       />
-
-      {/* "Butuh Perubahan?" → WhatsApp MomenKita (admin) */}
-      <a
-        href={buildWaLink(changeRequestMessage(invitationUrl), WHATSAPP_PRIMARY)}
-        target="_blank"
-        rel="noreferrer"
-        className="fixed bottom-24 sm:bottom-6 right-3 sm:right-5 z-[60] inline-flex items-center gap-1.5 btn-micro bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-amber-300 font-body text-[10px] sm:text-xs font-bold rounded-full px-3 py-2 sm:px-4 sm:py-2.5 shadow-xl"
-        title="Butuh perubahan pada undangan ini? Hubungi admin MomenKita."
-      >
-        <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>chat</span>
-        <span className="hidden min-[420px]:inline">Butuh Perubahan?</span>
-      </a>
     </div>
   );
 };
