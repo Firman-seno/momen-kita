@@ -354,6 +354,7 @@ export default function App() {
           currentTab={currentTab as NavigationTab}
           onSelectTab={handleSelectTab}
           onOpenWhatsApp={handleOpenWhatsAppModal}
+          onOpenAdminLogin={goAdminLogin}
         />
       )}
 
