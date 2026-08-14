@@ -10,8 +10,6 @@ interface SharePanelProps {
   onPublish?: () => void;
   /** Open the live invitation page. */
   onOpenInvitation?: () => void;
-  /** Go to dashboard. */
-  onGoDashboard?: () => void;
   title?: string;
 }
 
@@ -19,7 +17,6 @@ export const SharePanel: React.FC<SharePanelProps> = ({
   invitation,
   onPublish,
   onOpenInvitation,
-  onGoDashboard,
   title,
 }) => {
   const [copied, setCopied] = useState(false);
@@ -232,15 +229,17 @@ export const SharePanel: React.FC<SharePanelProps> = ({
           </>
         )}
 
-        {onGoDashboard && (
-          <button
-            onClick={onGoDashboard}
-            className="mt-4 w-full font-body text-[11px] sm:text-xs font-bold uppercase tracking-wider text-primary hover:underline underline-offset-4 cursor-pointer flex items-center justify-center gap-1.5"
-          >
-            <span className="material-symbols-outlined text-sm">dashboard</span>
-            Kelola Semua Undangan
-          </button>
-        )}
+        <a
+          href="/admin/dashboard"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 w-full font-body text-[11px] sm:text-xs font-bold uppercase tracking-wider text-primary hover:underline underline-offset-4 cursor-pointer flex items-center justify-center gap-1.5"
+          title="Buka dashboard admin di tab baru"
+        >
+          <span className="material-symbols-outlined text-sm">dashboard</span>
+          Kelola Semua Undangan
+          <span className="material-symbols-outlined text-sm opacity-60">open_in_new</span>
+        </a>
       </div>
 
       <Toast open={!!toast} message={toast} onClose={() => setToast('')} />

@@ -27,7 +27,6 @@ interface InvitationEditorProps {
   /** When creating from an Order → auto-fills customer + links the order. */
   orderId?: string;
   onBack: () => void;
-  onGoDashboard: () => void;
   onOpenInvitation?: (slug: string) => void;
 }
 
@@ -352,7 +351,6 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
   invitationId,
   orderId,
   onBack,
-  onGoDashboard,
   onOpenInvitation,
 }) => {
   const template: Template | undefined = useMemo(
@@ -1059,7 +1057,6 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
               if (onOpenInvitation) onOpenInvitation(savedInvitation.slug);
               else window.open(`/i/${savedInvitation.slug}`, '_blank', 'noopener,noreferrer');
             }}
-            onGoDashboard={onGoDashboard}
           />
         </div>
       )}

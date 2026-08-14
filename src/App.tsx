@@ -386,7 +386,6 @@ export default function App() {
             invitationId={editorInvitationId || undefined}
             orderId={editorOrderId || undefined}
             onBack={goAdminDashboard}
-            onGoDashboard={goAdminDashboard}
             onOpenInvitation={(slug) => openInvitation(slug)}
           />
         )}
