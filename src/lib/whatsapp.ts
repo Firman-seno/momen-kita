@@ -1,6 +1,10 @@
 // ============================================================================
-// MomenKita — WhatsApp Ordering Helpers
-// Primary: 6281911943754  |  Alternate: 6285711709471
+// MomenKita — WhatsApp Helpers
+// ------------------------------------------------------------
+// The ADMIN numbers below are used ONLY for admin communication
+// (homepage consultation, forgot-password, "Butuh Perubahan" on
+// invitations). They are NEVER used for the invitation "WA" buttons —
+// those always use the customer's own number from the order.
 // ============================================================================
 import { formatRupiah } from '../data/templates';
 
@@ -10,10 +14,37 @@ export const WHATSAPP_ALTERNATE = '6285711709471';
 export const WHATSAPP_PRIMARY_DISPLAY = '+62 819-119-43754';
 export const WHATSAPP_ALTERNATE_DISPLAY = '+62 857-117-09471';
 
+/**
+ * Normalize any Indonesian WhatsApp number into a valid international format:
+ *   "081234567890"  → "6281234567890"
+ *   "+6281234567890" → "6281234567890"
+ *   "6281234567890" → "6281234567890"
+ *   "08 1234-567890" → "6281234567890"
+ * Strips spaces, dashes, parentheses, dots, and the leading "+".
+ */
+export const normalizeWhatsAppNumber = (phone?: string | null): string => {
+  if (!phone) return '';
+  let p = String(phone).replace(/[^\d]/g, '');
+  if (!p) return '';
+  if (p.startsWith('0')) p = '62' + p.slice(1);
+  if (!p.startsWith('62')) p = '62' + p;
+  return p;
+};
+
+/**
+ * Build a WhatsApp deep-link. If `phone` is empty, produces a generic
+ * share/compose link (wa.me/?text=...). Otherwise the phone is normalized
+ * to an international number first, so customer numbers always point to
+ * the right chat regardless of how they were typed (08xx, +628xx, 628xx).
+ */
 export const buildWaLink = (
   message: string,
   phone: string = WHATSAPP_PRIMARY
-): string => `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+): string => {
+  const normalized = normalizeWhatsAppNumber(phone);
+  const target = normalized ? `/${normalized}` : '';
+  return `https://wa.me${target}?text=${encodeURIComponent(message)}`;
+};
 
 /** Generic homepage / consultation message */
 export const homepageWaMessage =

@@ -517,8 +517,32 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
     return list;
   }, [cat, musicGenreFilter, musicVocalFilter]);
 
+  /** Block saving when core data is incomplete or the WA number is invalid. */
+  const validateForm = (): string | null => {
+    if (!form.customerName.trim()) return 'Nama pemesan wajib diisi.';
+    if (!form.customerPhone.trim()) return 'Nomor WhatsApp pemilik wajib diisi agar tamu dapat menghubungi pemilik.';
+    const digits = form.customerPhone.replace(/[^\d]/g, '');
+    if (digits.length < 9 || digits.length > 15) return 'Nomor WhatsApp tidak valid. Periksa kembali.';
+    if (!form.eventDate.trim()) return 'Tanggal acara wajib diisi.';
+    if (cat === 'wedding' && (!form.groomName.trim() || !form.brideName.trim())) return 'Nama mempelai pria dan wanita wajib diisi.';
+    if (cat === 'sunatan' && !form.childName.trim()) return 'Nama anak wajib diisi.';
+    if (cat === 'aqiqah' && !form.babyName.trim()) return 'Nama bayi wajib diisi.';
+    if (cat === 'birthday' && !form.birthdayPerson.trim()) return 'Nama yang berulang tahun wajib diisi.';
+    return null;
+  };
+
   const handleSave = (publish: boolean) => {
     setSaving(true);
+
+    // Validation — never save an invitation with missing core data
+    const validationError = validateForm();
+    if (validationError) {
+      setSaving(false);
+      setToast(validationError);
+      setToastIcon('error');
+      return;
+    }
+
     const customData = buildCustomData(cat, form);
     const payload: Partial<Invitation> = {
       templateUid: template.uid,
@@ -545,9 +569,15 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
       result = createInvitation(payload);
     }
 
-    // Link Order → Invitation so the dashboard can show "Undangan: ADA"
-    if (result && linkedOrder && !linkedOrder.invitationId) {
-      updateOrder(linkedOrder.id, { invitationId: result.id });
+    // Keep the Order → Invitation relation in sync (invitationId + public slug)
+    if (result) {
+      const orderTarget = linkedOrder?.id || savedInvitation?.orderId;
+      if (orderTarget) {
+        const order = getOrderById(orderTarget);
+        if (order && (order.invitationId !== result.id || order.invitationSlug !== result.slug)) {
+          updateOrder(orderTarget, { invitationId: result.id, invitationSlug: result.slug });
+        }
+      }
     }
 
     // Simulate a tiny save delay for a satisfying UX then update state

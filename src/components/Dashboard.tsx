@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Template } from '../types';
 import { TEMPLATES, getTemplateByUid, formatRupiah } from '../data/templates';
 import { getTemplatePrice } from '../lib/templatePricing';
@@ -40,6 +40,7 @@ import {
   DEFAULT_ADMIN_PASSWORD,
 } from '../lib/admin';
 import { getPaymentSettings, setPaymentSettings, PaymentSettings, PAYMENT_HOLDER } from '../lib/payment';
+import { fetchDataFromServer, mergeServerDataIntoLocal } from '../lib/serverApi';
 import { Mail, Eye } from 'lucide-react';
 import { UiButton } from './UiButton';
 import { AdminTemplates } from './AdminTemplates';
@@ -261,8 +262,25 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
-  const refreshInvitations = () => setInvitations(getAllInvitations());
-  const refreshOrders = () => setOrders(getAllOrders());
+  const refreshInvitations = useCallback(() => setInvitations(getAllInvitations()), []);
+  const refreshOrders = useCallback(() => setOrders(getAllOrders()), []);
+
+  // Pull the latest dataset from the server once, merging into localStorage.
+  // Best-effort: when the API/KV isn't configured this simply no-ops.
+  useEffect(() => {
+    let cancelled = false;
+    fetchDataFromServer()
+      .then((data) => {
+        if (cancelled || !data) return;
+        mergeServerDataIntoLocal(data);
+        refreshInvitations();
+        refreshOrders();
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshInvitations, refreshOrders]);
 
   const handleSavedOrder = (order: Order) => {
     setOrderModal({ open: false });
@@ -272,7 +290,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   const handleCopy = async (inv: Invitation) => {
     const ok = await copyText(getInvitationUrl(inv));
-    setToast(ok ? 'Link undangan berhasil disalin.' : 'Gagal menyalin link.');
+    setToast(ok ? 'Link undangan berhasil disalin!' : 'Gagal menyalin link.');
     if (ok) {
       setCopiedSlug(inv.slug);
       window.setTimeout(() => setCopiedSlug(null), 2000);
@@ -715,16 +733,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>send</span> Send
                           </a>
                         )}
-                        <a
-                          href={buildWaLink(invitationShareMessage(title, url, inv.eventDate))}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-disabled={!shareable}
-                          className={`btn-micro min-h-[36px] px-3 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 cursor-pointer ${shareable ? 'bg-primary text-white hover:bg-[#1d2d54]' : 'bg-surface-container-low text-outline border border-outline-variant pointer-events-none'}`}
-                          title={shareable ? 'Bagikan via WhatsApp' : 'Publikasikan dulu'}
-                        >
-                          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>chat</span> WA
-                        </a>
+                        {inv.customerPhone && (
+                          <a
+                            href={buildWaLink(invitationShareMessage(title, url, inv.eventDate), inv.customerPhone)}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-disabled={!shareable}
+                            className={`btn-micro min-h-[36px] px-3 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 cursor-pointer ${shareable ? 'bg-primary text-white hover:bg-[#1d2d54]' : 'bg-surface-container-low text-outline border border-outline-variant pointer-events-none'}`}
+                            title={shareable ? 'Bagikan link ke customer via WhatsApp' : 'Publikasikan dulu'}
+                          >
+                            <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>chat</span> WA
+                          </a>
+                        )}
                         <button onClick={() => setConfirmDelete({ kind: 'invitation', id: inv.id })} className="btn-micro min-h-[36px] px-3 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1 cursor-pointer">
                           <span className="material-symbols-outlined text-sm">delete</span>
                         </button>

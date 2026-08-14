@@ -99,3 +99,16 @@ export const logoutAdmin = (): void => {
     /* ignore */
   }
 };
+
+/**
+ * Token sent to the serverless admin API (X-Admin-Token header).
+ * Uses the admin password stored on this device, so only an admin
+ * who can already log into the dashboard can push/pull the dataset.
+ */
+export const getAdminApiToken = (): string => {
+  try {
+    return localStorage.getItem(PASSWORD_KEY) || getAdminPassword();
+  } catch {
+    return '';
+  }
+};

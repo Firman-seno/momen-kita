@@ -1,5 +1,8 @@
 import { EventDetails, CategoryKey, Template } from '../types';
 import { getTemplateByUid } from '../data/templates';
+import { INVITATIONS_STORAGE_KEY } from './storageKeys';
+import { scheduleDataSync } from './serverApi';
+import { getOrderById, getAllOrders, updateOrder } from './orders';
 
 /* ============================================================
    MomenKita — Customer Invitation System
@@ -55,34 +58,117 @@ export interface Invitation {
   publishedAt?: number;
 }
 
-const STORAGE_KEY = 'momenkita.invitations.v1';
+const STORAGE_KEY = INVITATIONS_STORAGE_KEY;
 
 /* -----------------------------------------------
    Slug & ID generation (safe, collision-resistant)
+   -------------------------------------------------
+   Public links live at /i/<slug>. A slug is either a
+   readable "customer-name-xxxxx" (when a name is known)
+   or a random token. Slugs never contain /, spaces, or
+   anything that would break the route, and are always
+   unique.
    ----------------------------------------------- */
 const SLUG_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
 const SLUG_LENGTH = 10;
+const SLUG_SUFFIX_LENGTH = 5;
 
-export const generateSlug = (): string => {
-  const bytes = new Uint8Array(SLUG_LENGTH);
-  const existing = new Set(getAllInvitations().map((i) => i.slug));
+export const isValidSlug = (slug: string): boolean =>
+  typeof slug === 'string' && /^[A-Za-z0-9_-]{3,64}$/.test(slug);
+
+/** "Ibu Siti Aminah" → "ibu-siti-aminah"; strips accents & unsafe chars. */
+const slugifyName = (name: string): string => {
+  const ascii = name
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-');
+  return ascii.toLowerCase().slice(0, 24).replace(/-+$/g, '');
+};
+
+const randomPart = (len: number): string => {
+  const bytes = new Uint8Array(len);
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    crypto.getRandomValues(bytes);
+  } else {
+    for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+  }
+  return Array.from(bytes)
+    .map((b) => SLUG_ALPHABET[b % SLUG_ALPHABET.length])
+    .join('');
+};
+
+/**
+ * Generate a unique public slug. When `name` is provided the slug is
+ * human-readable ("miko-aB3kD"); otherwise a random token is used.
+ * `existing` may be passed to avoid reading storage (prevents recursion
+ * during the legacy-data migration).
+ */
+export const generateSlug = (name?: string, existing?: Set<string>): string => {
+  const taken = existing || new Set(getAllInvitations().map((i) => i.slug));
+  const base = name ? slugifyName(name) : '';
+  const suffixLen = base ? SLUG_SUFFIX_LENGTH : SLUG_LENGTH;
   let slug = '';
+  let attempts = 0;
   do {
-    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-      crypto.getRandomValues(bytes);
-    } else {
-      for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+    const random = randomPart(suffixLen);
+    slug = base ? `${base}-${random}` : random;
+    attempts += 1;
+    if (attempts > 120) {
+      slug = `inv-${Date.now().toString(36)}-${randomPart(4)}`;
+      break;
     }
-    slug = Array.from(bytes)
-      .map((b) => SLUG_ALPHABET[b % SLUG_ALPHABET.length])
-      .join('');
-  } while (existing.has(slug));
+  } while (taken.has(slug));
   return slug;
 };
 
 export const generateId = (): string => {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
   return `inv-${Date.now()}-${Math.floor(Math.random() * 1e9).toString(36)}`;
+};
+
+/* -----------------------------------------------
+   Legacy data migration
+   -------------------------------------------------
+   Idempotent + safe: repairs invitations that lack a
+   unique slug and links invitations to their order by
+   customer phone when orderId is missing. Only saves
+   when something actually changed. Existing data is
+   never deleted.
+   ----------------------------------------------- */
+const migrateInvitationList = (list: Invitation[]): { list: Invitation[]; changed: boolean } => {
+  const used = new Set<string>();
+  const orders = getAllOrders();
+  const byPhone = new Map<string, ReturnType<typeof getOrderById>>();
+  orders.forEach((o) => {
+    const digits = (o.customerPhone || '').replace(/[^\d]/g, '');
+    if (digits) byPhone.set(digits.slice(-10), o);
+  });
+
+  let changed = false;
+  const next = list.map((inv) => {
+    const copy = { ...inv, customData: inv.customData || {} };
+    if (!copy.id) {
+      copy.id = generateId();
+      changed = true;
+    }
+    if (!isValidSlug(copy.slug) || used.has(copy.slug)) {
+      copy.slug = generateSlug(copy.customerName || '', used);
+      changed = true;
+    }
+    used.add(copy.slug);
+    if (!copy.orderId) {
+      const digits = (copy.customerPhone || '').replace(/[^\d]/g, '');
+      const order = digits ? byPhone.get(digits.slice(-10)) : undefined;
+      if (order?.id) {
+        copy.orderId = order.id;
+        changed = true;
+      }
+    }
+    return copy;
+  });
+  return { list: next, changed };
 };
 
 /* -----------------------------------------------
@@ -94,7 +180,9 @@ export const getAllInvitations = (): Invitation[] => {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed as Invitation[];
+    const migrated = migrateInvitationList(parsed as Invitation[]);
+    if (migrated.changed) saveAll(migrated.list);
+    return migrated.list;
   } catch {
     return [];
   }
@@ -103,6 +191,7 @@ export const getAllInvitations = (): Invitation[] => {
 const saveAll = (list: Invitation[]): void => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    scheduleDataSync();
   } catch {
     // Storage full / unavailable — keep app working silently.
   }
@@ -120,9 +209,13 @@ export const createInvitation = (
   data: Partial<Invitation>
 ): Invitation => {
   const now = Date.now();
+  const existing = new Set(getAllInvitations().map((i) => i.slug));
+  const slug = data.slug && isValidSlug(data.slug) ? data.slug : generateSlug(data.customerName || '', existing);
+  // Never allow a duplicate slug — append a suffix if a caller passed one that collides.
+  const uniqueSlug = existing.has(slug) ? generateSlug(data.customerName || '', existing) : slug;
   const invitation: Invitation = {
     id: data.id || generateId(),
-    slug: data.slug || generateSlug(),
+    slug: uniqueSlug,
     templateUid: data.templateUid || '',
     category: data.category || 'birthday',
     templateNumber: data.templateNumber || '001',
@@ -209,7 +302,22 @@ export const getInvitationUrl = (invitation: Pick<Invitation, 'slug'>): string =
   const base = pathname.includes('index.html')
     ? `${origin}${pathname.replace(/index\.html$/, '')}`
     : origin;
-  return `${base}/i/${invitation.slug}`;
+  const slug = isValidSlug(invitation.slug) ? invitation.slug : generateSlug();
+  return `${base}/i/${slug}`;
+};
+
+/**
+ * Link an Order → Invitation so the order records both the internal
+ * invitation id and its public slug (kept in sync with the invitation).
+ */
+export const linkOrderToInvitation = (
+  orderId: string,
+  invitation: Pick<Invitation, 'id' | 'slug'>
+): boolean => {
+  const order = getOrderById(orderId);
+  if (!order) return false;
+  updateOrder(orderId, { invitationId: invitation.id, invitationSlug: invitation.slug });
+  return true;
 };
 
 /** Human-readable display title for the invitation. */
@@ -245,6 +353,26 @@ export const getInvitationDisplayName = (
   if (invitation.category === 'sunatan') return cd.childName || invitation.customerName;
   if (invitation.category === 'aqiqah') return cd.babyName || invitation.customerName;
   return cd.birthdayPerson || invitation.customerName;
+};
+
+/**
+ * Import an invitation received from the server into the local store.
+ * Keeps the public slug stable; the newer version (by updatedAt) wins.
+ * Used by the public invitation page as a fallback so links work on
+ * devices that never saw the admin's localStorage.
+ */
+export const upsertInvitationFromServer = (data: unknown): Invitation | undefined => {
+  if (!data || typeof data !== 'object') return undefined;
+  const d = data as Partial<Invitation>;
+  if (!d.id) return undefined;
+  const existing = getInvitationById(d.id);
+  if (existing) {
+    if ((d.updatedAt || 0) >= (existing.updatedAt || 0)) {
+      return updateInvitation(existing.id, { ...d, slug: existing.slug });
+    }
+    return existing;
+  }
+  return createInvitation(d);
 };
 
 export const invitationStatusLabel: Record<InvitationStatus, string> = {

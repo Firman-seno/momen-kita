@@ -9,8 +9,23 @@ import { Invitation, getInvitationTitle } from './invitations';
    actual invitation data — never the homepage.
    ============================================================ */
 
-const SITE_URL = 'https://momen-kita-sigma.vercel.app/';
-const OG_IMAGE = 'https://momen-kita-sigma.vercel.app/og-image.png';
+/**
+ * Base URL of the site as currently served (handles preview URLs,
+ * custom domains, and local dev). Never hardcoded to one domain.
+ */
+const getSiteBaseUrl = (): string => {
+  if (typeof window === 'undefined') return 'https://momen-kita.vercel.app/';
+  const { origin, pathname } = window.location;
+  if (pathname.includes('index.html')) {
+    const base = pathname.replace(/index\.html$/, '');
+    return `${origin}${base}`;
+  }
+  return origin;
+};
+
+const getSiteUrl = (path: string): string => `${getSiteBaseUrl().replace(/\/+$/, '')}${path}`;
+
+const getOgImage = (): string => getSiteUrl('/og-image.png');
 
 interface MetaOptions {
   title: string;
@@ -36,8 +51,8 @@ const setMeta = (selector: string, attribute: 'content' | 'href', value: string)
 export const applySocialMeta = ({
   title,
   description,
-  image = OG_IMAGE,
-  url = SITE_URL,
+  image = getOgImage(),
+  url = getSiteUrl('/'),
   type = 'website',
 }: MetaOptions): void => {
   document.title = title;
@@ -62,8 +77,12 @@ const DEFAULT_HOME = {
   title: 'MomenKita — Undangan Digital untuk Setiap Momen',
   description:
     'MomenKita menyediakan undangan digital modern, elegan, dan interaktif untuk Birthday, Sunatan, Wedding, Aqiqah, dan berbagai momen spesial lainnya.',
-  image: OG_IMAGE,
-  url: SITE_URL,
+  get image() {
+    return getOgImage();
+  },
+  get url() {
+    return getSiteUrl('/');
+  },
 };
 
 export const resetSocialMeta = (): void => {

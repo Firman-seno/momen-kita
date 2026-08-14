@@ -57,7 +57,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
     const ok = await copyText(invitationUrl);
     if (ok) {
       setCopied(true);
-      setToast('Link undangan berhasil disalin.');
+      setToast('Link undangan berhasil disalin!');
       window.setTimeout(() => setCopied(false), 2000);
     } else {
       setToast('Gagal menyalin link. Silakan salin manual.');
@@ -82,7 +82,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
   };
 
   const handleWhatsAppShare = () => {
-    const waHref = buildWaLink(invitationShareMessage(invitationTitle, invitationUrl, invitation.eventDate));
+    const waHref = buildWaLink(invitationShareMessage(invitationTitle, invitationUrl, invitation.eventDate), invitation.customerPhone || '');
     window.open(waHref, '_blank', 'noopener,noreferrer');
   };
 

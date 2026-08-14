@@ -1,4 +1,6 @@
 import { CategoryKey } from '../types';
+import { ORDERS_STORAGE_KEY } from './storageKeys';
+import { scheduleDataSync } from './serverApi';
 
 /* ============================================================
    MomenKita — Order System (customer + admin)
@@ -108,6 +110,9 @@ export interface Order {
    verifiedBy?: string;
    /** Set when the admin creates an invitation from this order. */
    invitationId?: string;
+   /** Public invitation slug — kept alongside invitationId so order
+       data always knows which /i/<slug> belongs to it. */
+   invitationSlug?: string;
    /** Max revisions included with the order (default 3). */
    maxRevision?: number;
    /** Number of revisions already used/requested. */
@@ -122,7 +127,7 @@ export interface Order {
    updatedAt: number;
 }
 
-const STORAGE_KEY = 'momenkita.orders.v1';
+const STORAGE_KEY = ORDERS_STORAGE_KEY;
 
 export const getAllOrders = (): Order[] => {
   try {
@@ -139,6 +144,7 @@ export const getAllOrders = (): Order[] => {
 const saveAllOrders = (list: Order[]): void => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    scheduleDataSync();
   } catch {
     /* storage full / unavailable — keep app working */
   }
@@ -146,6 +152,17 @@ const saveAllOrders = (list: Order[]): void => {
 
 export const getOrderById = (id: string): Order | undefined => {
   return getAllOrders().find((o) => o.id === id);
+};
+
+/** Find orders whose customer phone matches (used to link legacy invitations). */
+export const findOrdersByPhone = (phone?: string | null): Order[] => {
+  if (!phone) return [];
+  const digits = String(phone).replace(/[^\d]/g, '');
+  if (!digits) return [];
+  return getAllOrders().filter((o) => {
+    const d = (o.customerPhone || '').replace(/[^\d]/g, '');
+    return !!d && (d === digits || d.endsWith(digits.slice(-9)) || digits.endsWith(d.slice(-9)));
+  });
 };
 
 /** Sequential human-readable id: ORD-YYYYMMDD-NNN (unique per day). */
@@ -178,6 +195,7 @@ export const createOrder = (data: Partial<Order>): Order => {
     verifiedAt: data.verifiedAt,
     verifiedBy: data.verifiedBy,
     invitationId: data.invitationId,
+    invitationSlug: data.invitationSlug,
     maxRevision: data.maxRevision ?? 3,
     revisionCount: data.revisionCount ?? 0,
     finalInvitationUrl: data.finalInvitationUrl,

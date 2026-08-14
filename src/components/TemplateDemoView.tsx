@@ -1360,7 +1360,7 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
       <div className="fixed bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-sm sm:hidden">
         {isInvitation ? (
           <a
-            href={buildWaLink(guestMessageToHost(invitationTitle || template.name, getInvitationUrl({ slug: invitationSlug || 'invitation' })), invitationPhone || undefined)}
+            href={buildWaLink(guestMessageToHost(invitationTitle || template.name, getInvitationUrl({ slug: invitationSlug || 'invitation' })), invitationPhone || '')}
             target="_blank"
             rel="noreferrer"
             className="btn-micro w-full bg-emerald-600 hover:bg-emerald-500 text-white font-headline text-[11px] min-[360px]:text-xs font-bold py-3.5 px-4 rounded-full shadow-2xl flex items-center justify-center gap-1.5 border border-white/20 cursor-pointer min-h-[44px]"

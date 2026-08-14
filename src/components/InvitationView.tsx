@@ -4,10 +4,12 @@ import { getTemplateByUid } from '../data/templates';
 import {
   Invitation,
   getInvitationBySlug,
+  upsertInvitationFromServer,
   getEventDetailsForInvitation,
   getInvitationTitle,
   getInvitationUrl,
 } from '../lib/invitations';
+import { fetchPublicInvitation } from '../lib/serverApi';
 import { buildWaLink, changeRequestMessage, WHATSAPP_PRIMARY } from '../lib/whatsapp';
 import { applyInvitationMeta, resetSocialMeta } from '../lib/socialMeta';
 import { TemplateDemoView } from './TemplateDemoView';
@@ -21,19 +23,47 @@ interface InvitationViewProps {
 }
 
 export const InvitationView: React.FC<InvitationViewProps> = ({ slug, onGoHome }) => {
-  const [loading, setLoading] = useState(true);
+  const [local, setLocal] = useState<Invitation | undefined>(() => getInvitationBySlug(slug) || undefined);
+  const [showLoading, setShowLoading] = useState(true);
 
-  const invitation: Invitation | undefined = useMemo(() => getInvitationBySlug(slug), [slug]);
+  // Try localStorage first (fast, offline-capable), then fall back to the
+  // server so the link also opens on devices without the admin's data.
+  useEffect(() => {
+    let cancelled = false;
+    const start = Date.now();
+    setShowLoading(true);
+    setLocal(getInvitationBySlug(slug) || undefined);
+
+    const finish = () => {
+      if (cancelled) return;
+      const wait = Math.max(0, 450 - (Date.now() - start));
+      window.setTimeout(() => {
+        if (!cancelled) setShowLoading(false);
+      }, wait);
+    };
+
+    fetchPublicInvitation(slug)
+      .then((data) => {
+        if (cancelled) return;
+        if (data) {
+          upsertInvitationFromServer(data);
+          const fresh = getInvitationBySlug(slug);
+          if (fresh) setLocal(fresh);
+        }
+        finish();
+      })
+      .catch(() => finish());
+
+    return () => {
+      cancelled = true;
+    };
+  }, [slug]);
+
+  const invitation = local;
   const template: Template | undefined = useMemo(
     () => (invitation ? getTemplateByUid(invitation.templateUid) : undefined),
     [invitation]
   );
-
-  useEffect(() => {
-    setLoading(true);
-    const timer = window.setTimeout(() => setLoading(false), 650);
-    return () => window.clearTimeout(timer);
-  }, [slug]);
 
   // Dynamic social metadata for this invitation
   useEffect(() => {
@@ -45,7 +75,7 @@ export const InvitationView: React.FC<InvitationViewProps> = ({ slug, onGoHome }
     return () => resetSocialMeta();
   }, [invitation, template]);
 
-  if (loading) {
+  if (showLoading) {
     return <LoadingScreen label="Menyiapkan undangan..." />;
   }
 
