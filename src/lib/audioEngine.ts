@@ -31,6 +31,11 @@ export class TemplateAudioEngine {
   private loop: boolean = true;
   private lastVolumeBeforeMute: number = 0.6;
   private startTime: number = 0;
+  // Monotonic token: every start() bumps it, instantly invalidating any older
+  // in-flight play() attempt (e.g. a blocked autoplay whose promise some
+  // mobile browsers leave hanging) so a user gesture always starts fresh and
+  // two tracks can never overlap.
+  private attemptToken: number = 0;
 
   constructor(options: TemplateAudioEngineOptions) {
     this.fontStyle = options.fontStyle || 'elegant';
@@ -99,16 +104,22 @@ export class TemplateAudioEngine {
   public async start(): Promise<boolean> {
     if (this.isPlaying) return true;
 
+    // Invalidate any in-flight attempt and clear its element so a deferred
+    // play() can never fire on its own after we've moved on.
+    this.attemptToken += 1;
+    const token = this.attemptToken;
+    this.clearPendingElement();
+
     // 1. Attempt HTML5 Audio File playback (primary track)
     let audio = this.createAudioElement(this.primaryUrl);
     if (audio) {
-      const okPrimary = await this.playHtml5(audio, this.primaryUrl);
+      const okPrimary = await this.playHtml5(audio, this.primaryUrl, token);
       if (okPrimary) return true;
 
       // 2. Attempt per-category fallback track
       if (this.fallbackUrl && this.fallbackUrl !== this.primaryUrl) {
         audio = this.createAudioElement(this.fallbackUrl);
-        const okFallback = await this.playHtml5(audio, this.fallbackUrl);
+        const okFallback = await this.playHtml5(audio, this.fallbackUrl, token);
         if (okFallback) return true;
       }
     }
@@ -118,25 +129,60 @@ export class TemplateAudioEngine {
     return this.startSynthEngine();
   }
 
-  private playHtml5(audio: HTMLAudioElement, url: string): Promise<boolean> {
+  /** Pause & clear the current element unless it is genuinely playing. */
+  private clearPendingElement() {
+    if (this.audioElement && !this.isPlaying) {
+      try {
+        this.audioElement.pause();
+        this.audioElement.removeAttribute('src');
+      } catch {
+        // ignore
+      }
+      this.audioElement = null;
+    }
+  }
+
+  private playHtml5(audio: HTMLAudioElement, url: string, token: number): Promise<boolean> {
     return new Promise((resolve) => {
       let settled = false;
+      let timer: number | null = null;
+
+      const clearAudio = () => {
+        try {
+          audio.pause();
+          audio.removeAttribute('src');
+        } catch {
+          // ignore
+        }
+      };
+
       const finish = (ok: boolean) => {
         if (settled) return;
         settled = true;
+        if (timer !== null) window.clearTimeout(timer);
         audio.removeEventListener('error', onError);
         audio.removeEventListener('playing', onPlaying);
         audio.removeEventListener('loadedmetadata', onMetadata);
+        // Stale attempts (superseded by a newer start()) never affect the
+        // result and are torn down so they can't start playing later.
+        if (token !== this.attemptToken) {
+          clearAudio();
+          resolve(false);
+          return;
+        }
+        if (ok) this.isPlaying = true;
         resolve(ok);
       };
+
       const onError = () => {
-        console.warn(`[AudioEngine] HTML5 Audio failed for ${url}.`);
+        clearAudio();
         finish(false);
       };
+
       const onPlaying = () => {
-        this.isPlaying = true;
         finish(true);
       };
+
       const onMetadata = () => {
         // Skip intro/ambience by starting at the configured offset (clamped
         // to the track length so short fallbacks never break playback).
@@ -154,6 +200,14 @@ export class TemplateAudioEngine {
       audio.addEventListener('playing', onPlaying);
       audio.addEventListener('loadedmetadata', onMetadata);
 
+      // Safety net: some mobile browsers hold a blocked autoplay play() in a
+      // pending state that never resolves. Fail after a short window so the
+      // caller can retry inside a user gesture instead of hanging forever.
+      timer = window.setTimeout(() => {
+        clearAudio();
+        finish(false);
+      }, 2500);
+
       this.audioElement = audio;
       this.currentSourceUrl = url;
       audio.volume = 0;
@@ -162,14 +216,17 @@ export class TemplateAudioEngine {
       const p = audio.play();
       if (p !== undefined) {
         p.then(() => {
+          if (token !== this.attemptToken) {
+            clearAudio();
+            return;
+          }
           // Some browsers resolve before 'playing' fires
-          this.isPlaying = true;
           setTimeout(() => finish(true), 50);
         }).catch(() => {
+          clearAudio();
           finish(false);
         });
       } else {
-        this.isPlaying = true;
         finish(true);
       }
     });

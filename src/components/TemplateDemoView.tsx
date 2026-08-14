@@ -346,7 +346,9 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
 
   // Public invitation: the FIRST user gesture anywhere on the page also starts
   // the music, so autoplay-blocked browsers (mobile) reliably begin playing on
-  // the very first tap without any visible Play button.
+  // the very first tap without any visible Play button. The engine bumps an
+  // attempt token, so even if the mount autoplay is still hanging this forces
+  // a clean fresh start inside the gesture.
   useEffect(() => {
     if (!isInvitation || disableMusic) return;
 
@@ -354,6 +356,7 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
       document.removeEventListener('pointerdown', startOnFirstGesture);
       document.removeEventListener('touchstart', startOnFirstGesture);
       document.removeEventListener('keydown', startOnFirstGesture);
+      musicStartRef.current = null;
       void ensureMusicStarted();
     };
 
@@ -377,16 +380,19 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   const handleOpenInvitation = async () => {
     setCoverOpened(true);
 
-    // Reuse any in-flight autoplay/first-gesture attempt (avoids two
-    // overlapping tracks when both the document listener and this handler
-    // fire on the same tap). If it failed because the browser blocked
-    // autoplay, retry once here — we are now inside a user gesture, so the
-    // audio starts reliably without any visible Play button.
-    let started = await ensureMusicStarted();
+    // Authoritative fresh start inside the user gesture. Dropping the ref lets
+    // the engine start a new attempt; its token invalidates any older hanging
+    // autoplay attempt, so two tracks can never overlap. If autoplay already
+    // succeeded (desktop) the engine's isPlaying guard turns this into a no-op.
+    let started = false;
     const engine = audioEngineRef.current;
-    if (!started && engine && !disableMusic) {
+    if (engine && !disableMusic) {
       musicStartRef.current = null;
-      started = await ensureMusicStarted();
+      try {
+        started = await engine.startWithFade();
+      } catch {
+        started = false;
+      }
     }
 
     if (started) {
@@ -571,6 +577,33 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
               </div>
             )}
           </div>
+          )}
+
+          {/* Floating Music Toggle (public invitation only) — a single elegant
+              button so guests can always turn the background music on/off.
+              Music still autoplays; this is the fallback when a mobile browser
+              blocks it. */}
+          {isInvitation && !disableMusic && (
+            <div className="fixed bottom-5 right-3 sm:right-5 z-40">
+              <button
+                onClick={() => void handleTogglePlay()}
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/80 border border-white/20 backdrop-blur-md shadow-2xl flex items-center justify-center cursor-pointer transition-colors hover:bg-black/60"
+                title={isPlayingMusic ? 'Jeda musik' : 'Putar musik'}
+                aria-label={isPlayingMusic ? 'Jeda musik' : 'Putar musik'}
+              >
+                {isPlayingMusic ? (
+                  <span className="flex items-end gap-[3px] h-4" aria-hidden="true">
+                    <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '8px' }} />
+                    <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '14px', animationDelay: '0.15s' }} />
+                    <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '10px', animationDelay: '0.3s' }} />
+                  </span>
+                ) : (
+                  <span className="material-symbols-outlined text-xl text-amber-300" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    music_off
+                  </span>
+                )}
+              </button>
+            </div>
           )}
 
           {/* SECTION 1: COVER VIEW / HERO */}
