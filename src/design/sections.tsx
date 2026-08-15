@@ -40,6 +40,7 @@ export interface SectionProps {
   ds: DesignResolution;
   family: FamilyConfig;
   themeStyle: Template['themeStyle'];
+  template: Template;
   profile: AnimProfile;
   content: DemoContent;
   eventDetails: EventDetails;

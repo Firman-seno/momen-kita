@@ -179,6 +179,7 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
     ds,
     family,
     themeStyle,
+    template,
     profile,
     content,
     eventDetails,
