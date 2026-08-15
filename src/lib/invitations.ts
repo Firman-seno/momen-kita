@@ -350,6 +350,20 @@ export const getInvitationTitle = (
     const person = cd.graduateName;
     return person ? `Undangan Wisuda ${person}` : `Undangan Wisuda & Graduation`;
   }
+  const extendedLabels: Record<string, string> = {
+    religious: 'Keagamaan',
+    tasyakuran: 'Tasyakuran',
+    gathering: 'Acara & Gathering',
+    business: 'Bisnis',
+    anniversary: 'Anniversary',
+    family: 'Keluarga',
+    'doa-haul': 'Doa & Haul',
+  };
+  const extLabel = extendedLabels[invitation.category];
+  if (extLabel) {
+    const title = (cd.eventTitle || '').trim();
+    return title ? `Undangan ${title}` : `Undangan ${extLabel}`;
+  }
   const person = cd.birthdayPerson;
   return person ? `Undangan Ulang Tahun ${person}` : `Undangan Ulang Tahun`;
 };
@@ -365,6 +379,10 @@ export const getInvitationDisplayName = (
   if (invitation.category === 'sunatan') return cd.childName || invitation.customerName;
   if (invitation.category === 'aqiqah') return cd.babyName || invitation.customerName;
   if (invitation.category === 'education') return cd.graduateName || invitation.customerName;
+  const extended = ['religious', 'tasyakuran', 'gathering', 'business', 'anniversary', 'family', 'doa-haul'];
+  if (extended.includes(invitation.category)) {
+    return cd.eventTitle || invitation.customerName;
+  }
   return cd.birthdayPerson || invitation.customerName;
 };
 

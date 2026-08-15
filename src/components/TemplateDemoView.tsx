@@ -163,6 +163,74 @@ const getDemoContent = (template: Template, eventDetails: EventDetails): DemoCon
     };
   }
 
+  const extended = (['religious', 'tasyakuran', 'gathering', 'business', 'anniversary', 'family', 'doa-haul'] as const).includes(cat as never);
+
+  if (extended) {
+    const isDoa = cat === 'doa-haul';
+    const isBusiness = cat === 'business';
+    const isAnniversary = cat === 'anniversary';
+    const mainTitle =
+      isAnniversary && eventDetails.coupleName
+        ? `${eventDetails.coupleName} • ${eventDetails.anniversaryYear ?? 1} Tahun`
+        : eventDetails.eventTitle || template.name;
+    const eventSubtitle =
+      cat === 'anniversary'
+        ? 'Anniversary Celebration'
+        : cat === 'doa-haul'
+          ? 'Undangan Doa & Haul'
+          : cat === 'business'
+            ? 'Undangan Bisnis & Acara'
+            : cat === 'religious'
+              ? 'Undangan Acara Keagamaan'
+              : cat === 'tasyakuran'
+                ? 'Undangan Tasyakuran'
+                : cat === 'gathering'
+                  ? 'Acara & Gathering'
+                  : 'Undangan Keluarga';
+    const by =
+      isBusiness
+        ? eventDetails.companyName || eventDetails.hostName || ''
+        : eventDetails.hostName || '';
+    const honoree =
+      isDoa ? eventDetails.deceasedName || '' : by;
+    return {
+      mainTitle,
+      eventSubtitle,
+      messageHeading: cat === 'anniversary' ? 'Our Journey' : cat === 'doa-haul' ? 'Doa & Ucapan' : 'Undangan & Ucapan',
+      messageText: eventDetails.messageQuote || '',
+      messageBy: by,
+      countdownTitle: isDoa ? 'Waktu Acara Tahlilan' : 'Countdown Menuju Acara',
+      galleryHeading: cat === 'anniversary' ? 'Our Moments' : 'Momen Acara',
+      galleryNote: cat === 'anniversary' ? 'Setiap tahun selalu ada cerita indah' : 'Dokumentasi keseruan acara kami',
+      mapHeading: 'Lokasi Acara',
+      rsvpHeading: 'Konfirmasi Kehadiran',
+      rsvpNote: 'Mohon konfirmasi kehadiran Anda',
+      wishesHeading: isDoa ? 'Kirim Doa & Ucapan' : 'Kirim Ucapan & Doa',
+      wishesNote: isDoa
+        ? `Tulis doa untuk ${honoree || 'almarhum/almarhumah'}`
+        : `Tulis ucapan untuk ${eventDetails.eventTitle || 'acara ini'}`,
+      wishesPlaceholder: isDoa
+        ? `Tulis doa untuk ${honoree || 'almarhum/almarhumah'}...`
+        : `Tulis ucapan untuk ${eventDetails.eventTitle || 'acara ini'}...`,
+      wishButton: isDoa ? 'Kirim Doa' : 'Kirim Ucapan',
+      closingTitle:
+        cat === 'anniversary'
+          ? 'Forever & Always'
+          : cat === 'doa-haul'
+            ? 'Al Fatihah'
+            : cat === 'business'
+              ? 'Terima Kasih'
+              : 'Terima Kasih',
+      closingQuote: eventDetails.messageQuote || '',
+      closingBy:
+        isBusiness
+          ? eventDetails.companyName || eventDetails.hostName || ''
+          : isAnniversary
+            ? eventDetails.coupleName || eventDetails.hostName || ''
+            : eventDetails.hostName || '',
+    };
+  }
+
   // birthday (default)
   return {
     mainTitle: `${eventDetails.birthdayPerson}'s ${eventDetails.age}th`,
@@ -1038,6 +1106,70 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
                           <p className="text-sm font-bold mt-0.5">{eventDetails.institutionName}</p>
                           <p className="text-xs opacity-85 mt-0.5">{eventDetails.parentsName}</p>
                         </div>
+                      </div>
+                    </StaggerChild>
+                  </Stagger>
+                </section>
+              )}
+
+              {/* SECTION 2e: EXTENDED CATEGORY HOST / INSTITUTION */}
+              {(template.category === 'religious' ||
+                template.category === 'tasyakuran' ||
+                template.category === 'gathering' ||
+                template.category === 'business' ||
+                template.category === 'anniversary' ||
+                template.category === 'family' ||
+                template.category === 'doa-haul') && (
+                <section className="my-10">
+                  <Stagger
+                    profile={profile}
+                    className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md flex items-start gap-4"
+                  >
+                    <StaggerChild variant="scale">
+                      <div className="p-3 rounded-xl bg-white/15 text-amber-300 shrink-0">
+                        <span className="material-symbols-outlined text-2xl">
+                          {template.category === 'religious'
+                            ? 'mosque'
+                            : template.category === 'tasyakuran'
+                              ? 'home'
+                              : template.category === 'gathering'
+                                ? 'groups'
+                                : template.category === 'business'
+                                  ? 'business_center'
+                                  : template.category === 'anniversary'
+                                    ? 'favorite'
+                                    : template.category === 'family'
+                                      ? 'family_restroom'
+                                      : 'prayer_times'}
+                        </span>
+                      </div>
+                    </StaggerChild>
+                    <StaggerChild variant="right">
+                      <div className="flex-1">
+                        <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200">
+                          {template.category === 'business'
+                            ? 'Penyelenggara'
+                            : template.category === 'doa-haul'
+                              ? 'Atas Nama Keluarga'
+                              : template.category === 'anniversary'
+                                ? 'Pasangan'
+                                : 'Penyelenggara'}
+                        </h3>
+                        <p className="text-base font-bold mt-0.5">
+                          {template.category === 'business'
+                            ? eventDetails.companyName || eventDetails.hostName
+                            : template.category === 'anniversary'
+                              ? eventDetails.coupleName || eventDetails.hostName
+                              : eventDetails.hostName || eventDetails.institutionName}
+                        </p>
+                        {template.category === 'doa-haul' && eventDetails.deceasedName && (
+                          <p className="text-sm mt-1 italic opacity-90">Untuk almarhum/almarhumah {eventDetails.deceasedName}</p>
+                        )}
+                        {template.category === 'anniversary' && eventDetails.anniversaryYear && (
+                          <p className="text-xs opacity-85 mt-0.5">
+                            Merayakan {eventDetails.anniversaryYear} tahun kebersamaan
+                          </p>
+                        )}
                       </div>
                     </StaggerChild>
                   </Stagger>
