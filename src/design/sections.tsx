@@ -19,16 +19,24 @@ import {
   radiusFor,
 } from './blocks';
 import {
-  GoldDivider,
-  FloralDivider,
   EightStar,
   StarDivider,
   PartyBand,
   ScriptSwirl,
   ArchWreath,
   ArabesqueDivider,
-  BatikDivider,
   LeafSprig,
+  BalloonArch,
+  ComicBurst,
+  RocketMark,
+  CrownMark,
+  CandyStripe,
+  RainbowArc,
+  StarBurst,
+  CrownDivider,
+  ConfettiDivider,
+  ThinDivider,
+  dividerFor,
 } from './ornaments';
 import { InvitationVideo } from '../components/InvitationVideo';
 
@@ -432,6 +440,443 @@ export const CoverView: React.FC<P> = (p) => {
                 <div className="h-2 bg-gradient-to-r from-[#b4540a] via-[#d9a441] to-[#b4540a]" />
               </div>
             </StaggerChild>
+          </Stagger>
+        </section>
+      );
+    }
+
+    /* ---------------- BDAY-BALLOON-ARCH: floating balloon arch ---------------- */
+    case 'bday-balloon-arch': {
+      return (
+        <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
+          <AmbientMarks family={family} />
+          <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
+            <StaggerChild variant="down" duration={0.7}>
+              <BalloonArch color={family.accent} className="w-56 mx-auto" />
+            </StaggerChild>
+            <StaggerChild variant="down" duration={0.7}>
+              <CoverRibbon family={family} label={`${p.catEmoji} ${p.catLabel} Invitation`} />
+            </StaggerChild>
+            <StaggerChild variant="scale" duration={0.95}>
+              <div className="relative">
+                <div
+                  className="absolute -inset-6 rounded-full opacity-50 blur-2xl pointer-events-none"
+                  style={{ background: `radial-gradient(circle, ${family.accent}44, transparent 70%)` }}
+                />
+                <FamilyPhotoFrame family={family} src={eventDetails.portraitImage} alt={content.mainTitle} />
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{titleBlock}</StaggerChild>
+            <StaggerChild variant="up" duration={0.7}>{datePill}</StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{openButton}</StaggerChild>
+          </Stagger>
+        </section>
+      );
+    }
+
+    /* ---------------- BDAY-COMIC-HERO: comic pop-art ---------------- */
+    case 'bday-comic-hero': {
+      return (
+        <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
+          <AmbientMarks family={family} />
+          <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
+            <StaggerChild variant="down" duration={0.7}>
+              <div className="flex items-center justify-center gap-2">
+                <StarBurst color={family.accent} className="w-8" />
+                <span className="text-[11px] font-black uppercase tracking-[0.35em]" style={{ color: family.accent }}>
+                  {family.motto}
+                </span>
+                <StarBurst color={family.accent} className="w-8" />
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="scale" duration={0.9}>
+              <div className="relative">
+                <ComicBurst color={family.accent} className="absolute -top-10 -left-8 w-24 opacity-80" />
+                <ComicBurst color={family.accent} className="absolute -bottom-8 -right-6 w-16 opacity-60" />
+                <FamilyPhotoFrame family={family} src={eventDetails.portraitImage} alt={content.mainTitle} />
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.9}>
+              <h1
+                className={`text-4xl sm:text-5xl font-black leading-tight ${family.titleTracking} ${family.titleTransform}`}
+                style={{
+                  fontFamily: themeStyle.fontFamilyTitle,
+                  color: titleColor,
+                  WebkitTextStroke: '2px #141020',
+                  textShadow: `4px 4px 0 ${family.accent}`,
+                }}
+              >
+                {content.mainTitle}
+                <span className="text-xl block mt-2 font-semibold normal-case tracking-normal" style={{ WebkitTextStroke: '0', textShadow: 'none' }}>
+                  {content.eventSubtitle}
+                </span>
+              </h1>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.7}>{datePill}</StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{openButton}</StaggerChild>
+          </Stagger>
+        </section>
+      );
+    }
+
+    /* ---------------- BDAY-SPACE-PORTAL: cosmic ring ---------------- */
+    case 'bday-space-portal': {
+      return (
+        <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
+          <AmbientMarks family={family} />
+          <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
+            <StaggerChild variant="down" duration={0.7}>
+              <RocketMark color={family.accent} className="w-14 mx-auto" />
+            </StaggerChild>
+            <StaggerChild variant="scale" duration={1}>
+              <div className="relative">
+                <div
+                  className="absolute -inset-8 rounded-full opacity-60 pointer-events-none"
+                  style={{ background: `radial-gradient(circle, ${family.accent}33, transparent 65%)` }}
+                />
+                <div
+                  className="absolute -inset-3 rounded-full border border-dashed border-white/20 pointer-events-none"
+                  style={{ animation: 'spin 30s linear infinite' }}
+                />
+                <StarBurst color="#ffffff" className="absolute -top-3 -right-4 w-6 opacity-80" />
+                <StarBurst color={family.accent} className="absolute -bottom-2 -left-5 w-5 opacity-80" />
+                <FamilyPhotoFrame family={family} src={eventDetails.portraitImage} alt={content.mainTitle} />
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{titleBlock}</StaggerChild>
+            <StaggerChild variant="up" duration={0.7}>{datePill}</StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{openButton}</StaggerChild>
+          </Stagger>
+        </section>
+      );
+    }
+
+    /* ---------------- BDAY-PRINCESS-ARCH: crown + royal arch ---------------- */
+    case 'bday-princess-arch': {
+      return (
+        <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
+          <AmbientMarks family={family} />
+          <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
+            <StaggerChild variant="down" duration={0.7}>
+              <CrownMark color={family.accent} className="w-20 mx-auto" />
+            </StaggerChild>
+            <StaggerChild variant="down" duration={0.7}>
+              <div className="text-[11px] font-bold uppercase tracking-[0.4em]" style={{ color: family.accent }}>
+                {family.motto}
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="scale" duration={1}>
+              <div className="relative">
+                <div
+                  className="absolute -inset-6 rounded-full opacity-40 blur-2xl pointer-events-none"
+                  style={{ background: `radial-gradient(circle, ${family.accent}55, transparent 70%)` }}
+                />
+                <FamilyPhotoFrame family={family} src={eventDetails.portraitImage} alt={content.mainTitle} />
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>
+              <div className="w-48"><CrownDivider color={family.accent} /></div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{titleBlock}</StaggerChild>
+            <StaggerChild variant="up" duration={0.7}>{datePill}</StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{openButton}</StaggerChild>
+          </Stagger>
+        </section>
+      );
+    }
+
+    /* ---------------- BDAY-PASTEL-CLOUDS: dreamy clouds ---------------- */
+    case 'bday-pastel-clouds': {
+      return (
+        <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
+          <AmbientMarks family={family} />
+          <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
+            <StaggerChild variant="down" duration={0.8}>
+              <div className="relative h-16 w-64 mx-auto">
+                <div className="absolute left-4 top-6 w-24 h-10 bg-white/25 rounded-full blur-[1px]" />
+                <div className="absolute left-24 top-2 w-32 h-12 bg-white/30 rounded-full" />
+                <div className="absolute right-4 top-8 w-20 h-9 bg-white/20 rounded-full" />
+                <RainbowArc color={family.accent} className="absolute right-8 -top-2 w-24 opacity-80" />
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="down" duration={0.7}>
+              <CoverRibbon family={family} label={`${p.catEmoji} ${p.catLabel} Invitation`} />
+            </StaggerChild>
+            <StaggerChild variant="scale" duration={0.95}>
+              <div className="relative">
+                <div
+                  className="absolute -inset-5 rounded-full opacity-40 blur-2xl pointer-events-none"
+                  style={{ background: `radial-gradient(circle, ${family.accent}44, transparent 70%)` }}
+                />
+                <FamilyPhotoFrame family={family} src={eventDetails.portraitImage} alt={content.mainTitle} />
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{titleBlock}</StaggerChild>
+            <StaggerChild variant="up" duration={0.7}>{datePill}</StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{openButton}</StaggerChild>
+          </Stagger>
+        </section>
+      );
+    }
+
+    /* ---------------- BDAY-MINIMAL-TYPE: big type, whitespace ---------------- */
+    case 'bday-minimal-type': {
+      return (
+        <section className="min-h-screen w-full flex flex-col items-center justify-center p-8 relative z-20 overflow-hidden">
+          <Stagger profile={p.profile} onView={false} delay={0.15} stagger={0.15} className="w-full max-w-md my-auto flex flex-col items-center text-center">
+            <StaggerChild variant="up" duration={0.8}>
+              <div className="text-[11px] font-bold uppercase tracking-[0.5em]" style={{ color: family.accent }}>
+                {family.motto}
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.9}>
+              <h1
+                className="mt-4 text-5xl sm:text-6xl font-black leading-[0.95] tracking-tight"
+                style={{ fontFamily: themeStyle.fontFamilyTitle, color: titleColor }}
+              >
+                {content.mainTitle}
+              </h1>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>
+              <div className="w-12 h-px my-5" style={{ backgroundColor: family.accent }} />
+            </StaggerChild>
+            <StaggerChild variant="photo" duration={1}>
+              <FamilyPhotoFrame family={family} src={eventDetails.portraitImage} alt={content.mainTitle} />
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>
+              <p className={`mt-5 text-lg font-medium ${subColor}`}>{content.eventSubtitle}</p>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.7}>
+              <div className="mt-6">{datePill}</div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>
+              <div className="mt-5 w-full max-w-xs">{openButton}</div>
+            </StaggerChild>
+          </Stagger>
+        </section>
+      );
+    }
+
+    /* ---------------- BDAY-LUXE-CIRCLE: gold gala ---------------- */
+    case 'bday-luxe-circle': {
+      return (
+        <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
+          <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
+            <StaggerChild variant="down" duration={0.8}>
+              <div className="text-[11px] font-bold uppercase tracking-[0.45em] text-amber-200/80">
+                {p.catEmoji} {p.catLabel} • {family.motto}
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="scale" duration={1}>
+              <div className="relative">
+                <div
+                  className="absolute -inset-8 rounded-full opacity-50 pointer-events-none"
+                  style={{ background: `radial-gradient(circle, ${family.accent}22, transparent 70%)` }}
+                />
+                <div className="absolute -inset-4 rounded-full border border-amber-200/30" />
+                <div className="absolute -inset-2 rounded-full border border-amber-200/20" />
+                <FamilyPhotoFrame family={family} src={eventDetails.portraitImage} alt={content.mainTitle} />
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>
+              <div className="flex items-center gap-3 text-amber-200/80">
+                <span className="w-10 h-px bg-gradient-to-r from-transparent to-amber-200/60" />
+                <CrownMark color="#d4af37" className="w-10" />
+                <span className="w-10 h-px bg-gradient-to-l from-transparent to-amber-200/60" />
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{titleBlock}</StaggerChild>
+            <StaggerChild variant="up" duration={0.7}>{datePill}</StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{openButton}</StaggerChild>
+          </Stagger>
+        </section>
+      );
+    }
+
+    /* ---------------- BDAY-NEON-TILT: neon glow ---------------- */
+    case 'bday-neon-tilt': {
+      return (
+        <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
+          <AmbientMarks family={family} />
+          <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
+            <StaggerChild variant="down" duration={0.7}>
+              <div
+                className="text-[11px] font-black uppercase tracking-[0.4em]"
+                style={{ color: family.accent, textShadow: `0 0 12px ${family.accent}` }}
+              >
+                {family.motto}
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="photo" duration={1}>
+              <div className="relative -rotate-3">
+                <div className="absolute inset-0 rounded-2xl blur-xl opacity-60 pointer-events-none" style={{ background: family.accent }} />
+                <FamilyPhotoFrame family={family} src={eventDetails.portraitImage} alt={content.mainTitle} />
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.9}>
+              <h1
+                className={`text-5xl sm:text-6xl font-black leading-[1.02] tracking-tight ${family.titleTransform}`}
+                style={{
+                  fontFamily: themeStyle.fontFamilyTitle,
+                  color: titleColor,
+                  textShadow: `0 0 18px ${family.accent}88, 4px 4px 0 ${family.accent}66`,
+                }}
+              >
+                {content.mainTitle}
+                <span className="text-xl block mt-2 font-semibold normal-case tracking-normal" style={{ textShadow: 'none' }}>
+                  {content.eventSubtitle}
+                </span>
+              </h1>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.7}>{datePill}</StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{openButton}</StaggerChild>
+          </Stagger>
+        </section>
+      );
+    }
+
+    /* ---------------- BDAY-CANDY-SPLIT: candy stripe split ---------------- */
+    case 'bday-candy-split': {
+      return (
+        <section className="min-h-screen w-full flex flex-col items-center justify-center p-5 sm:p-8 relative z-20 overflow-hidden">
+          <AmbientMarks family={family} />
+          <Stagger profile={p.profile} onView={false} delay={0.15} stagger={0.16} className="w-full max-w-lg my-auto">
+            <StaggerChild variant="down" duration={0.7}>
+              <CandyStripe color={family.accent} className="w-56 mx-auto mb-4" />
+            </StaggerChild>
+            <StaggerChild variant="photo" duration={1}>
+              <div className={`flex flex-col sm:flex-row items-center sm:items-stretch gap-6 sm:gap-8 ${base}`}>
+                <div className="sm:w-[45%] flex justify-center">
+                  <FamilyPhotoFrame family={family} src={eventDetails.portraitImage} alt={content.mainTitle} size="small" />
+                </div>
+                <div className="sm:w-[55%] flex flex-col items-center sm:items-start text-center sm:text-left gap-4">
+                  <div className="text-xs font-bold uppercase tracking-[0.3em]" style={{ color: family.accent }}>
+                    {family.motto}
+                  </div>
+                  <h1
+                    className={`text-4xl sm:text-5xl font-black leading-tight ${family.titleTracking} ${family.titleTransform}`}
+                    style={{ fontFamily: themeStyle.fontFamilyTitle, color: titleColor }}
+                  >
+                    {content.mainTitle}
+                  </h1>
+                  <p className="text-lg font-semibold opacity-90">{content.eventSubtitle}</p>
+                  {datePill}
+                  <div className="w-full max-w-[240px]">
+                    <PrimaryButton family={family} themeStyle={themeStyle} onClick={p.onOpen}>
+                      <Mail size={16} aria-hidden="true" /> Open
+                    </PrimaryButton>
+                  </div>
+                </div>
+              </div>
+            </StaggerChild>
+          </Stagger>
+        </section>
+      );
+    }
+
+    /* ---------------- BDAY-ELEGANT-FRAME: refined card ---------------- */
+    case 'bday-elegant-frame': {
+      return (
+        <section className="min-h-screen w-full flex flex-col items-center justify-center p-5 sm:p-8 relative z-20">
+          <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto">
+            <StaggerChild variant="zoom" duration={0.9}>
+              <div
+                className="relative p-6 sm:p-8 border border-[#c4627e]/40 rounded-[2rem] text-center"
+                style={{
+                  background: isPaper ? 'rgba(253,246,238,0.92)' : 'rgba(0,0,0,0.32)',
+                  boxShadow: `0 30px 80px rgba(0,0,0,0.35), inset 0 0 60px rgba(196,98,126,0.08)`,
+                }}
+              >
+                <CornerOrnaments family={family} color="#c4627e" />
+                <div className="relative flex flex-col items-center gap-5">
+                  <div className="text-[11px] font-bold uppercase tracking-[0.35em]" style={{ color: family.accent }}>
+                    {p.catEmoji} {p.catLabel} Invitation
+                  </div>
+                  <LeafSprig color="#c4627e" className="w-14" />
+                  <h1
+                    className="text-4xl sm:text-5xl font-black leading-tight italic"
+                    style={{ fontFamily: themeStyle.fontFamilyTitle, color: isPaper ? '#3d2f12' : themeStyle.textColor }}
+                  >
+                    {content.mainTitle}
+                    <span className="text-xl block mt-2 font-semibold normal-case tracking-normal">{content.eventSubtitle}</span>
+                  </h1>
+                  <FamilyPhotoFrame family={family} src={eventDetails.portraitImage} alt={content.mainTitle} />
+                  {datePill}
+                  {openButton}
+                </div>
+              </div>
+            </StaggerChild>
+          </Stagger>
+        </section>
+      );
+    }
+
+    /* ---------------- BDAY-RETRO-BURST: 90s backdrop ---------------- */
+    case 'bday-retro-burst': {
+      return (
+        <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
+          <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none" style={{ color: family.accent }}>
+            <ComicBurst color={family.accent} className="w-[420px] h-[420px]" />
+          </div>
+          <div
+            className="absolute inset-0 opacity-[0.06] pointer-events-none"
+            style={{
+              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 8px, #ffffff 8px, #ffffff 9px), repeating-linear-gradient(90deg, transparent, transparent 8px, #ffffff 8px, #ffffff 9px)',
+            }}
+          />
+          <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
+            <StaggerChild variant="down" duration={0.7}>
+              <CoverRibbon family={family} label={`${p.catEmoji} ${p.catLabel} • ${family.motto}`} />
+            </StaggerChild>
+            <StaggerChild variant="scale" duration={0.9}>
+              <div className="relative rotate-1">
+                <FamilyPhotoFrame family={family} src={eventDetails.portraitImage} alt={content.mainTitle} />
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.9}>
+              <h1
+                className={`text-4xl sm:text-5xl font-black leading-tight ${family.titleTransform}`}
+                style={{ fontFamily: themeStyle.fontFamilyTitle, color: titleColor, textShadow: `3px 3px 0 ${family.accent}` }}
+              >
+                {content.mainTitle}
+                <span className="text-xl block mt-2 font-semibold normal-case tracking-normal" style={{ textShadow: 'none' }}>
+                  {content.eventSubtitle}
+                </span>
+              </h1>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.7}>{datePill}</StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{openButton}</StaggerChild>
+          </Stagger>
+        </section>
+      );
+    }
+
+    /* ---------------- BDAY-BOHO-FRAME: organic wreath ---------------- */
+    case 'bday-boho-frame': {
+      return (
+        <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
+          <AmbientMarks family={family} />
+          <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
+            <StaggerChild variant="down" duration={0.7}>
+              <div className="text-[11px] font-bold uppercase tracking-[0.4em]" style={{ color: family.accent }}>
+                {family.motto}
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="scale" duration={1}>
+              <div className="relative">
+                <div
+                  className="absolute -inset-6 opacity-40 pointer-events-none"
+                  style={{ background: `radial-gradient(circle, ${family.accent}33, transparent 70%)` }}
+                />
+                <ArchWreath color={family.accent} className="absolute -top-8 left-1/2 -translate-x-1/2 w-40 opacity-90" />
+                <FamilyPhotoFrame family={family} src={eventDetails.portraitImage} alt={content.mainTitle} />
+                <LeafSprig color={family.accent} className="absolute -bottom-4 -left-6 w-16 rotate-12" />
+                <LeafSprig color={family.accent} className="absolute -bottom-4 -right-6 w-16 -rotate-12" />
+              </div>
+            </StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{titleBlock}</StaggerChild>
+            <StaggerChild variant="up" duration={0.7}>{datePill}</StaggerChild>
+            <StaggerChild variant="up" duration={0.8}>{openButton}</StaggerChild>
           </Stagger>
         </section>
       );
@@ -987,15 +1432,7 @@ export const ClosingSection: React.FC<P> = (p) => {
       <StaggerChild variant="fade">
         <div className="flex justify-center mb-4">
           <div className="w-52" style={{ color: family.accent }}>
-            {family.dividerStyle === 'floral' || family.dividerStyle === 'leaf' ? (
-              <FloralDivider color={family.accent} />
-            ) : family.dividerStyle === 'arabesque' ? (
-              <ArabesqueDivider color={family.accent} />
-            ) : family.dividerStyle === 'batik' ? (
-              <BatikDivider color={family.accent} />
-            ) : (
-              <GoldDivider color={family.accent} />
-            )}
+            {dividerFor(family.dividerStyle, family.accent)}
           </div>
         </div>
       </StaggerChild>
@@ -1024,8 +1461,16 @@ export const ClosingSection: React.FC<P> = (p) => {
             <EightStar color={family.accent} className="w-8 opacity-80" />
           ) : family.key === 'kids-fun' ? (
             <PartyBand color={family.accent} className="w-40" />
-          ) : family.key === 'floral' || family.key === 'romantic' ? (
+          ) : family.key === 'floral' || family.key === 'romantic' || family.key === 'bday-elegant' || family.key === 'bday-boho' ? (
             <ScriptSwirl color={family.accent} className="w-44" />
+          ) : family.key === 'bday-princess' || family.key === 'bday-luxury' ? (
+            <CrownMark color={family.accent} className="w-12 opacity-90" />
+          ) : family.key === 'bday-space' ? (
+            <RocketMark color={family.accent} className="w-12 opacity-90" />
+          ) : family.key === 'bday-neon' ? (
+            <StarBurst color={family.accent} className="w-10 opacity-90" />
+          ) : family.key === 'bday-balloon' || family.key === 'bday-candy' || family.key === 'bday-pastel' ? (
+            <PartyBand color={family.accent} className="w-40" />
           ) : (
             <StarDivider color={family.accent} className="w-44" />
           )}

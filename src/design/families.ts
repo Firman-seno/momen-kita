@@ -3,13 +3,14 @@ import { Template } from '../types';
 import { FamilyConfig, FamilyKey, CoverStyle, GalleryStyle, DesignResolution } from './types';
 
 /* ============================================================
-   MOMENKITA DESIGN SYSTEM — 10 VISUAL FAMILIES
+   MOMENKITA DESIGN SYSTEM — 22 VISUAL FAMILIES
    -------------------------------------
-   Every template in the catalog resolves deterministically to
-   ONE family + ONE cover + ONE gallery. Families control real
-   visual output (cover composition, cards, ornaments, patterns,
-   dividers, gallery arrangement, button shape) so each template
-   family looks genuinely different — not just a color swap.
+   10 core families + 12 birthday-only families. Every template
+   in the catalog resolves deterministically to ONE family + ONE
+   cover + ONE gallery. Families control real visual output (cover
+   composition, cards, ornaments, patterns, dividers, gallery
+   arrangement, button shape) so each template family looks
+   genuinely different — not just a color swap.
    ============================================================ */
 
 export const FAMILIES: Record<FamilyKey, FamilyConfig> = {
@@ -268,6 +269,294 @@ export const FAMILIES: Record<FamilyKey, FamilyConfig> = {
     titleTracking: 'wide',
     titleTransform: 'uppercase',
   },
+
+  /* -------------------------------------------------- K. BDAY BALLOON
+     Bright bubbly party: floating balloon arch, cute rounded glass. */
+  'bday-balloon': {
+    key: 'bday-balloon',
+    label: 'Balloon Party',
+    motto: 'Let The Party Begin!',
+    coverStyle: 'bday-balloon-arch',
+    headingStyle: 'classic',
+    dividerStyle: 'stars',
+    cardStyle: 'glass',
+    photoShape: 'circle',
+    galleryStyle: 'polaroid',
+    buttonShape: 'round',
+    cornerMarks: ['★'],
+    ambientMarks: ['🎈', '🎉', '⭐', '☁️', '🎂'],
+    ornamentedHeadings: true,
+    cardClass:
+      'bg-white/10 border-2 border-white/25 backdrop-blur-md rounded-3xl shadow-[0_12px_34px_rgba(0,0,0,0.35)]',
+    accent: '#f472b6',
+    coverFrameEmphasis: false,
+    titleTracking: 'normal',
+    titleTransform: 'none',
+  },
+
+  /* -------------------------------------------------- L. BDAY CARTOON
+     Comic energy: bold outlines, star bursts, pop-art colors. */
+  'bday-cartoon': {
+    key: 'bday-cartoon',
+    label: 'Cartoon Fun',
+    motto: 'Comic Vibes Only',
+    coverStyle: 'bday-comic-hero',
+    headingStyle: 'modern',
+    dividerStyle: 'dots',
+    cardStyle: 'glass',
+    photoShape: 'square',
+    galleryStyle: 'collage',
+    buttonShape: 'round',
+    cornerMarks: ['★'],
+    ambientMarks: ['💥', '🎨', '⭐', '🍿', '🎪'],
+    ornamentedHeadings: true,
+    cardClass:
+      'bg-[#141020]/60 border-[3px] border-yellow-300/60 backdrop-blur-md rounded-2xl shadow-[0_12px_34px_rgba(0,0,0,0.45)]',
+    accent: '#facc15',
+    coverFrameEmphasis: false,
+    titleTracking: 'normal',
+    titleTransform: 'uppercase',
+  },
+
+  /* -------------------------------------------------- M. BDAY SPACE
+     Deep cosmos: portal photo, planets, stars, rocket energy. */
+  'bday-space': {
+    key: 'bday-space',
+    label: 'Space Adventure',
+    motto: 'To Infinity & Beyond',
+    coverStyle: 'bday-space-portal',
+    headingStyle: 'classic',
+    dividerStyle: 'stars',
+    cardStyle: 'dark',
+    photoShape: 'circle',
+    galleryStyle: 'grid',
+    buttonShape: 'pill',
+    cornerMarks: ['✦'],
+    ambientMarks: ['🚀', '⭐', '🌙', '✨', '🪐'],
+    ornamentedHeadings: true,
+    cardClass:
+      'bg-slate-950/60 border border-cyan-300/25 backdrop-blur-md rounded-2xl shadow-[0_12px_34px_rgba(0,0,0,0.5)]',
+    accent: '#22d3ee',
+    coverFrameEmphasis: true,
+    titleTracking: 'normal',
+    titleTransform: 'none',
+  },
+
+  /* -------------------------------------------------- N. BDAY PRINCESS
+     Fairytale royalty: arch photo, crown, castle, blush pink. */
+  'bday-princess': {
+    key: 'bday-princess',
+    label: 'Royal Princess',
+    motto: 'Fairytale For A Day',
+    coverStyle: 'bday-princess-arch',
+    headingStyle: 'script',
+    dividerStyle: 'crown',
+    cardStyle: 'soft',
+    photoShape: 'arch',
+    galleryStyle: 'framed',
+    buttonShape: 'round',
+    cornerMarks: ['♛'],
+    ambientMarks: ['👑', '🌸', '✨', '🦋', '💖'],
+    ornamentedHeadings: true,
+    cardClass:
+      'bg-[#241020]/55 border border-pink-200/30 backdrop-blur-md rounded-[2rem] shadow-[0_12px_36px_rgba(0,0,0,0.4)]',
+    accent: '#f9a8d4',
+    coverFrameEmphasis: true,
+    titleTracking: 'normal',
+    titleTransform: 'none',
+  },
+
+  /* -------------------------------------------------- O. BDAY PASTEL
+     Soft clouds & hearts: dreamy rounded shapes, gentle colors. */
+  'bday-pastel': {
+    key: 'bday-pastel',
+    label: 'Pastel Dream',
+    motto: 'Soft & Sweet',
+    coverStyle: 'bday-pastel-clouds',
+    headingStyle: 'classic',
+    dividerStyle: 'stars',
+    cardStyle: 'glass',
+    photoShape: 'heart',
+    galleryStyle: 'grid',
+    buttonShape: 'pill',
+    cornerMarks: ['✿'],
+    ambientMarks: ['☁️', '🌸', '💖', '🦄', '✨'],
+    ornamentedHeadings: true,
+    cardClass:
+      'bg-white/15 border border-white/30 backdrop-blur-md rounded-[2rem] shadow-[0_12px_34px_rgba(0,0,0,0.3)]',
+    accent: '#c084fc',
+    coverFrameEmphasis: false,
+    titleTracking: 'normal',
+    titleTransform: 'none',
+  },
+
+  /* -------------------------------------------------- P. BDAY MINIMAL
+     Clean modern: big type, white space, premium restraint. */
+  'bday-minimal': {
+    key: 'bday-minimal',
+    label: 'Modern Minimal',
+    motto: 'Clean & Cool',
+    coverStyle: 'bday-minimal-type',
+    headingStyle: 'modern',
+    dividerStyle: 'thin',
+    cardStyle: 'dark',
+    photoShape: 'square',
+    galleryStyle: 'grid',
+    buttonShape: 'pill',
+    cornerMarks: ['●'],
+    ambientMarks: ['●', '○', '—', '✦'],
+    ornamentedHeadings: false,
+    cardClass:
+      'bg-white/5 border border-white/15 backdrop-blur-md rounded-xl shadow-[0_12px_32px_rgba(0,0,0,0.4)]',
+    accent: '#e4e4e7',
+    coverFrameEmphasis: false,
+    titleTracking: 'tracking-tight',
+    titleTransform: 'uppercase',
+  },
+
+  /* -------------------------------------------------- Q. BDAY LUXURY
+     Black & gold gala: circle in a gold ring, royal ornaments. */
+  'bday-luxury': {
+    key: 'bday-luxury',
+    label: 'Luxury Gold',
+    motto: 'Celebrate In Gold',
+    coverStyle: 'bday-luxe-circle',
+    headingStyle: 'ornate',
+    dividerStyle: 'gold-line',
+    cardStyle: 'dark',
+    photoShape: 'circle',
+    galleryStyle: 'framed',
+    buttonShape: 'square',
+    cornerMarks: ['✦'],
+    ambientMarks: ['✨', '👑', '🥂', '💎'],
+    ornamentedHeadings: true,
+    cardClass:
+      'bg-[#160f08]/60 border border-amber-200/25 backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.5)]',
+    accent: '#d4af37',
+    coverFrameEmphasis: true,
+    titleTracking: 'tracking-wide',
+    titleTransform: 'uppercase',
+  },
+
+  /* -------------------------------------------------- R. BDAY NEON
+     Teen glow: tilted photos, neon grid, futuristic type. */
+  'bday-neon': {
+    key: 'bday-neon',
+    label: 'Neon Night',
+    motto: 'Glow Up Time',
+    coverStyle: 'bday-neon-tilt',
+    headingStyle: 'modern',
+    dividerStyle: 'geometric',
+    cardStyle: 'dark',
+    photoShape: 'square',
+    galleryStyle: 'masonry',
+    buttonShape: 'angled',
+    cornerMarks: ['⚡'],
+    ambientMarks: ['⚡', '🎧', '🌌', '💿', '✨'],
+    ornamentedHeadings: false,
+    cardClass:
+      'bg-slate-950/60 border border-fuchsia-400/30 backdrop-blur-md rounded-lg shadow-[0_0_30px_rgba(168,85,247,0.35)]',
+    accent: '#22d3ee',
+    coverFrameEmphasis: false,
+    titleTracking: 'tracking-tight',
+    titleTransform: 'uppercase',
+  },
+
+  /* -------------------------------------------------- S. BDAY CANDY
+     Sweet shop: candy stripes, sprinkles, playful hearts. */
+  'bday-candy': {
+    key: 'bday-candy',
+    label: 'Candy Sweet',
+    motto: 'Sweet As Candy',
+    coverStyle: 'bday-candy-split',
+    headingStyle: 'classic',
+    dividerStyle: 'confetti',
+    cardStyle: 'glass',
+    photoShape: 'heart',
+    galleryStyle: 'polaroid',
+    buttonShape: 'round',
+    cornerMarks: ['★'],
+    ambientMarks: ['🍭', '🧁', '🌈', '💖', '🎀'],
+    ornamentedHeadings: true,
+    cardClass:
+      'bg-white/15 border-2 border-pink-300/40 backdrop-blur-md rounded-[2rem] shadow-[0_12px_34px_rgba(0,0,0,0.35)]',
+    accent: '#fb7185',
+    coverFrameEmphasis: false,
+    titleTracking: 'normal',
+    titleTransform: 'none',
+  },
+
+  /* -------------------------------------------------- T. BDAY ELEGANT
+     Refined adult celebration: blush florals, soft paper. */
+  'bday-elegant': {
+    key: 'bday-elegant',
+    label: 'Elegant Birthday',
+    motto: 'Refined & Classy',
+    coverStyle: 'bday-elegant-frame',
+    headingStyle: 'script',
+    dividerStyle: 'floral',
+    cardStyle: 'paper',
+    photoShape: 'arch',
+    galleryStyle: 'collage',
+    buttonShape: 'round',
+    cornerMarks: ['✿'],
+    ambientMarks: ['🌸', '🌹', '✨', '🦋', '🥂'],
+    ornamentedHeadings: true,
+    cardClass:
+      'bg-[#fdf6ee]/95 text-slate-800 border border-white/80 shadow-[0_14px_34px_rgba(80,30,50,0.22)]',
+    accent: '#c4627e',
+    coverFrameEmphasis: true,
+    titleTracking: 'normal',
+    titleTransform: 'none',
+  },
+
+  /* -------------------------------------------------- U. BDAY RETRO
+     90s nostalgia: burst shapes, retro grid, loud pop colors. */
+  'bday-retro': {
+    key: 'bday-retro',
+    label: 'Retro Party',
+    motto: 'Rad 90s Vibe',
+    coverStyle: 'bday-retro-burst',
+    headingStyle: 'modern',
+    dividerStyle: 'geometric',
+    cardStyle: 'glass',
+    photoShape: 'square',
+    galleryStyle: 'collage',
+    buttonShape: 'square',
+    cornerMarks: ['★'],
+    ambientMarks: ['📼', '🌶', '💿', '🎉', '✳️'],
+    ornamentedHeadings: false,
+    cardClass:
+      'bg-[#1a1026]/60 border-[3px] border-cyan-300/40 backdrop-blur-md rounded-xl shadow-[0_12px_34px_rgba(0,0,0,0.45)]',
+    accent: '#f472b6',
+    coverFrameEmphasis: false,
+    titleTracking: 'normal',
+    titleTransform: 'uppercase',
+  },
+
+  /* -------------------------------------------------- V. BDAY BOHO
+     Free-spirited wild: terracotta, leaves, organic circles. */
+  'bday-boho': {
+    key: 'bday-boho',
+    label: 'Boho & Wild',
+    motto: 'Free Spirit Vibes',
+    coverStyle: 'bday-boho-frame',
+    headingStyle: 'script',
+    dividerStyle: 'leaf',
+    cardStyle: 'paper',
+    photoShape: 'circle',
+    galleryStyle: 'stacked',
+    buttonShape: 'square',
+    cornerMarks: ['✿'],
+    ambientMarks: ['🌿', '🌾', '🍂', '🪶', '🌵'],
+    ornamentedHeadings: true,
+    cardClass:
+      'bg-[#f7ecda]/96 text-slate-800 border border-[#e0cda8]/90 shadow-[0_12px_32px_rgba(30,20,5,0.25)]',
+    accent: '#d97706',
+    coverFrameEmphasis: true,
+    titleTracking: 'normal',
+    titleTransform: 'capitalize',
+  },
 };
 
 export const FAMILY_ORDER: FamilyKey[] = [
@@ -282,6 +571,70 @@ export const FAMILY_ORDER: FamilyKey[] = [
   'contemporary',
   'traditional-indonesian',
 ];
+
+/* ============================================================
+   BIRTHDAY-ONLY FAMILIES
+   ------------------------------------------------------------
+   These 12 families exist solely for the birthday category. They
+   give 100 birthday templates genuinely different compositions
+   (balloon arch, comic hero, space portal, princess arch, pastel
+   clouds, minimal type, luxe circle, neon tilt, candy split,
+   elegant frame, retro burst, boho frame). They are resolved
+   BEFORE the generic family matcher, so they never affect any
+   other category.
+   ============================================================ */
+
+type BirthdayFamily = Extract<FamilyKey, `bday-${string}`>;
+
+export const BIRTHDAY_FAMILY_ORDER: BirthdayFamily[] = [
+  'bday-princess',
+  'bday-luxury',
+  'bday-neon',
+  'bday-cartoon',
+  'bday-space',
+  'bday-candy',
+  'bday-pastel',
+  'bday-retro',
+  'bday-boho',
+  'bday-minimal',
+  'bday-elegant',
+  'bday-balloon',
+];
+
+const BIRTHDAY_KEYWORDS: Record<BirthdayFamily, string[]> = {
+  'bday-princess': ['princess', 'crown', 'castle', 'fairy', 'queen', 'tiara', 'royal'],
+  'bday-luxury': ['luxe', 'luxury', 'gold', 'champagne', 'silver', 'emerald', 'vip', 'gala', 'premium', 'midnight', 'soiree'],
+  'bday-neon': ['neon', 'cyber', 'glow', 'gaming', 'robot', 'dance', 'k-pop', 'rhythm', 'stage'],
+  'bday-cartoon': ['cartoon', 'comic', 'circus', 'pirate', 'train', 'ninja', 'superhero', 'hero', 'racing', 'football', 'basketball', 'soccer', 'slam dunk', 'champion', 'boot camp'],
+  'bday-space': ['space', 'galaxy', 'rocket', 'moon', 'starry', 'cosmic', 'astro', 'planet', 'apollo', 'night sky'],
+  'bday-candy': ['candy', 'sweet', 'chocolate', 'cupcake', 'ice cream', 'donut', 'dessert', 'confetti', 'mermaid', 'ocean', 'under the sea', 'sea'],
+  'bday-pastel': ['pastel', 'unicorn', 'lavender', 'mint', 'peach', 'soft', 'strawberry', 'cloud'],
+  'bday-retro': ['retro', '90s', 'vintage', 'cowboy', 'pixel', 'arcade', '8-bit', 'deco', 'rosy'],
+  'bday-boho': ['boho', 'bohemian', 'terracotta', 'safari', 'jungle', 'dino', 'dinosaur', 'picnic', 'tangerine', 'sunny', 'explorer', 'tribal', 'wild', 'rainforest'],
+  'bday-minimal': ['minimal', 'monochrome', 'line art', 'scandi', 'nordic', 'geometric', 'clean', 'sage & stone', 'black white', 'timeless'],
+  'bday-elegant': ['elegant', 'glam', 'floral', 'garden', 'parisian', 'tea', 'seventeen', 'blush', 'cocktail', 'glitter', 'royal ball'],
+  'bday-balloon': ['balloon', 'carnival', 'teddy', 'bubble', 'farm', 'zoo', 'puppy', 'kitty', 'bumblebee', 'ladybug', 'honey', 'little dots', 'cuddly'],
+};
+
+/* Token-level keyword match. Words are matched exactly so a keyword never
+   accidentally hits inside another word (e.g. 'gala' inside 'galaxy', or
+   'sea' inside 'season'). Multi-word keywords (e.g. 'sage & stone', 'night
+   sky') match when every token is present in the design style. */
+const matchKeyword = (designStyle: string, keyword: string): boolean => {
+  const tokens = designStyle.toLowerCase().split(/\s+/).filter(Boolean);
+  const kw = keyword.toLowerCase().split(/\s+/).filter(Boolean);
+  if (kw.length === 1) return tokens.includes(kw[0]);
+  return kw.every((t) => tokens.includes(t));
+};
+
+const matchBirthdayFamily = (designStyle: string): BirthdayFamily | null => {
+  const s = designStyle.toLowerCase();
+  for (const family of BIRTHDAY_FAMILY_ORDER) {
+    const words = BIRTHDAY_KEYWORDS[family];
+    if (words.some((w) => matchKeyword(s, w))) return family;
+  }
+  return null;
+};
 
 /* ============================================================
    DETERMINISTIC RESOLUTION
@@ -338,6 +691,20 @@ const KEYWORDS: Record<Exclude<FamilyKey, 'contemporary'>, string[]> = {
     'beige', 'simple', 'minimalist', 'white & clean', 'sage & stone', 'vanilla',
     'off-white', 'taupe',
   ],
+  // Birthday-only families never match the generic loop (they are not part
+  // of FAMILY_ORDER); entries exist only to satisfy the Record type.
+  'bday-balloon': BIRTHDAY_KEYWORDS['bday-balloon'],
+  'bday-cartoon': BIRTHDAY_KEYWORDS['bday-cartoon'],
+  'bday-space': BIRTHDAY_KEYWORDS['bday-space'],
+  'bday-princess': BIRTHDAY_KEYWORDS['bday-princess'],
+  'bday-pastel': BIRTHDAY_KEYWORDS['bday-pastel'],
+  'bday-minimal': BIRTHDAY_KEYWORDS['bday-minimal'],
+  'bday-luxury': BIRTHDAY_KEYWORDS['bday-luxury'],
+  'bday-neon': BIRTHDAY_KEYWORDS['bday-neon'],
+  'bday-candy': BIRTHDAY_KEYWORDS['bday-candy'],
+  'bday-elegant': BIRTHDAY_KEYWORDS['bday-elegant'],
+  'bday-retro': BIRTHDAY_KEYWORDS['bday-retro'],
+  'bday-boho': BIRTHDAY_KEYWORDS['bday-boho'],
 };
 
 const CATEGORY_DEFAULTS: Record<string, FamilyKey> = {
@@ -366,6 +733,10 @@ const matchFamily = (designStyle: string): FamilyKey | null => {
 };
 
 export const resolveFamily = (template: Template): FamilyKey => {
+  if (template.category === 'birthday') {
+    const birthdayMatched = matchBirthdayFamily(template.designStyle);
+    if (birthdayMatched) return birthdayMatched;
+  }
   const matched = matchFamily(template.designStyle);
   if (matched) return matched;
   const def = CATEGORY_DEFAULTS[template.category];
@@ -449,8 +820,29 @@ const resolveGalleryStyle = (template: Template, family: FamilyKey): GalleryStyl
   }
 };
 
+/* ---- birthday gallery style: layout keyword overrides, else family default ---- */
+const resolveBirthdayGallery = (template: Template, family: FamilyConfig): GalleryStyle => {
+  const layout = (template.layoutStyle || '').toLowerCase();
+  if (layout.includes('polaroid')) return 'polaroid';
+  if (layout.includes('collage')) return 'collage';
+  if (layout.includes('masonry') || layout.includes('mosaic')) return 'masonry';
+  if (layout.includes('gallery focus')) return 'collage';
+  if (layout.includes('card stack') || layout.includes('stack')) return 'stacked';
+  if (layout.includes('frame')) return 'framed';
+  return family.galleryStyle;
+};
+
 export const resolveDesignSystem = (template: Template): DesignResolution => {
   const family = resolveFamily(template);
+  // Birthday templates use their own dedicated cover + gallery families so
+  // the 100 birthday designs are genuinely distinct compositions.
+  if (template.category === 'birthday') {
+    return {
+      family: FAMILIES[family],
+      coverStyle: FAMILIES[family].coverStyle,
+      galleryStyle: resolveBirthdayGallery(template, FAMILIES[family]),
+    };
+  }
   return {
     family: FAMILIES[family],
     coverStyle: resolveCoverStyle(template, family),

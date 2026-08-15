@@ -16,7 +16,19 @@ export type FamilyKey =
   | 'kids-fun'
   | 'rustic'
   | 'contemporary'
-  | 'traditional-indonesian';
+  | 'traditional-indonesian'
+  | 'bday-balloon'
+  | 'bday-cartoon'
+  | 'bday-space'
+  | 'bday-princess'
+  | 'bday-pastel'
+  | 'bday-minimal'
+  | 'bday-luxury'
+  | 'bday-neon'
+  | 'bday-candy'
+  | 'bday-elegant'
+  | 'bday-retro'
+  | 'bday-boho';
 
 export type CoverStyle =
   | 'centered'
@@ -28,7 +40,19 @@ export type CoverStyle =
   | 'polaroid-scatter'
   | 'asym'
   | 'islamic-arch'
-  | 'card-focus';
+  | 'card-focus'
+  | 'bday-balloon-arch'
+  | 'bday-comic-hero'
+  | 'bday-space-portal'
+  | 'bday-princess-arch'
+  | 'bday-pastel-clouds'
+  | 'bday-minimal-type'
+  | 'bday-luxe-circle'
+  | 'bday-neon-tilt'
+  | 'bday-candy-split'
+  | 'bday-elegant-frame'
+  | 'bday-retro-burst'
+  | 'bday-boho-frame';
 
 export type CardStyle = 'glass' | 'paper' | 'dark' | 'soft' | 'bordered' | 'minimal';
 
@@ -36,9 +60,23 @@ export type GalleryStyle = 'grid' | 'polaroid' | 'collage' | 'masonry' | 'framed
 
 export type HeadingStyle = 'classic' | 'ornate' | 'modern' | 'script' | 'lines';
 
-export type DividerStyle = 'floral' | 'gold-line' | 'dots' | 'double-line' | 'geometric' | 'leaf' | 'stars' | 'arabesque' | 'batik' | 'thin';
+export type DividerStyle = 'floral' | 'gold-line' | 'dots' | 'double-line' | 'geometric' | 'leaf' | 'stars' | 'arabesque' | 'batik' | 'thin' | 'confetti' | 'crown';
 
 export type ButtonShape = 'round' | 'square' | 'pill' | 'angled';
+
+export type PhotoShape =
+  | 'arch'
+  | 'circle'
+  | 'square'
+  | 'islamic-arch'
+  | 'portrait'
+  | 'card'
+  | 'polaroid'
+  | 'hex'
+  | 'heart'
+  | 'star'
+  | 'blob'
+  | 'ticket';
 
 export interface FamilyConfig {
   key: FamilyKey;
@@ -54,7 +92,7 @@ export interface FamilyConfig {
   /** Card chrome. */
   cardStyle: CardStyle;
   /** Photo shape used on covers / galleries. */
-  photoShape: 'arch' | 'circle' | 'square' | 'islamic-arch' | 'portrait' | 'card' | 'polaroid' | 'hex';
+  photoShape: PhotoShape;
   /** Gallery arrangement. */
   galleryStyle: GalleryStyle;
   /** Button geometry override (falls back to themeStyle.buttonStyle). */

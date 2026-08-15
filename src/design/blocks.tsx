@@ -20,9 +20,18 @@ export interface BlockCtx {
 export const radiusFor = (family: FamilyConfig): string => {
   switch (family.key) {
     case 'modern':
+    case 'bday-neon':
+    case 'bday-minimal':
       return 'rounded-xl';
     case 'kids-fun':
+    case 'bday-balloon':
+    case 'bday-pastel':
+    case 'bday-candy':
+    case 'bday-cartoon':
       return 'rounded-3xl';
+    case 'bday-luxury':
+    case 'bday-retro':
+      return 'rounded-md';
     default:
       return 'rounded-2xl';
   }
@@ -304,6 +313,76 @@ export const FamilyPhotoFrame: React.FC<FamilyPhotoFrameProps> = ({
         </div>,
         ''
       );
+    case 'heart':
+      return wrap(
+        <div className={`${dims} p-1.5`} style={{ background: `conic-gradient(${family.accent}, rgba(255,255,255,0.5), ${family.accent})` }}>
+          <img
+            src={src}
+            alt={alt || 'photo'}
+            className="w-full h-full object-cover"
+            style={{
+              clipPath:
+                'path("M 100 180 C 100 180 20 120 20 70 A 40 40 0 0 1 100 40 A 40 40 0 0 1 180 70 C 180 120 100 180 100 180 Z")',
+            }}
+          />
+        </div>,
+        ''
+      );
+    case 'star':
+      return wrap(
+        <div className={`${dims} p-1`} style={{ background: `conic-gradient(${family.accent}, rgba(255,255,255,0.4), ${family.accent})` }}>
+          <img
+            src={src}
+            alt={alt || 'photo'}
+            className="w-full h-full object-cover"
+            style={{
+              clipPath:
+                'path("M 100 8 L 124 74 L 194 74 L 137 116 L 156 182 L 100 140 L 44 182 L 63 116 L 6 74 L 76 74 Z")',
+            }}
+          />
+        </div>,
+        ''
+      );
+    case 'blob':
+      return wrap(
+        <div className={`${dims} p-1`} style={{ background: `conic-gradient(${family.accent}, rgba(255,255,255,0.45), ${family.accent})` }}>
+          <img
+            src={src}
+            alt={alt || 'photo'}
+            className="w-full h-full object-cover"
+            style={{
+              clipPath:
+                'path("M 100 14 C 148 14 186 46 186 96 C 186 148 148 186 100 186 C 52 186 14 148 14 96 C 14 46 52 14 100 14 Z")',
+            }}
+          />
+        </div>,
+        ''
+      );
+    case 'ticket':
+      return wrap(
+        <div
+          className={`${dims} rounded-xl p-2.5 relative shadow-2xl`}
+          style={{
+            background: isPaperFamily(family) ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.35)',
+            border: `1.5px solid ${family.accent}66`,
+          }}
+        >
+          <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-px h-[115%] bg-current opacity-10" />
+          <img
+            src={src}
+            alt={alt || 'photo'}
+            className="w-full h-full object-cover rounded-md"
+            style={{ clipPath: 'inset(0 round 6px)' }}
+          />
+          <span
+            className="absolute left-1/2 -translate-x-1/2 -top-1.5 text-[8px] font-black tracking-widest uppercase px-2 rounded-full"
+            style={{ background: family.accent, color: '#ffffff' }}
+          >
+            {alt || 'party'}
+          </span>
+        </div>,
+        ''
+      );
     default:
       return wrap(
         <div
@@ -338,13 +417,19 @@ export const CountdownBlock: React.FC<CountdownBlockProps> = ({ family, profile,
     { label: 'Secs', value: countdown.secs },
   ];
   const box =
-    family.key === 'kids-fun'
+    family.key === 'kids-fun' ||
+    family.key === 'bday-balloon' ||
+    family.key === 'bday-candy' ||
+    family.key === 'bday-cartoon' ||
+    family.key === 'bday-pastel'
       ? 'bg-white/10 border-2 border-white/25 rounded-3xl'
-      : family.key === 'modern'
+      : family.key === 'modern' || family.key === 'bday-neon' || family.key === 'bday-minimal'
         ? 'bg-white/5 border border-white/20 rounded-xl'
-        : isPaper
-          ? 'bg-white/70 border border-[#e5dcc4] rounded-2xl'
-          : 'bg-black/45 border border-white/20 rounded-2xl';
+        : family.key === 'bday-luxury'
+          ? 'bg-[#160f08]/60 border border-amber-200/25 rounded-md'
+          : isPaper
+            ? 'bg-white/70 border border-[#e5dcc4] rounded-2xl'
+            : 'bg-black/45 border border-white/20 rounded-2xl';
 
   return (
     <Stagger profile={profile} className="grid grid-cols-4 gap-2.5">

@@ -330,7 +330,7 @@ const ANIM_POOLS: Record<CategoryKey, AnimationStyle[]> = {
 };
 
 const LAYOUT_POOLS: Record<CategoryKey, string[]> = {
-  birthday: ["Centered Cover", "Vertical Story Scroll", "Polaroid Grid", "Split Panel", "Hero Banner", "Card Stack", "Timeline Layout", "Arch Frame", "Fullscreen Hero", "Two Column"],
+  birthday: ["Centered Cover", "Vertical Story Scroll", "Polaroid Grid", "Collage Grid", "Masonry Layout", "Mosaic Wall", "Hero Banner", "Gallery Focus", "Card Stack", "Frame Layout", "Timeline Layout", "Arch Frame", "Fullscreen Hero", "Two Column"],
   sunatan: ["Centered Arch", "Vertical Story Scroll", "Golden Frame", "Split Panel", "Hero Mosque", "Serene Single Column", "Ornamental Border", "Timeline Layout", "Elegant Banner", "Calligraphy Focus"],
   wedding: ["Centered Arch", "Vertical Story Scroll", "Split Panel", "Gallery Focus", "Hero Banner", "Timeline Layout", "Elegant Columns", "Fullscreen Hero", "Polaroid Collage", "Minimal Grid"],
   aqiqah: ["Centered Cover", "Vertical Story Scroll", "Polaroid Grid", "Soft Cards", "Hero Banner", "Moon Arch", "Card Stack", "Split Panel", "Timeline Layout", "Rounded Grid"],
@@ -345,7 +345,7 @@ const LAYOUT_POOLS: Record<CategoryKey, string[]> = {
 };
 
 const BG_POOLS: Record<CategoryKey, BackgroundType[]> = {
-  birthday: ["celebration-confetti", "kids-adventure", "comic-doodles", "neon-glow", "floral-lace", "marble-gold", "luxury-emerald", "pastel-clouds", "minimalist-lines", "wine-jazz"],
+  birthday: ["balloon-party", "space-cosmic", "princess-royal", "candy-sweet", "confetti-burst", "pastel-cute", "retro-pop", "neon-party", "luxury-gold", "minimal-clean"],
   sunatan: ["islamic-gold", "marble-gold", "luxury-emerald", "wedding-royal", "minimalist-lines", "baby-moon"],
   wedding: ["wedding-garden", "wedding-royal", "marble-gold", "floral-lace", "luxury-emerald", "minimalist-lines", "wine-jazz", "watercolor"],
   aqiqah: ["baby-moon", "pastel-clouds", "baby-animal", "watercolor", "wedding-garden", "minimalist-lines"],
@@ -360,7 +360,7 @@ const BG_POOLS: Record<CategoryKey, BackgroundType[]> = {
 };
 
 const FRAME_POOLS: Record<CategoryKey, FrameStyle[]> = {
-  birthday: ["cute-ribbon", "glass-frame", "polaroid", "arch", "neon-border", "minimal-circle", "gold-border", "comic-frame", "royal-crest", "floral-ring"],
+  birthday: ["cute-ribbon", "glass-frame", "polaroid", "arch", "neon-border", "minimal-circle", "gold-border", "comic-frame", "royal-crest", "floral-ring", "balloon-ring", "candy-border", "retro-burst", "boho-wreath"],
   sunatan: ["islamic-arch", "arch", "gold-border", "minimal-circle", "royal-crest", "glass-frame"],
   wedding: ["arch", "gold-border", "floral-ring", "minimal-line", "royal-crown", "glass-frame", "polaroid"],
   aqiqah: ["moon-arch", "cute-ribbon", "glass-frame", "polaroid", "minimal-circle", "floral-wreath", "gold-border"],
@@ -545,106 +545,129 @@ const FEATURES = ["Background Music", "Live Countdown", "Maps Integration", "Pho
 type Seed = [string, string, string, string, FontKey, string, TemplateBadge?];
 
 const BIRTHDAY_SEEDS: Seed[] = [
-  ["Pink Balloons Kids", "Cute Kids", "Balloon Fun", "pink-white", "cute", "Floating Balloons", "POPULAR"],
-  ["Blue Clouds & Stars", "Cute Kids", "Sky Dream", "blue-white", "cute", "Clouds & Stars"],
-  ["Rainbow Confetti", "Colorful", "Confetti Pop", "rainbow", "playful", "Confetti Burst"],
-  ["Dinosaur Jungle", "Dinosaur", "Jungle Adventure", "jungle-green", "playful", "Dino Silhouettes"],
-  ["Little Princess", "Princess", "Royal Fairy Tale", "pink-gold", "hand", "Crown & Castle", "POPULAR"],
-  ["Magical Unicorn", "Unicorn", "Fantasy Pastel", "pastel-purple", "cute", "Unicorn & Sparkles"],
-  ["Space Adventure", "Space", "Cosmic Voyage", "space-navy", "playful", "Rockets & Planets"],
-  ["Safari Birthday", "Safari", "Wild Explorer", "safari-earth", "playful", "Safari Animals"],
-  ["Under The Sea", "Ocean", "Ocean Wonder", "ocean-teal", "playful", "Fish & Coral", "FEATURED"],
-  ["Candy Party", "Colorful", "Sweet Treats", "candy-pastel", "playful", "Candy & Lollipops"],
-  ["Pastel Dream", "Pastel", "Soft Romance", "pastel-pink", "cute", "Pastel Watercolor"],
-  ["Teddy Bear Party", "Cute Kids", "Cuddly Friends", "teddy-brown", "cute", "Teddy Bears"],
-  ["Racing Champion", "Racing", "Speed & Finish", "racing-red", "playful", "Race Cars"],
-  ["Football Star", "Football", "Soccer Stadium", "football-green", "playful", "Football & Trophy"],
-  ["Superhero Birthday", "Superhero", "Hero Mission", "super-redblue", "playful", "Hero Capes", "POPULAR"],
-  ["Galaxy Night", "Space", "Starry Galaxy", "galaxy-purple", "elegant", "Galaxy Swirl"],
-  ["Neon Birthday", "Neon", "Glow Night", "neon-cyan", "neon", "Neon Signs"],
-  ["Sweet Seventeen", "Sweet Seventeen", "Glam Celebration", "rosegold", "elegant", "Glitter & Rose", "TRENDING"],
-  ["Elegant Birthday", "Elegant", "Refined Luxury", "ivory-gold", "elegant", "Floral Lines"],
-  ["Black Gold Celebration", "Luxury", "Midnight Royal", "black-gold", "luxury", "Gold Foil", "POPULAR"],
-  ["Basketball Slam Dunk", "Basketball", "Court Vibes", "basketball-orange", "playful", "Basketball Court"],
-  ["Gaming Controller", "Gaming", "Player One", "gaming-neon", "neon", "Game Controllers"],
-  ["K-Pop Idol Party", "K-Pop", "Stage Lights", "kpop-pink", "neon", "Stage & Lightstick"],
-  ["Floral Garden Party", "Floral", "Garden Bloom", "floral-blush", "hand", "Watercolor Florals"],
-  ["Bohemian Birthday", "Bohemian", "Free Spirit", "boho-terracotta", "hand", "Pampas & Wildflowers"],
-  ["Vintage Tea Party", "Vintage", "Old Charm", "vintage-cream", "hand", "Tea Cups & Lace"],
-  ["Retro 90s Party", "Retro", "Nostalgia Pop", "retro-90s", "retro", "Retro Shapes"],
-  ["Adult Birthday Cocktail", "Adult", "Midnight Toast", "adult-charcoal", "elegant", "Cocktail Glasses"],
-  ["Pink & Gold Glam", "Pink & Gold", "Glamour Shine", "pink-gold", "elegant", "Gold Sparkle", "TRENDING"],
-  ["Blue & Silver Soiree", "Blue & Silver", "Winter Glam", "bluesilver", "elegant", "Silver Snowflakes"],
-  ["Purple Dream Party", "Purple", "Royal Haze", "purple-royal", "elegant", "Purple Haze"],
-  ["Emerald Green Party", "Green", "Fresh Celebration", "emerald-green", "elegant", "Emerald Leaves"],
-  ["Tangerine Fun", "Orange", "Citrus Pop", "orange-warm", "playful", "Orange Slices"],
-  ["Sunny Yellow Bash", "Yellow", "Sunshine Smile", "yellow-sun", "playful", "Suns & Smiles"],
-  ["Monochrome Modern", "Monochrome", "Black White", "monochrome", "minimal", "Line Art"],
-  ["Mermaid Lagoon", "Under The Sea", "Mermaid Tale", "ocean-teal", "cute", "Mermaid Tails", "NEW"],
-  ["Ocean Explorer", "Ocean", "Deep Dive", "sky-cloud", "playful", "Submarine & Waves"],
-  ["Dino Roar", "Dinosaur", "T-Rex Power", "jungle-green", "playful", "Dino Footprints"],
-  ["Unicorn Rainbow", "Unicorn", "Dreamy Ride", "rainbow", "cute", "Rainbow Unicorn"],
-  ["Fairy Wings", "Fairy", "Enchanted Forest", "pastel-lavender", "hand", "Fairy & Wings"],
-  ["Balloon Carnival", "Balloon", "Carnival Joy", "candy-pop", "playful", "Balloon Arch"],
-  ["Circus Party", "Cartoon", "Big Top Fun", "red-navy", "playful", "Circus Tent"],
-  ["Little Explorer", "Adventure", "Map Quest", "safari-earth", "playful", "Maps & Compass"],
-  ["Pirate Treasure", "Cartoon", "Pirate Hunt", "ocean-teal", "playful", "Ships & Treasure"],
-  ["Robot Party", "Gaming", "Tech Bot", "gaming-neon", "neon", "Robots & Gears"],
-  ["Train Adventure", "Cartoon", "All Aboard", "blue-white", "playful", "Trains & Tracks"],
-  ["Farm Animal Party", "Safari", "Barnyard Friends", "brown-cream", "cute", "Farm Animals", "NEW"],
-  ["Zoo Friends", "Safari", "Zoo Day", "jungle-green", "cute", "Zoo Animals"],
-  ["Puppy Party", "Cute Kids", "Puppy Love", "teddy-brown", "cute", "Puppies & Paws"],
-  ["Kitty Cat Party", "Cute Kids", "Meow Time", "pastel-pink", "cute", "Cats & Whiskers"],
-  ["Bumblebee Birthday", "Colorful", "Honey Buzz", "yellow-sun", "playful", "Bees & Honey"],
-  ["Ladybug Party", "Cute Kids", "Little Dots", "red-navy", "cute", "Ladybugs"],
-  ["Starry Night Party", "Space", "Night Sky", "galaxy-purple", "elegant", "Night Stars"],
-  ["Rocket Launch Party", "Space", "Blast Off", "space-navy", "playful", "Rockets"],
-  ["Moon Landing Party", "Space", "Apollo Fun", "sky-cloud", "playful", "Moon & Astronauts"],
-  ["Superhero Training", "Superhero", "Boot Camp", "super-redblue", "playful", "Shield Badges"],
-  ["Ninja Birthday", "Cartoon", "Stealth Mode", "monochrome", "playful", "Ninja Stars"],
-  ["Cowboy Party", "Retro", "Wild West", "boho-terracotta", "retro", "Boots & Lasso"],
-  ["Jungle Tribe Party", "Safari", "Rainforest Fun", "jungle-green", "playful", "Tropical Leaves"],
-  ["Dessert Bar Party", "Colorful", "Sweet Bar", "candy-pastel", "playful", "Desserts"],
-  ["Chocolate Dream", "Colorful", "Cocoa Delight", "brown-gold", "playful", "Chocolate Drops"],
-  ["Strawberry Cream", "Pastel", "Berry Sweet", "pastel-pink", "cute", "Strawberries"],
-  ["Lavender Fields", "Pastel", "Calm Meadow", "pastel-lavender", "hand", "Lavender Sprigs"],
-  ["Mint Fresh Party", "Pastel", "Cool Breeze", "pastel-mint", "cute", "Mint Leaves"],
-  ["Peach Blossom", "Pastel", "Soft Petals", "pastel-peach", "hand", "Peach Blossoms"],
-  ["Cloud Nine Party", "Cute Kids", "Sky High", "sky-cloud", "cute", "Clouds", "NEW"],
-  ["Bubble Pop Party", "Cute Kids", "Soap Fun", "pastel-purple", "cute", "Bubbles"],
-  ["Cupcake Corner", "Colorful", "Bake Shop", "candy-pop", "cute", "Cupcakes"],
-  ["Ice Cream Party", "Colorful", "Scoops Fun", "pastel-peach", "playful", "Ice Cream Cones"],
-  ["Donut Party", "Colorful", "Sprinkle Day", "candy-pastel", "playful", "Donuts"],
-  ["Pancake Breakfast", "Cute Kids", "Morning Fun", "brown-cream", "cute", "Pancakes & Syrup"],
-  ["Picnic Party", "Bohemian", "Park Day", "boho-terracotta", "hand", "Picnic Baskets"],
-  ["Garden Tea Party", "Floral", "Afternoon Tea", "garden-pink", "hand", "Tea & Roses"],
-  ["Rosy Retro", "Vintage", "Rose Pop", "vintage-cream", "retro", "Retro Roses"],
-  ["Parisian Chic", "Elegant", "French Class", "ivory-gold", "hand", "Eiffel & Macarons"],
-  ["Golden Hour Party", "Luxury", "Sunset Glow", "gold-lux", "luxury", "Golden Sun"],
-  ["Champagne Toast", "Luxury", "Cheers Night", "champagne", "luxury", "Champagne Glasses"],
-  ["Royal Crown", "Luxury", "Monarch Night", "black-gold", "luxury", "Crown & Scepter"],
-  ["Crown Princess", "Princess", "Royal Ball", "rosegold", "hand", "Tiara & Ballgown", "FEATURED"],
-  ["Queen For A Day", "Luxury", "Majesty", "gold-lux", "luxury", "Queens & Pearls"],
-  ["Minimal Line Art", "Minimalist", "Simple Lines", "monochrome", "minimal", "Line Drawings"],
-  ["Monochrome Chic", "Monochrome", "Paris Black", "monochrome", "minimal", "Bold Typography"],
-  ["Black & White Party", "Monochrome", "Timeless", "white-clean", "minimal", "Checker Pattern"],
-  ["Terracotta Trend", "Bohemian", "Clay Love", "boho-terracotta", "hand", "Clay Pots"],
-  ["Sage & Stone", "Minimalist", "Natural Calm", "sage", "minimal", "Sage Branches"],
-  ["Nordic Party", "Minimalist", "Scandi Clean", "white-clean", "minimal", "Nordic Shapes"],
-  ["Modern Geometric", "Modern", "Shape Play", "geometric", "minimal", "Geometric Blocks"],
-  ["Art Deco Glam", "Vintage", "Roaring 20s", "artdeco", "luxury", "Deco Ornaments"],
-  ["Neon Nights", "Neon", "City Lights", "neon-cyan", "neon", "Neon City"],
-  ["Cyber Party", "Gaming", "Cyberwave", "pixel", "neon", "Cyber Grid"],
-  ["Pixel Party", "Gaming", "8-bit Fun", "pixel", "retro", "Pixel Art"],
-  ["Arcade Fever", "Gaming", "Coin Up", "gaming-neon", "retro", "Arcade Machines"],
-  ["Rhythm & Beats", "K-Pop", "Dance Music", "kpop-pink", "neon", "Music Notes"],
-  ["Dance Party", "Teen", "Move It", "neon-cyan", "neon", "Dance Silhouettes", "TRENDING"],
-  ["Glow Party", "Neon", "Blacklight Fun", "neon-cyan", "neon", "Glow Sticks"],
-  ["Confetti Pop", "Colorful", "Party Burst", "rainbow", "playful", "Confetti Drops"],
-  ["Balloon Bouquet", "Balloon", "String of Joy", "candy-pastel", "cute", "Balloon Bunch"],
-  ["Silver Shimmer", "Blue & Silver", "Silver Lining", "bluesilver", "elegant", "Silver Glitter"],
-  ["Gold Luxe Birthday", "Black & Gold", "Gold Rush", "gold-lux", "luxury", "Gold Dust"],
-  ["VIP Midnight Celebration", "Premium", "Exclusive Gala", "emerald-green", "luxury", "Emerald & Gold", "POPULAR"],
+  /* ================= BALLOON FAMILY (12) — cute rounded balloon party ================= */
+  ["Pink Balloons Kids", "Cute Kids", "Balloon Pink", "pink-white", "cute", "Floating Balloons", "POPULAR"],
+  ["Balloon Carnival", "Balloon", "Carnival Balloon", "candy-pop", "playful", "Balloon Arch"],
+  ["Balloon Bouquet", "Balloon", "Balloon Bouquet", "candy-pastel", "cute", "Balloon Bunch"],
+  ["Teddy Bear Party", "Cute Kids", "Cuddly Teddy", "teddy-brown", "cute", "Teddy Bears", "NEW"],
+  ["Zoo Friends", "Safari", "Zoo Balloon", "jungle-green", "cute", "Zoo Animals"],
+  ["Farm Animal Party", "Safari", "Barnyard Balloon", "brown-cream", "cute", "Farm Animals"],
+  ["Puppy Party", "Cute Kids", "Puppy Balloon", "teddy-brown", "cute", "Puppies & Paws"],
+  ["Kitty Cat Party", "Cute Kids", "Kitty Balloon", "pastel-pink", "cute", "Cats & Whiskers"],
+  ["Bumblebee Birthday", "Colorful", "Honey Balloon", "yellow-sun", "playful", "Bees & Honey"],
+  ["Ladybug Party", "Cute Kids", "Ladybug Balloon", "red-navy", "cute", "Ladybugs"],
+  ["Bubble Pop Party", "Cute Kids", "Bubble Balloon", "pastel-purple", "cute", "Bubbles"],
+  ["Balloon Magic", "Balloon", "Balloon Sky", "sky-cloud", "cute", "Balloon Clouds"],
+
+  /* ================= CARTOON FAMILY (11) — bold comic pop-art ================= */
+  ["Circus Party", "Cartoon", "Cartoon Circus", "red-navy", "playful", "Circus Tent"],
+  ["Pirate Treasure", "Cartoon", "Cartoon Pirate", "ocean-teal", "playful", "Ships & Treasure"],
+  ["Train Adventure", "Cartoon", "Cartoon Train", "blue-white", "playful", "Trains & Tracks"],
+  ["Ninja Birthday", "Cartoon", "Cartoon Ninja", "monochrome", "playful", "Ninja Stars"],
+  ["Superhero Birthday", "Superhero", "Hero Comic", "super-redblue", "playful", "Hero Capes", "POPULAR"],
+  ["Superhero Training", "Superhero", "Superhero Mission", "super-redblue", "playful", "Shield Badges"],
+  ["Racing Champion", "Racing", "Racing Hero", "racing-red", "playful", "Race Cars"],
+  ["Football Star", "Football", "Football Hero", "football-green", "playful", "Football & Trophy"],
+  ["Basketball Slam Dunk", "Basketball", "Basketball Hero", "basketball-orange", "playful", "Basketball Court"],
+  ["Comic Hero Party", "Cartoon", "Comic Pop Art", "rainbow", "playful", "Comic Panels"],
+  ["Cartoon Pop", "Cartoon", "Cartoon Pop", "candy-pop", "playful", "Toon Faces"],
+
+  /* ================= SPACE FAMILY (5) — cosmic portal & rockets ================= */
+  ["Space Adventure", "Space", "Space Voyage", "space-navy", "playful", "Rockets & Planets"],
+  ["Galaxy Night", "Space", "Galaxy Night", "galaxy-purple", "elegant", "Galaxy Swirl"],
+  ["Starry Night Party", "Space", "Starry Night", "galaxy-purple", "elegant", "Night Stars"],
+  ["Rocket Launch Party", "Space", "Rocket Launch", "space-navy", "playful", "Rockets"],
+  ["Moon Landing Party", "Space", "Moon Landing", "sky-cloud", "playful", "Moon & Astronauts"],
+
+  /* ================= PRINCESS FAMILY (6) — royal arch & crowns ================= */
+  ["Little Princess", "Princess", "Princess Crown", "pink-gold", "hand", "Crown & Castle", "POPULAR"],
+  ["Crown Princess", "Princess", "Crown Princess", "rosegold", "hand", "Tiara & Ballgown", "FEATURED"],
+  ["Royal Crown", "Princess", "Royal Crown", "black-gold", "luxury", "Crown & Scepter"],
+  ["Queen For A Day", "Princess", "Queen Royal", "gold-lux", "luxury", "Queens & Pearls"],
+  ["Fairy Wings", "Fairy", "Fairy Princess", "pastel-lavender", "hand", "Fairy & Wings"],
+  ["Princess Ball", "Princess", "Castle Princess", "pastel-purple", "hand", "Castle & Crown"],
+
+  /* ================= PASTEL FAMILY (7) — soft clouds & hearts ================= */
+  ["Pastel Dream", "Pastel", "Pastel Dream", "pastel-pink", "cute", "Pastel Watercolor"],
+  ["Magical Unicorn", "Unicorn", "Unicorn Magic", "pastel-purple", "cute", "Unicorn & Sparkles"],
+  ["Unicorn Rainbow", "Unicorn", "Unicorn Rainbow", "rainbow", "cute", "Rainbow Unicorn"],
+  ["Lavender Fields", "Pastel", "Lavender Calm", "pastel-lavender", "hand", "Lavender Sprigs"],
+  ["Mint Fresh Party", "Pastel", "Mint Fresh", "pastel-mint", "cute", "Mint Leaves"],
+  ["Peach Blossom", "Pastel", "Peach Blossom", "pastel-peach", "hand", "Peach Blossoms"],
+  ["Strawberry Cream", "Pastel", "Strawberry Cream", "pastel-pink", "cute", "Strawberries"],
+
+  /* ================= MINIMAL FAMILY (7) — clean type-driven ================= */
+  ["Minimal Line Art", "Minimalist", "Minimal Line Art", "monochrome", "minimal", "Line Drawings"],
+  ["Monochrome Chic", "Monochrome", "Monochrome Chic", "monochrome", "minimal", "Bold Typography"],
+  ["Black & White Party", "Monochrome", "Black White", "white-clean", "minimal", "Checker Pattern"],
+  ["Monochrome Modern", "Monochrome", "Monochrome Modern", "monochrome", "minimal", "Line Art"],
+  ["Sage & Stone", "Minimalist", "Sage & Stone", "sage", "minimal", "Sage Branches"],
+  ["Nordic Party", "Minimalist", "Scandi Nordic", "white-clean", "minimal", "Nordic Shapes"],
+  ["Modern Geometric", "Modern", "Geometric Modern", "geometric", "minimal", "Geometric Blocks"],
+
+  /* ================= LUXURY FAMILY (8) — black & gold gala ================= */
+  ["Black Gold Celebration", "Luxury", "Gold Midnight", "black-gold", "luxury", "Gold Foil", "POPULAR"],
+  ["Golden Hour Party", "Luxury", "Gold Hour", "gold-lux", "luxury", "Golden Sun"],
+  ["Champagne Toast", "Luxury", "Champagne Gold", "champagne", "luxury", "Champagne Glasses"],
+  ["VIP Midnight Celebration", "Premium", "VIP Gala", "emerald-green", "luxury", "Emerald & Gold", "POPULAR"],
+  ["Silver Shimmer", "Blue & Silver", "Silver Shimmer", "bluesilver", "elegant", "Silver Glitter"],
+  ["Blue & Silver Soiree", "Blue & Silver", "Silver Soiree", "bluesilver", "elegant", "Silver Snowflakes"],
+  ["Emerald Green Party", "Green", "Emerald Luxe", "emerald-green", "elegant", "Emerald Leaves"],
+  ["Gold Luxe Birthday", "Black & Gold", "Gold Luxe", "gold-lux", "luxury", "Gold Dust"],
+
+  /* ================= NEON FAMILY (9) — glowing teen night ================= */
+  ["Neon Birthday", "Neon", "Neon Night", "neon-cyan", "neon", "Neon Signs"],
+  ["Neon Nights", "Neon", "Neon City", "neon-cyan", "neon", "Neon City"],
+  ["Cyber Party", "Gaming", "Cyber Party", "pixel", "neon", "Cyber Grid"],
+  ["Robot Party", "Gaming", "Robot Tech", "gaming-neon", "neon", "Robots & Gears"],
+  ["Glow Party", "Neon", "Glow Party", "neon-cyan", "neon", "Glow Sticks"],
+  ["Dance Party", "Teen", "Dance Neon", "neon-cyan", "neon", "Dance Silhouettes", "TRENDING"],
+  ["Rhythm & Beats", "K-Pop", "Rhythm Night", "kpop-pink", "neon", "Music Notes"],
+  ["K-Pop Idol Party", "K-Pop", "K-Pop Stage", "kpop-pink", "neon", "Stage & Lightstick"],
+  ["Gaming Controller", "Gaming", "Gaming Neon", "gaming-neon", "neon", "Game Controllers"],
+
+  /* ================= CANDY FAMILY (10) — sweet shop & ocean treats ================= */
+  ["Candy Party", "Colorful", "Candy Sweet", "candy-pastel", "playful", "Candy & Lollipops"],
+  ["Confetti Pop", "Colorful", "Confetti Candy", "rainbow", "playful", "Confetti Drops"],
+  ["Chocolate Dream", "Colorful", "Chocolate Sweet", "brown-gold", "playful", "Chocolate Drops"],
+  ["Dessert Bar Party", "Colorful", "Dessert Sweet", "candy-pastel", "playful", "Desserts"],
+  ["Cupcake Corner", "Colorful", "Cupcake Sweet", "candy-pop", "cute", "Cupcakes"],
+  ["Ice Cream Party", "Colorful", "Ice Cream Sweet", "pastel-peach", "playful", "Ice Cream Cones"],
+  ["Donut Party", "Colorful", "Donut Sweet", "candy-pastel", "playful", "Donuts"],
+  ["Mermaid Lagoon", "Under The Sea", "Mermaid Ocean", "ocean-teal", "cute", "Mermaid Tails", "NEW"],
+  ["Under The Sea", "Ocean", "Under The Sea", "ocean-teal", "playful", "Fish & Coral", "FEATURED"],
+  ["Ocean Explorer", "Ocean", "Ocean Explorer", "sky-cloud", "playful", "Submarine & Waves"],
+
+  /* ================= ELEGANT FAMILY (8) — refined adult celebration ================= */
+  ["Sweet Seventeen", "Sweet Seventeen", "Elegant Seventeen", "rosegold", "elegant", "Glitter & Rose", "TRENDING"],
+  ["Elegant Birthday", "Elegant", "Elegant Classic", "ivory-gold", "elegant", "Floral Lines"],
+  ["Floral Garden Party", "Floral", "Elegant Garden", "floral-blush", "hand", "Watercolor Florals"],
+  ["Pink & Gold Glam", "Pink & Gold", "Glam Pink", "pink-gold", "elegant", "Gold Sparkle", "TRENDING"],
+  ["Garden Tea Party", "Floral", "Elegant Tea", "garden-pink", "hand", "Tea & Roses"],
+  ["Parisian Chic", "Elegant", "Parisian Chic", "ivory-gold", "hand", "Eiffel & Macarons"],
+  ["Purple Dream Party", "Purple", "Blush Dream", "purple-royal", "elegant", "Purple Haze"],
+  ["Adult Birthday Cocktail", "Adult", "Cocktail Night", "adult-charcoal", "elegant", "Cocktail Glasses"],
+
+  /* ================= RETRO FAMILY (7) — 90s pop & vintage ================= */
+  ["Retro 90s Party", "Retro", "Retro Pop", "retro-90s", "retro", "Retro Shapes"],
+  ["Vintage Tea Party", "Vintage", "Retro Tea", "vintage-cream", "hand", "Tea Cups & Lace"],
+  ["Rosy Retro", "Vintage", "Retro Rosy", "vintage-cream", "retro", "Retro Roses"],
+  ["Cowboy Party", "Retro", "Retro Cowboy", "boho-terracotta", "retro", "Boots & Lasso"],
+  ["Art Deco Glam", "Vintage", "Retro Deco", "artdeco", "luxury", "Deco Ornaments"],
+  ["Pixel Party", "Gaming", "Retro Pixel", "pixel", "retro", "Pixel Art"],
+  ["Arcade Fever", "Gaming", "Retro Arcade", "gaming-neon", "retro", "Arcade Machines"],
+
+  /* ================= BOHO FAMILY (10) — free-spirited & organic ================= */
+  ["Bohemian Birthday", "Bohemian", "Boho Free Spirit", "boho-terracotta", "hand", "Pampas & Wildflowers"],
+  ["Safari Birthday", "Safari", "Safari Wild", "safari-earth", "playful", "Safari Animals"],
+  ["Jungle Tribe Party", "Safari", "Jungle Tribe", "jungle-green", "playful", "Tropical Leaves"],
+  ["Dinosaur Jungle", "Dinosaur", "Boho Dino", "jungle-green", "playful", "Dino Silhouettes"],
+  ["Dino Roar", "Dinosaur", "Dino Roar", "jungle-green", "playful", "Dino Footprints"],
+  ["Tangerine Fun", "Orange", "Tangerine Boho", "orange-warm", "playful", "Orange Slices"],
+  ["Sunny Yellow Bash", "Yellow", "Sunny Boho", "yellow-sun", "playful", "Suns & Smiles"],
+  ["Picnic Party", "Bohemian", "Picnic Day", "boho-terracotta", "hand", "Picnic Baskets"],
+  ["Terracotta Trend", "Bohemian", "Terracotta Trend", "boho-terracotta", "hand", "Clay Pots"],
+  ["Little Explorer", "Adventure", "Little Explorer", "safari-earth", "playful", "Maps & Compass"],
 ];
 
 const SUNATAN_SEEDS: Seed[] = [
@@ -1861,6 +1884,16 @@ const buildThemeStyle = (category: CategoryKey, seed: Seed, idx: number): ThemeS
     "baby-moon": "baby-moon",
     "baby-animal": "baby-animal",
     watercolor: "watercolor-soft",
+    "balloon-party": "balloon-party",
+    "space-cosmic": "space-cosmic",
+    "princess-royal": "princess-royal",
+    "candy-sweet": "candy-sweet",
+    "confetti-burst": "confetti-burst",
+    "pastel-cute": "pastel-cute",
+    "retro-pop": "retro-pop",
+    "neon-party": "neon-party",
+    "luxury-gold": "luxury-gold",
+    "minimal-clean": "minimal-clean",
   };
 
   return {
@@ -1924,23 +1957,26 @@ export const TEMPLATES: Template[] = (() => {
       const price = DEFAULT_TEMPLATE_PRICE;
       const isExtended = (["religious", "tasyakuran", "gathering", "business", "anniversary", "family", "doa-haul"] as const).includes(catKey as never);
       const themeStyle = buildThemeStyle(catKey, seed, i);
-      const portrait = isExtended
-        ? buildTemplateCover({
-            category: catKey,
-            categoryLabel: CATEGORY_LABELS[catKey],
-            categoryEmoji: CATEGORY_EMOJIS[catKey],
-            templateNumber: num,
-            name,
-            subcategory: seed[1],
-            designStyle: seed[2],
-            themeStyle,
-          })
-        : pick(IMAGE_POOLS[catKey], i * 7 + 3);
+      const isBirthday = catKey === "birthday";
+      const photo = pick(IMAGE_POOLS[catKey], i * 7 + 3);
+      const cover = buildTemplateCover({
+        category: catKey,
+        categoryLabel: CATEGORY_LABELS[catKey],
+        categoryEmoji: CATEGORY_EMOJIS[catKey],
+        templateNumber: num,
+        name,
+        subcategory: seed[1],
+        designStyle: seed[2],
+        themeStyle,
+      });
+      const portrait = isExtended || isBirthday ? cover : photo;
       const eventDetails = isExtended
         ? buildExtendedDetails(catKey as ExtendedCategory, i, portrait)
-        : catKey === "education"
-          ? buildEducationDetails(i, portrait)
-          : buildEventDetails(catKey, i, portrait);
+        : isBirthday
+          ? buildEventDetails(catKey, i, photo)
+          : catKey === "education"
+            ? buildEducationDetails(i, photo)
+            : buildEventDetails(catKey, i, photo);
       const music = getTemplateMusic(catKey, i, {
         subcategory: seed[1],
         designStyle: seed[2],

@@ -240,6 +240,143 @@ export const TapeStrip: React.FC<OrnamentProps> = ({ color = '#f1f5f9', classNam
   </svg>
 );
 
+/* ============================================================
+   BIRTHDAY ORNAMENTS
+   Playful inline SVG elements used by the birthday families.
+   ============================================================ */
+
+/* Confetti divider — bursting sprinkles */
+export const ConfettiDivider: React.FC<OrnamentProps> = ({ color = 'currentColor', className, style }) => (
+  <svg viewBox="0 0 220 24" className={className} style={style} aria-hidden="true" fill="none">
+    <path d="M6 12 H84" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+    <path d="M136 12 H214" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+    <rect x="104" y="8" width="6" height="8" rx="2" fill={color} transform="rotate(20 107 12)" opacity="0.9" />
+    <rect x="112" y="5" width="5" height="7" rx="2" fill={color} transform="rotate(-25 114 8)" opacity="0.8" />
+    <circle cx="110" cy="16" r="1.8" fill={color} />
+    <circle cx="102" cy="13" r="1.4" fill={color} opacity="0.8" />
+    <circle cx="118" cy="11" r="1.4" fill={color} opacity="0.8" />
+    <path d="M106 4 L110 2 M114 4 L118 2" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.7" />
+  </svg>
+);
+
+/* Crown divider — royal accent */
+export const CrownDivider: React.FC<OrnamentProps> = ({ color = 'currentColor', className, style }) => (
+  <svg viewBox="0 0 220 24" className={className} style={style} aria-hidden="true" fill="none">
+    <path d="M10 12 H88" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+    <path d="M132 12 H210" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+    <path d="M98 16 L102 6 L110 12 L116 4 L124 12 L118 6 L126 16 Z" fill={color} opacity="0.9" transform="translate(34 0)" />
+    <circle cx="110" cy="12" r="1.8" fill={color} />
+    <circle cx="92" cy="12" r="1.3" fill={color} opacity="0.7" />
+    <circle cx="128" cy="12" r="1.3" fill={color} opacity="0.7" />
+  </svg>
+);
+
+/* Balloon arch — used above cover photos */
+export const BalloonArch: React.FC<OrnamentProps> = ({ color = 'currentColor', className, style }) => (
+  <svg viewBox="0 0 200 70" className={className} style={style} aria-hidden="true" fill="none">
+    {[
+      { cx: 30, cy: 52, r: 13, rot: -14 },
+      { cx: 58, cy: 30, r: 15, rot: -8 },
+      { cx: 100, cy: 18, r: 17, rot: 0 },
+      { cx: 142, cy: 30, r: 15, rot: 8 },
+      { cx: 170, cy: 52, r: 13, rot: 14 },
+    ].map((b, i) => (
+      <g key={i}>
+        <ellipse
+          cx={b.cx}
+          cy={b.cy}
+          rx={b.r}
+          ry={b.r * 1.25}
+          stroke={color}
+          strokeWidth="1.4"
+          transform={`rotate(${b.rot} ${b.cx} ${b.cy})`}
+          opacity={0.95}
+        />
+        <path d={`M${b.cx} ${b.cy + b.r * 1.25} l-2.5 10 M${b.cx} ${b.cy + b.r * 1.25} l2.5 10`} stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.8" />
+      </g>
+    ))}
+  </svg>
+);
+
+/* Comic pop burst — starburst shape for cartoon covers */
+export const ComicBurst: React.FC<OrnamentProps> = ({ color = 'currentColor', className, style }) => (
+  <svg viewBox="0 0 160 160" className={className} style={style} aria-hidden="true" fill="none">
+    <path
+      d="M80 4 L90 28 L114 10 L104 38 L136 30 L112 52 L150 60 L116 72 L146 92 L108 88 L122 118 L96 102 L92 134 L74 108 L54 128 L58 98 L28 104 L48 80 L14 66 L50 60 L30 36 L66 50 L60 16 L82 38 Z"
+      fill={color}
+      fillOpacity="0.85"
+    />
+  </svg>
+);
+
+/* Candy stripe band — sweet two-tone divider */
+export const CandyStripe: React.FC<OrnamentProps> = ({ color = 'currentColor', className, style }) => (
+  <svg viewBox="0 0 220 20" className={className} style={style} aria-hidden="true">
+    <defs>
+      <pattern id="candy-stripe" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)">
+        <rect width="11" height="22" fill={color} opacity="0.55" />
+        <rect x="11" width="11" height="22" fill="#ffffff" opacity="0.35" />
+      </pattern>
+    </defs>
+    <rect x="0" y="7" width="220" height="6" rx="3" fill="url(#candy-stripe)" />
+  </svg>
+);
+
+/* Simple rocket mark */
+export const RocketMark: React.FC<OrnamentProps> = ({ color = 'currentColor', className, style }) => (
+  <svg viewBox="0 0 60 60" className={className} style={style} aria-hidden="true" fill="none">
+    <path d="M30 8 C 30 20 40 30 40 42 L 20 42 C 20 30 30 20 30 8 Z" stroke={color} strokeWidth="1.6" fill={color} fillOpacity="0.15" />
+    <path d="M30 8 L 30 18" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+    <path d="M24 44 L 30 56 L 36 44" stroke={color} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="30" cy="14" r="2.6" stroke={color} strokeWidth="1.2" />
+    <path d="M8 40 C 12 34 18 34 20 40 M40 40 C 44 34 50 34 52 40" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+  </svg>
+);
+
+/* Candy / gift box mark */
+export const GiftMark: React.FC<OrnamentProps> = ({ color = 'currentColor', className, style }) => (
+  <svg viewBox="0 0 60 60" className={className} style={style} aria-hidden="true" fill="none">
+    <rect x="14" y="26" width="32" height="26" rx="3" stroke={color} strokeWidth="1.6" fill={color} fillOpacity="0.12" />
+    <path d="M14 34 H46" stroke={color} strokeWidth="1.4" />
+    <path d="M30 26 V52" stroke={color} strokeWidth="1.4" />
+    <path d="M30 26 C 30 18 22 14 18 18 C 14 22 20 28 30 26 Z" stroke={color} strokeWidth="1.3" fill={color} fillOpacity="0.2" />
+    <path d="M30 26 C 30 18 38 14 42 18 C 46 22 40 28 30 26 Z" stroke={color} strokeWidth="1.3" fill={color} fillOpacity="0.2" />
+  </svg>
+);
+
+/* Rainbow arc */
+export const RainbowArc: React.FC<OrnamentProps> = ({ color = 'currentColor', className, style }) => (
+  <svg viewBox="0 0 120 60" className={className} style={style} aria-hidden="true" fill="none">
+    <path d="M10 60 A 50 50 0 0 1 110 60" stroke={color} strokeWidth="3" strokeLinecap="round" opacity="0.9" />
+    <path d="M22 60 A 38 38 0 0 1 98 60" stroke={color} strokeWidth="3" strokeLinecap="round" opacity="0.65" />
+    <path d="M34 60 A 26 26 0 0 1 86 60" stroke={color} strokeWidth="3" strokeLinecap="round" opacity="0.4" />
+    <circle cx="10" cy="60" r="2.5" fill={color} />
+    <circle cx="110" cy="60" r="2.5" fill={color} />
+  </svg>
+);
+
+/* Star burst mark (twinkle / sparkle) */
+export const StarBurst: React.FC<OrnamentProps> = ({ color = 'currentColor', className, style }) => (
+  <svg viewBox="0 0 60 60" className={className} style={style} aria-hidden="true" fill="none">
+    <path
+      d="M30 4 L35 18 L49 12 L43 26 L58 28 L43 32 L49 46 L35 40 L30 54 L25 40 L11 46 L17 32 L2 28 L17 26 L11 12 L25 18 Z"
+      fill={color}
+      opacity="0.9"
+    />
+  </svg>
+);
+
+/* Crown mark */
+export const CrownMark: React.FC<OrnamentProps> = ({ color = 'currentColor', className, style }) => (
+  <svg viewBox="0 0 60 40" className={className} style={style} aria-hidden="true" fill="none">
+    <path d="M6 30 L10 12 L20 22 L30 8 L40 22 L50 12 L54 30 Z" stroke={color} strokeWidth="1.6" strokeLinejoin="round" fill={color} fillOpacity="0.15" />
+    <rect x="6" y="30" width="48" height="4" rx="2" fill={color} opacity="0.8" />
+    <circle cx="12" cy="14" r="2" fill={color} />
+    <circle cx="30" cy="11" r="2" fill={color} />
+    <circle cx="48" cy="14" r="2" fill={color} />
+  </svg>
+);
+
 export const dividerFor = (style: string, color?: string): React.ReactNode => {
   const c = color || 'currentColor';
   switch (style) {
@@ -261,6 +398,10 @@ export const dividerFor = (style: string, color?: string): React.ReactNode => {
       return <ArabesqueDivider color={c} />;
     case 'batik':
       return <BatikDivider color={c} />;
+    case 'confetti':
+      return <ConfettiDivider color={c} />;
+    case 'crown':
+      return <CrownDivider color={c} />;
     default:
       return <ThinDivider color={c} />;
   }

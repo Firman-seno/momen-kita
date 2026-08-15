@@ -253,7 +253,7 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
           {filteredTemplates.map((template) => (
             <article
               key={template.uid}
-              className="template-card group bg-surface-container-lowest rounded-[18px] overflow-hidden border border-outline-variant/40 flex flex-col h-full shadow-sm hover:shadow-xl min-w-0 w-full box-border"
+              className="template-card group relative bg-surface-container-lowest rounded-[18px] overflow-hidden border border-outline-variant/40 flex flex-col h-full shadow-sm hover:shadow-xl min-w-0 w-full box-border"
             >
               <TemplateImage
                 src={template.image}
@@ -267,6 +267,13 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
                 badgeClassName={template.badge ? BADGE_STYLES[template.badge] : undefined}
                 onClick={() => onOpenDemo(template)}
               />
+
+              {/* Promo ribbon — marketing hook; the real price is still shown
+                  below via formatRupiah(getTemplatePrice(template)). */}
+              <div className="pointer-events-none absolute top-2.5 left-1/2 -translate-x-1/2 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-rose-600 via-pink-600 to-amber-500 text-white text-[10px] font-body font-extrabold uppercase tracking-widest shadow-md border border-white/40 whitespace-nowrap">
+                <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>percent</span>
+                Promo
+              </div>
 
               <div className="p-3 sm:p-4 flex flex-col flex-grow min-w-0 w-full box-border">
                 <div className="flex items-center justify-between gap-1 mb-1.5">

@@ -40,7 +40,17 @@ export type BackgroundType =
   | 'wedding-garden'
   | 'baby-moon'
   | 'baby-animal'
-  | 'watercolor';
+  | 'watercolor'
+  | 'balloon-party'
+  | 'space-cosmic'
+  | 'princess-royal'
+  | 'candy-sweet'
+  | 'confetti-burst'
+  | 'pastel-cute'
+  | 'retro-pop'
+  | 'neon-party'
+  | 'luxury-gold'
+  | 'minimal-clean';
 
 export type FrameStyle =
   | 'arch'
@@ -57,7 +67,11 @@ export type FrameStyle =
   | 'moon-arch'
   | 'floral-wreath'
   | 'royal-crown'
-  | 'minimal-line';
+  | 'minimal-line'
+  | 'balloon-ring'
+  | 'candy-border'
+  | 'retro-burst'
+  | 'boho-wreath';
 
 export type ButtonStyle =
   | 'playful'

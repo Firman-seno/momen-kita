@@ -160,6 +160,26 @@ const patternFor = (bgType: string, accent: string, primary: string): string => 
       return `<g fill="${accent}" fill-opacity="0.35"><path d="M16 26 a8 8 0 0 1 16 0 Z" transform="rotate(180 24 30)"/><circle cx="24" cy="30" r="3" fill="${accent}"/><path d="M46 52 a8 8 0 0 1 16 0 Z" transform="rotate(180 54 56)"/><circle cx="54" cy="56" r="3" fill="${accent}"/></g>`;
     case 'wine-jazz':
       return `<g fill="none" stroke="${accent}" stroke-opacity="0.4"><path d="M8 40 q10 -14 20 0 q10 14 20 0" fill="none"/><circle cx="12" cy="20" r="4"/></g>`;
+    case 'balloon-party':
+      return `<g fill="${accent}" fill-opacity="0.5"><circle cx="20" cy="22" r="8"/><path d="M20 30 l-3 8 M20 30 l3 8" stroke="${accent}" stroke-width="1.5" stroke-opacity="0.5" fill="none"/><circle cx="45" cy="42" r="6"/></g>`;
+    case 'space-cosmic':
+      return `<g fill="${accent}" fill-opacity="0.55"><path d="M22 30 l4 -6 l4 6 l-8 0 Z"/><circle cx="45" cy="20" r="2.5"/><circle cx="12" cy="48" r="1.8"/><text x="34" y="50" font-size="8" fill="${primary}" fill-opacity="0.6">✦</text></g>`;
+    case 'princess-royal':
+      return `<g fill="${accent}" fill-opacity="0.5"><path d="M20 34 L24 22 L28 34 L24 30 Z"/><circle cx="45" cy="20" r="4"/><circle cx="14" cy="46" r="3"/></g>`;
+    case 'candy-sweet':
+      return `<g fill="${accent}" fill-opacity="0.5"><circle cx="20" cy="18" r="5"/><rect x="26" y="12" width="4" height="12" rx="2" transform="rotate(28 28 18)"/><circle cx="46" cy="40" r="4"/><rect x="50" y="35" width="3" height="10" rx="1.5" transform="rotate(-25 51 40)"/></g>`;
+    case 'confetti-burst':
+      return `<g fill="${accent}" fill-opacity="0.55"><rect x="16" y="20" width="6" height="10" rx="2" transform="rotate(20 19 25)"/><rect x="40" y="14" width="6" height="10" rx="2" transform="rotate(-30 43 19)"/><circle cx="30" cy="44" r="4"/><rect x="44" y="36" width="6" height="10" rx="2" transform="rotate(45 47 41)"/></g>`;
+    case 'pastel-cute':
+      return `<g fill="${accent}" fill-opacity="0.4"><circle cx="20" cy="20" r="7"/><circle cx="30" cy="16" r="9"/><circle cx="40" cy="22" r="6"/><text x="50" y="48" font-size="10" fill="${primary}" fill-opacity="0.55">♥</text></g>`;
+    case 'retro-pop':
+      return `<g fill="${accent}" fill-opacity="0.5"><circle cx="22" cy="22" r="4"/><circle cx="38" cy="26" r="5"/><circle cx="20" cy="42" r="3"/><rect x="40" y="44" width="8" height="8" rx="2" transform="rotate(15 44 48)"/></g>`;
+    case 'neon-party':
+      return `<g fill="none" stroke="${accent}" stroke-opacity="0.6" stroke-width="2"><path d="M14 34 l10 -12 l4 14 l6 -10 M40 18 l4 10 l6 -6 l-4 12" stroke-linecap="round"/></g>`;
+    case 'luxury-gold':
+      return `<g fill="${accent}" fill-opacity="0.45"><path d="M20 30 L26 18 L32 30 L26 26 Z"/><path d="M46 48 L52 36 L58 48 L52 44 Z"/></g>`;
+    case 'minimal-clean':
+      return `<g stroke="${accent}" stroke-opacity="0.45" stroke-width="1.5"><path d="M8 20 h24 M8 40 h24 M8 60 h24"/></g>`;
     default:
       return `<g fill="${accent}" fill-opacity="0.35"><circle cx="24" cy="24" r="5"/><circle cx="50" cy="46" r="3.5"/></g>`;
   }
@@ -216,6 +236,29 @@ const frameFor = (frameStyle: string, accent: string, secondary: string, text: s
     case 'glass-frame':
       return g(
         `<rect x="46" y="46" width="508" height="708" rx="30" fill="rgba(255,255,255,0.05)" stroke="${accent}" stroke-width="3" stroke-opacity="0.7"/>`
+      );
+    case 'balloon-ring':
+      return g(
+        `<circle cx="300" cy="360" r="300" fill="none" stroke="${secondary}" stroke-width="3" stroke-opacity="0.7"/>` +
+        `<circle cx="300" cy="360" r="288" fill="none" stroke="${accent}" stroke-width="1.5" stroke-opacity="0.5"/>` +
+        `<text x="300" y="44" font-size="26" text-anchor="middle">🎈</text><text x="60" y="360" font-size="26">🎈</text><text x="540" y="360" font-size="26">🎈</text>`
+      );
+    case 'candy-border':
+      return g(
+        `<rect x="40" y="40" width="520" height="720" rx="28" fill="none" stroke="${secondary}" stroke-width="9" stroke-opacity="0.85"/>` +
+        `<rect x="52" y="52" width="496" height="696" rx="20" fill="none" stroke="${accent}" stroke-width="2" stroke-opacity="0.7"/>` +
+        `<circle cx="40" cy="40" r="11" fill="${accent}"/><circle cx="560" cy="40" r="11" fill="${accent}"/><circle cx="40" cy="760" r="11" fill="${accent}"/><circle cx="560" cy="760" r="11" fill="${accent}"/>`
+      );
+    case 'retro-burst':
+      return g(
+        `<path d="M40 300 l24 -40 60 0 26 40 -26 40 -60 0 Z M540 480 l-24 40 -60 0 -26 -40 26 -40 60 0 Z" fill="${accent}" fill-opacity="0.4"/>` +
+        `<rect x="46" y="46" width="508" height="708" rx="10" fill="none" stroke="${secondary}" stroke-width="5" stroke-opacity="0.9"/>`
+      );
+    case 'boho-wreath':
+      return g(
+        `<circle cx="300" cy="360" r="300" fill="none" stroke="${secondary}" stroke-width="3" stroke-opacity="0.7"/>` +
+        `<circle cx="300" cy="360" r="292" fill="none" stroke="${accent}" stroke-width="1.5" stroke-opacity="0.45" stroke-dasharray="10 8"/>` +
+        `<text x="300" y="40" font-size="26" text-anchor="middle">🌿</text><text x="52" y="360" font-size="26">🌿</text><text x="548" y="360" font-size="26">🌿</text>`
       );
     default:
       return g(
