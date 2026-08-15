@@ -1,16 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mail, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Template, WishItem, EventDetails } from '../types';
 import { formatRupiah, CATEGORY_EMOJIS, CATEGORY_LABELS } from '../data/templates';
 import { TemplateAudioEngine } from '../lib/audioEngine';
 import { TemplateBackground } from './TemplateBackground';
 import { MotionConfig, motion, AnimatePresence } from 'motion/react';
-import { Reveal, Stagger, StaggerChild, getProfile, EASE_OUT } from './AnimationKit';
-import { UiButton } from './UiButton';
+import { getProfile, EASE_OUT } from './AnimationKit';
 import { getTemplatePrice } from '../lib/templatePricing';
 import { RatingSection } from './RatingSection';
-import { InvitationVideo } from './InvitationVideo';
 import { isValidPublicVideoUrl } from '../lib/videoStorage';
+import { DemoContent, getDemoContent } from '../design/content';
+import { resolveDesignSystem } from '../design/families';
+import { SectionProps } from '../design/sections';
+import {
+  CoverView,
+  UnveiledHeader,
+  MessageSection,
+  WeddingParentsSection,
+  ChildParentsSection,
+  EducationHostSection,
+  ExtendedHostSection,
+  EventDetailsSection,
+  CountdownSection,
+  GallerySection,
+  VideoSection,
+  MapSection,
+  RsvpSection,
+  WishesSection,
+  ClosingSection,
+} from '../design/sections';
 
 interface TemplateDemoViewProps {
   template: Template;
@@ -46,213 +64,6 @@ interface TemplateDemoViewProps {
   /** Optional custom back target label/action for invitation mode. */
   onBackLabel?: string;
 }
-
-interface DemoContent {
-  mainTitle: string;
-  eventSubtitle: string;
-  messageHeading: string;
-  messageText: string;
-  messageBy: string;
-  countdownTitle: string;
-  galleryHeading: string;
-  galleryNote: string;
-  mapHeading: string;
-  rsvpHeading: string;
-  rsvpNote: string;
-  wishesHeading: string;
-  wishesNote: string;
-  wishesPlaceholder: string;
-  wishButton: string;
-  closingTitle: string;
-  closingQuote: string;
-  closingBy: string;
-}
-
-const getDemoContent = (template: Template, eventDetails: EventDetails): DemoContent => {
-  const cat = template.category;
-
-  if (cat === 'sunatan') {
-    return {
-      mainTitle: eventDetails.childName || '',
-      eventSubtitle: 'Khitanan Putra Kami',
-      messageHeading: 'Doa & Ucapan',
-      messageText: eventDetails.messageQuote || '',
-      messageBy: eventDetails.parentsName || '',
-      countdownTitle: 'Countdown Acara Khitanan',
-      galleryHeading: 'Momen Sang Buah Hati',
-      galleryNote: 'Kenangan kecil yang penuh makna',
-      mapHeading: 'Lokasi Acara',
-      rsvpHeading: 'Konfirmasi Kehadiran',
-      rsvpNote: 'Mohon konfirmasi kehadiran Anda',
-      wishesHeading: 'Kirim Doa & Ucapan',
-      wishesNote: 'Tulis doa dan ucapan untuk si kecil',
-      wishesPlaceholder: `Tulis doa & ucapan untuk ${eventDetails.childName}...`,
-      wishButton: 'Kirim Doa & Ucapan',
-      closingTitle: 'Jazakumullahu Khairan',
-      closingQuote: '"Semoga Allah memberkahi dan menjadikannya anak yang sholeh."',
-      closingBy: eventDetails.parentsName || '',
-    };
-  }
-
-  if (cat === 'wedding') {
-    return {
-      mainTitle: `${eventDetails.groomName} & ${eventDetails.brideName}`,
-      eventSubtitle: 'The Wedding of',
-      messageHeading: 'Our Love Story',
-      messageText: eventDetails.coupleStory || '',
-      messageBy: eventDetails.hashtag || '#OurWedding',
-      countdownTitle: 'Countdown Pernikahan',
-      galleryHeading: 'Our Moments',
-      galleryNote: 'Sepenggal cerita kami',
-      mapHeading: 'Lokasi Acara',
-      rsvpHeading: 'RSVP Kehadiran',
-      rsvpNote: 'Mohon konfirmasi kehadiran Anda',
-      wishesHeading: 'Kirim Ucapan',
-      wishesNote: 'Tulis ucapan & doa untuk kedua mempelai',
-      wishesPlaceholder: `Tulis ucapan untuk ${eventDetails.groomName} & ${eventDetails.brideName}...`,
-      wishButton: 'Kirim Ucapan',
-      closingTitle: 'Thank You',
-      closingQuote: eventDetails.messageQuote || '',
-      closingBy: `${eventDetails.groomName} & ${eventDetails.brideName}`,
-    };
-  }
-
-  if (cat === 'aqiqah') {
-    return {
-      mainTitle: eventDetails.babyName || '',
-      eventSubtitle: 'Syukuran Aqiqah',
-      messageHeading: 'Doa Untuk Buah Hati',
-      messageText: eventDetails.messageQuote || '',
-      messageBy: eventDetails.parentsName || '',
-      countdownTitle: 'Countdown Acara Aqiqah',
-      galleryHeading: 'Little Moments',
-      galleryNote: 'Kebahagiaan kecil yang besar artinya',
-      mapHeading: 'Lokasi Acara',
-      rsvpHeading: 'Konfirmasi Kehadiran',
-      rsvpNote: 'Mohon konfirmasi kehadiran Anda',
-      wishesHeading: 'Kirim Doa & Ucapan',
-      wishesNote: 'Tulis doa & ucapan untuk sang buah hati',
-      wishesPlaceholder: `Tulis doa & ucapan untuk ${eventDetails.babyName}...`,
-      wishButton: 'Kirim Doa & Ucapan',
-      closingTitle: 'Terima Kasih',
-      closingQuote: eventDetails.messageQuote || '',
-      closingBy: eventDetails.parentsName || '',
-    };
-  }
-
-  if (cat === 'education') {
-    return {
-      mainTitle: eventDetails.graduateName || '',
-      eventSubtitle: eventDetails.degreeName || 'Wisuda & Graduation',
-      messageHeading: 'Ucapan & Doa',
-      messageText: eventDetails.messageQuote || '',
-      messageBy: eventDetails.parentsName || '',
-      countdownTitle: 'Countdown Menuju Wisuda',
-      galleryHeading: 'Momen Perjalanan',
-      galleryNote: 'Perjalanan panjang menuju hari ini',
-      mapHeading: 'Lokasi Acara',
-      rsvpHeading: 'Konfirmasi Kehadiran',
-      rsvpNote: 'Mohon konfirmasi kehadiran Anda',
-      wishesHeading: 'Kirim Ucapan & Doa',
-      wishesNote: 'Tulis ucapan untuk sang lulusan',
-      wishesPlaceholder: `Tulis ucapan untuk ${eventDetails.graduateName}...`,
-      wishButton: 'Kirim Ucapan',
-      closingTitle: 'Terima Kasih',
-      closingQuote: eventDetails.messageQuote || '',
-      closingBy: eventDetails.parentsName || '',
-    };
-  }
-
-  const extended = (['religious', 'tasyakuran', 'gathering', 'business', 'anniversary', 'family', 'doa-haul'] as const).includes(cat as never);
-
-  if (extended) {
-    const isDoa = cat === 'doa-haul';
-    const isBusiness = cat === 'business';
-    const isAnniversary = cat === 'anniversary';
-    const mainTitle =
-      isAnniversary && eventDetails.coupleName
-        ? `${eventDetails.coupleName} • ${eventDetails.anniversaryYear ?? 1} Tahun`
-        : eventDetails.eventTitle || template.name;
-    const eventSubtitle =
-      cat === 'anniversary'
-        ? 'Anniversary Celebration'
-        : cat === 'doa-haul'
-          ? 'Undangan Doa & Haul'
-          : cat === 'business'
-            ? 'Undangan Bisnis & Acara'
-            : cat === 'religious'
-              ? 'Undangan Acara Keagamaan'
-              : cat === 'tasyakuran'
-                ? 'Undangan Tasyakuran'
-                : cat === 'gathering'
-                  ? 'Acara & Gathering'
-                  : 'Undangan Keluarga';
-    const by =
-      isBusiness
-        ? eventDetails.companyName || eventDetails.hostName || ''
-        : eventDetails.hostName || '';
-    const honoree =
-      isDoa ? eventDetails.deceasedName || '' : by;
-    return {
-      mainTitle,
-      eventSubtitle,
-      messageHeading: cat === 'anniversary' ? 'Our Journey' : cat === 'doa-haul' ? 'Doa & Ucapan' : 'Undangan & Ucapan',
-      messageText: eventDetails.messageQuote || '',
-      messageBy: by,
-      countdownTitle: isDoa ? 'Waktu Acara Tahlilan' : 'Countdown Menuju Acara',
-      galleryHeading: cat === 'anniversary' ? 'Our Moments' : 'Momen Acara',
-      galleryNote: cat === 'anniversary' ? 'Setiap tahun selalu ada cerita indah' : 'Dokumentasi keseruan acara kami',
-      mapHeading: 'Lokasi Acara',
-      rsvpHeading: 'Konfirmasi Kehadiran',
-      rsvpNote: 'Mohon konfirmasi kehadiran Anda',
-      wishesHeading: isDoa ? 'Kirim Doa & Ucapan' : 'Kirim Ucapan & Doa',
-      wishesNote: isDoa
-        ? `Tulis doa untuk ${honoree || 'almarhum/almarhumah'}`
-        : `Tulis ucapan untuk ${eventDetails.eventTitle || 'acara ini'}`,
-      wishesPlaceholder: isDoa
-        ? `Tulis doa untuk ${honoree || 'almarhum/almarhumah'}...`
-        : `Tulis ucapan untuk ${eventDetails.eventTitle || 'acara ini'}...`,
-      wishButton: isDoa ? 'Kirim Doa' : 'Kirim Ucapan',
-      closingTitle:
-        cat === 'anniversary'
-          ? 'Forever & Always'
-          : cat === 'doa-haul'
-            ? 'Al Fatihah'
-            : cat === 'business'
-              ? 'Terima Kasih'
-              : 'Terima Kasih',
-      closingQuote: eventDetails.messageQuote || '',
-      closingBy:
-        isBusiness
-          ? eventDetails.companyName || eventDetails.hostName || ''
-          : isAnniversary
-            ? eventDetails.coupleName || eventDetails.hostName || ''
-            : eventDetails.hostName || '',
-    };
-  }
-
-  // birthday (default)
-  return {
-    mainTitle: `${eventDetails.birthdayPerson}'s ${eventDetails.age}th`,
-    eventSubtitle: 'Birthday Invitation',
-    messageHeading: 'Birthday Message',
-    messageText: eventDetails.messageQuote || '',
-    messageBy: `${eventDetails.birthdayPerson} & Family`,
-    countdownTitle: 'Countdown to the Party',
-    galleryHeading: 'Photo Gallery',
-    galleryNote: 'Kenangan indah yang tak terlupakan',
-    mapHeading: 'Event Location Map',
-    rsvpHeading: 'Will You Attend?',
-    rsvpNote: 'Please confirm your presence',
-    wishesHeading: 'Leave a Birthday Wish',
-    wishesNote: `Tulis ucapan & doa hangat untuk ${eventDetails.birthdayPerson}`,
-    wishesPlaceholder: `Tulis ucapan ulang tahun untuk ${eventDetails.birthdayPerson}...`,
-    wishButton: 'Send Wish / Kirim Ucapan',
-    closingTitle: 'See You At The Party!',
-    closingQuote: '"Kehadiran dan doa Anda adalah kado terindah bagi kami."',
-    closingBy: `${eventDetails.birthdayPerson} & Family`,
-  };
-};
 
 export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   template,
@@ -360,6 +171,39 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   const catLabel = CATEGORY_LABELS[template.category];
   const catEmoji = CATEGORY_EMOJIS[template.category];
   const profile = getProfile(template.category);
+  const ds = resolveDesignSystem(template);
+  const family = ds.family;
+
+  // Shared props for every design-system section
+  const sectionProps: SectionProps = {
+    ds,
+    family,
+    themeStyle,
+    profile,
+    content,
+    eventDetails,
+    catLabel,
+    catEmoji,
+    templateNumber: template.templateNumber,
+    onOpen: () => void handleOpenInvitation(),
+    countdown,
+    onGalleryClick: (url) => setGalleryImage(url),
+    onMapOpen: () => setMapModalOpen(true),
+    rsvpData,
+    rsvpSubmitted,
+    onRsvpChange: (patch) => setRsvpData((prev) => ({ ...prev, ...patch })),
+    onRsvpSubmit: (e) => void handleRSVPSubmit(e),
+    wishesList,
+    newWishName,
+    newWishText,
+    wishSuccess,
+    onWishNameChange: setNewWishName,
+    onWishTextChange: setNewWishText,
+    onWishSubmit: (e) => void handleSendWish(e),
+    videoUrl: activeVideoUrl,
+    videoType: videoOverride?.type,
+    videoName: videoOverride?.name,
+  };
 
   // Keep wishes in sync if the override changes (e.g. editor preview remounts).
   useEffect(() => {
@@ -699,420 +543,26 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
 
           {/* SECTION 1: COVER VIEW / HERO */}
           {!coverOpened ? (
-            <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 text-center relative z-20">
-              <Stagger
-                profile={profile}
-                onView={false}
-                delay={0.2}
-                stagger={0.2}
-                className="max-w-md w-full flex flex-col items-center gap-5 relative z-10 my-auto"
-              >
-                {/* Decorative Theme Badging */}
-                <StaggerChild variant="down" duration={0.7}>
-                  <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 border border-white/20 text-xs font-bold uppercase tracking-widest text-amber-300 shadow-lg backdrop-blur-md">
-                    <span>{themeStyle.decorations?.[0] || '✨'}</span>
-                    <span>You Are Invited To</span>
-                    <span>{themeStyle.decorations?.[1] || '✨'}</span>
-                  </div>
-                </StaggerChild>
-
-                <StaggerChild variant="scale" duration={0.9}>
-                  <h1
-                    className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight drop-shadow-md"
-                    style={{ fontFamily: themeStyle.fontFamilyTitle, color: themeStyle.textColor }}
-                  >
-                    {content.mainTitle}
-                    <br />
-                    <span className="text-2xl sm:text-3xl block mt-2">{content.eventSubtitle}</span>
-                  </h1>
-                </StaggerChild>
-
-                {/* Custom Photo Frame based on frameStyle */}
-                <StaggerChild variant="photo" duration={1.0}>
-                {(() => {
-                  const frame = themeStyle.frameStyle || 'glass-frame';
-
-                  if (frame === 'arch' || frame === 'islamic-arch') {
-                    return (
-                      <div className="w-44 h-56 sm:w-52 sm:h-64 rounded-t-full rounded-b-2xl overflow-hidden shadow-2xl border-4 border-amber-300/60 my-2 relative group bg-black/30 p-1 shrink-0">
-                        <img
-                          src={eventDetails.portraitImage}
-                          alt={content.mainTitle}
-                          className="w-full h-full object-cover rounded-t-full rounded-b-xl group-hover:scale-105 transition-transform duration-700"
-                        />
-                      </div>
-                    );
-                  }
-
-                  if (frame === 'gold-border') {
-                    return (
-                      <div className="w-44 h-56 sm:w-52 sm:h-64 rounded-2xl overflow-hidden shadow-2xl border-4 border-amber-400 p-1 bg-gradient-to-tr from-amber-300 via-amber-500 to-amber-200 my-2 relative group shrink-0">
-                        <img
-                          src={eventDetails.portraitImage}
-                          alt={content.mainTitle}
-                          className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-700"
-                        />
-                      </div>
-                    );
-                  }
-
-                  if (frame === 'polaroid') {
-                    return (
-                      <div className="w-44 sm:w-52 p-2.5 pb-6 bg-amber-50 text-slate-900 rounded-lg shadow-2xl transform -rotate-2 hover:rotate-0 transition-transform duration-500 my-2 relative border border-slate-200 shrink-0">
-                        <div className="w-full h-44 sm:h-52 overflow-hidden rounded bg-slate-200">
-                          <img
-                            src={eventDetails.portraitImage}
-                            alt={content.mainTitle}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="mt-2 text-center font-bold text-[11px] tracking-wider opacity-80 uppercase">
-                          {template.name}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  if (frame === 'cute-ribbon' || frame === 'moon-arch' || frame === 'floral-wreath') {
-                    return (
-                      <div className="w-44 h-56 sm:w-52 sm:h-64 rounded-3xl overflow-hidden shadow-2xl border-4 border-pink-300/80 my-2 relative group bg-pink-950/20 p-1 shrink-0">
-                        <div className="absolute top-1 left-1/2 -translate-x-1/2 z-20 text-xl select-none">
-                          {frame === 'moon-arch' ? '🌙' : frame === 'floral-wreath' ? '🌷' : '🎀'}
-                        </div>
-                        <img
-                          src={eventDetails.portraitImage}
-                          alt={content.mainTitle}
-                          className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700"
-                        />
-                      </div>
-                    );
-                  }
-
-                  if (frame === 'neon-border') {
-                    return (
-                      <div className="w-44 h-56 sm:w-52 sm:h-64 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(6,182,212,0.6)] border-2 border-cyan-400 p-1 bg-slate-950 my-2 relative group shrink-0">
-                        <img
-                          src={eventDetails.portraitImage}
-                          alt={content.mainTitle}
-                          className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-700"
-                        />
-                      </div>
-                    );
-                  }
-
-                  if (frame === 'royal-crest' || frame === 'royal-crown') {
-                    return (
-                      <div className="w-44 h-56 sm:w-52 sm:h-64 rounded-t-full rounded-b-3xl overflow-hidden shadow-2xl border-2 border-amber-300 p-1.5 bg-gradient-to-b from-amber-400 via-emerald-700 to-amber-500 my-2 relative group shrink-0">
-                        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 text-xl drop-shadow-md select-none">👑</div>
-                        <img
-                          src={eventDetails.portraitImage}
-                          alt={content.mainTitle}
-                          className="w-full h-full object-cover rounded-t-full rounded-b-2xl pt-3 group-hover:scale-105 transition-transform duration-700"
-                        />
-                      </div>
-                    );
-                  }
-
-                  if (frame === 'minimal-circle' || frame === 'minimal-line') {
-                    return (
-                      <div className="w-44 h-56 sm:w-52 sm:h-64 rounded-full overflow-hidden shadow-2xl border-2 border-white/40 my-2 relative group bg-black/30 p-1.5 shrink-0">
-                        <img
-                          src={eventDetails.portraitImage}
-                          alt={content.mainTitle}
-                          className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform duration-700"
-                        />
-                      </div>
-                    );
-                  }
-
-                  // Default glass frame
-                  return (
-                    <div className="w-44 h-56 sm:w-52 sm:h-64 rounded-3xl overflow-hidden shadow-2xl border-4 border-white/30 my-2 relative group bg-black/30 p-1 shrink-0">
-                      <img
-                        src={eventDetails.portraitImage}
-                        alt={content.mainTitle}
-                        className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-700"
-                      />
-                    </div>
-                  );
-                })()}
-                </StaggerChild>
-
-                <StaggerChild variant="up" duration={0.7}>
-                  <p className="text-sm sm:text-base opacity-95 font-semibold drop-shadow-sm">
-                    {eventDetails.date}
-                  </p>
-                </StaggerChild>
-
-                <StaggerChild variant="up" duration={0.8}>
-
-                {/* Custom Styled Open Invitation Button */}
-                {(() => {
-                  const btn = themeStyle.buttonStyle || 'playful';
-
-                  if (btn === 'gold-luxury' || btn === 'emerald-glass' || btn === 'islamic-gold' || btn === 'garden-rose') {
-                    return (
-                      <button
-                        onClick={handleOpenInvitation}
-                        className="btn-micro w-full max-w-xs py-4 px-8 rounded-full font-extrabold text-xs sm:text-sm uppercase tracking-widest shadow-2xl flex items-center justify-center gap-2 cursor-pointer border-2 border-amber-300/80 mt-3 bg-gradient-to-r from-amber-500 via-amber-300 to-amber-600 text-slate-950 shadow-amber-500/20"
-                      >
-                        <Mail size={18} aria-hidden="true" />
-                        OPEN INVITATION
-                      </button>
-                    );
-                  }
-
-                  if (btn === 'rose-gold') {
-                    return (
-                      <button
-                        onClick={handleOpenInvitation}
-                        className="btn-micro w-full max-w-xs py-4 px-8 rounded-full font-extrabold text-xs sm:text-sm uppercase tracking-widest shadow-2xl flex items-center justify-center gap-2 cursor-pointer border border-rose-300/60 mt-3 bg-gradient-to-r from-rose-500 via-pink-400 to-amber-400 text-white shadow-rose-500/20"
-                      >
-                        <Mail size={18} aria-hidden="true" />
-                        OPEN INVITATION
-                      </button>
-                    );
-                  }
-
-                  if (btn === 'neon-glow') {
-                    return (
-                      <button
-                        onClick={handleOpenInvitation}
-                        className="btn-micro w-full max-w-xs py-4 px-8 rounded-full font-extrabold text-xs sm:text-sm uppercase tracking-widest shadow-[0_0_25px_rgba(6,182,212,0.6)] flex items-center justify-center gap-2 cursor-pointer border-2 border-cyan-300 mt-3 bg-gradient-to-r from-cyan-500 to-fuchsia-600 text-white"
-                      >
-                        <Mail size={18} aria-hidden="true" />
-                        OPEN INVITATION
-                      </button>
-                    );
-                  }
-
-                  if (btn === 'minimal-dark') {
-                    return (
-                      <button
-                        onClick={handleOpenInvitation}
-                        className="btn-micro w-full max-w-xs py-4 px-8 rounded-xl font-bold text-xs uppercase tracking-widest shadow-xl flex items-center justify-center gap-2 cursor-pointer border border-white/40 mt-3 bg-slate-900 text-white"
-                      >
-                        <Mail size={16} aria-hidden="true" />
-                        OPEN INVITATION
-                      </button>
-                    );
-                  }
-
-                  return (
-                    <button
-                      onClick={handleOpenInvitation}
-                      className="btn-micro w-full max-w-xs py-4 px-8 rounded-full font-extrabold text-xs sm:text-sm uppercase tracking-wider shadow-2xl flex items-center justify-center gap-2 cursor-pointer border border-white/40 mt-3"
-                      style={{
-                        backgroundColor: themeStyle.primaryColor,
-                        color: '#ffffff',
-                      }}
-                    >
-                      <Mail size={18} aria-hidden="true" />
-                      OPEN INVITATION
-                    </button>
-                  );
-                })()}
-                </StaggerChild>
-              </Stagger>
-            </section>
+            <CoverView {...sectionProps} />
           ) : (
             /* UNVEILED INVITATION SECTIONS */
             <div className="w-full pb-28 animate-fade-in max-w-md mx-auto px-4 sm:px-6">
-              {/* Top Banner / Hero Header */}
-              <header className="min-h-[80vh] flex flex-col items-center justify-center text-center py-10 relative border-b border-white/10">
-                <Stagger
-                  profile={profile}
-                  onView={false}
-                  delay={0.15}
-                  stagger={0.2}
-                  className="flex flex-col items-center gap-4 relative z-10 my-auto"
-                >
-                  <StaggerChild variant="down" duration={0.7}>
-                    <div className="px-3.5 py-1 rounded-full bg-black/40 border border-white/20 backdrop-blur-md text-amber-300 text-xs font-bold uppercase tracking-widest">
-                      {catEmoji} Digital {catLabel} Invitation #{template.templateNumber}
-                    </div>
-                  </StaggerChild>
+              <UnveiledHeader {...sectionProps} />
 
-                  <StaggerChild variant="scale" duration={0.9}>
-                    <h1
-                      className="text-4xl sm:text-5xl font-extrabold leading-tight drop-shadow-md"
-                      style={{ fontFamily: themeStyle.fontFamilyTitle, color: themeStyle.textColor }}
-                    >
-                      {content.mainTitle}
-                      <br />
-                      <span className="text-2xl sm:text-3xl block mt-2">{content.eventSubtitle}</span>
-                    </h1>
-                  </StaggerChild>
+              <MessageSection {...sectionProps} />
 
-                  <StaggerChild variant="photo" duration={1.0}>
-                    <div className="w-44 h-56 rounded-full p-1.5 bg-gradient-to-tr from-amber-400 via-rose-500 to-indigo-500 my-4 shadow-2xl">
-                      <img
-                        src={eventDetails.portraitImage}
-                        alt={content.mainTitle}
-                        className="w-full h-full object-cover rounded-full border-2 border-slate-900"
-                      />
-                    </div>
-                  </StaggerChild>
-
-                  <StaggerChild variant="up" duration={0.7}>
-                    <p className="text-sm opacity-95 font-semibold bg-black/40 px-4 py-2 rounded-full border border-white/15 backdrop-blur-md">
-                      {eventDetails.date} • {eventDetails.time}
-                    </p>
-                  </StaggerChild>
-                </Stagger>
-              </header>
-
-              {/* SECTION 2: MESSAGE / DOA / LOVE STORY */}
-              <section className="my-10 text-center">
-                <Stagger
-                  profile={profile}
-                  className="p-6 rounded-3xl backdrop-blur-md bg-black/40 border border-white/20 shadow-2xl relative overflow-hidden"
-                >
-                  <StaggerChild variant="scale">
-                    <span
-                      className="material-symbols-outlined text-4xl mb-2 block"
-                      style={{ color: themeStyle.primaryColor }}
-                    >
-                      format_quote
-                    </span>
-                  </StaggerChild>
-                  <StaggerChild variant="up">
-                    <h2
-                      className="text-xl font-bold mb-3 drop-shadow-sm"
-                      style={{ fontFamily: themeStyle.fontFamilyTitle, color: themeStyle.textColor }}
-                    >
-                      {content.messageHeading}
-                    </h2>
-                  </StaggerChild>
-                  <StaggerChild variant="up">
-                    <p className="text-sm sm:text-base leading-relaxed italic opacity-95">
-                      "{content.messageText}"
-                    </p>
-                  </StaggerChild>
-                  <StaggerChild variant="up">
-                    <div className="mt-4 text-xs font-bold uppercase tracking-widest text-amber-300">
-                      — {content.messageBy}
-                    </div>
-                  </StaggerChild>
-                </Stagger>
-              </section>
-
-              {/* SECTION 2b: WEDDING PARENTS + AKAD/RESEPSI */}
               {template.category === 'wedding' && (
-                <section className="my-10">
-                  <Stagger profile={profile}>
-                    <StaggerChild variant="up" className="mb-4">
-                      <div className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md">
-                        <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200 mb-1">
-                          Putra dari Bapak & Ibu
-                        </h3>
-                        <p className="text-sm font-bold">{eventDetails.groomName}</p>
-                        <p className="text-xs opacity-85 mt-0.5">{eventDetails.groomParents}</p>
-                      </div>
-                    </StaggerChild>
-                    <StaggerChild variant="up">
-                      <div className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md">
-                        <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200 mb-1">
-                          Putri dari Bapak & Ibu
-                        </h3>
-                        <p className="text-sm font-bold">{eventDetails.brideName}</p>
-                        <p className="text-xs opacity-85 mt-0.5">{eventDetails.brideParents}</p>
-                      </div>
-                    </StaggerChild>
-                  </Stagger>
-                </section>
+                <WeddingParentsSection {...sectionProps} />
               )}
 
-              {/* SECTION 2c: SUNATAN / AQIQAH CHILD + PARENTS */}
               {(template.category === 'sunatan' || template.category === 'aqiqah') && (
-                <section className="my-10">
-                  <Stagger
-                    profile={profile}
-                    stagger={0.12}
-                    className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md flex items-start gap-4"
-                  >
-                    <StaggerChild variant="scale">
-                      <div className="p-3 rounded-xl bg-white/15 text-amber-300 shrink-0">
-                        <span className="material-symbols-outlined text-2xl">child_care</span>
-                      </div>
-                    </StaggerChild>
-                    <StaggerChild variant="right">
-                      <div className="flex-1">
-                        <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200">
-                          {template.category === 'sunatan' ? 'Nama Anak' : 'Nama Buah Hati'}
-                        </h3>
-                        <p className="text-base font-bold mt-0.5">
-                          {template.category === 'sunatan' ? eventDetails.childName : eventDetails.babyName}
-                        </p>
-                        {template.category === 'aqiqah' && eventDetails.babyGender && (
-                          <p className="text-xs opacity-85 mt-0.5">Jenis Kelamin: {eventDetails.babyGender}</p>
-                        )}
-                        {template.category === 'aqiqah' && eventDetails.babyBirthDate && (
-                          <p className="text-xs opacity-85 mt-0.5">Lahir: {eventDetails.babyBirthDate}</p>
-                        )}
-                      </div>
-                    </StaggerChild>
-                  </Stagger>
-                  <Stagger
-                    profile={profile}
-                    delay={0.2}
-                    stagger={0.12}
-                    className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md flex items-start gap-4 mt-3"
-                  >
-                    <StaggerChild variant="scale">
-                      <div className="p-3 rounded-xl bg-white/15 text-amber-300 shrink-0">
-                        <span className="material-symbols-outlined text-2xl">family_restroom</span>
-                      </div>
-                    </StaggerChild>
-                    <StaggerChild variant="right">
-                      <div>
-                        <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200">
-                          Orang Tua
-                        </h3>
-                        <p className="text-sm font-bold mt-0.5">{eventDetails.parentsName}</p>
-                      </div>
-                    </StaggerChild>
-                  </Stagger>
-                </section>
+                <ChildParentsSection {...sectionProps} />
               )}
 
-              {/* SECTION 2d: EDUCATION GRADUATE + INSTITUTION */}
               {template.category === 'education' && (
-                <section className="my-10">
-                  <Stagger profile={profile}>
-                    <StaggerChild variant="up" className="mb-4">
-                      <div className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md flex items-start gap-4">
-                        <div className="p-3 rounded-xl bg-white/15 text-amber-300 shrink-0">
-                          <span className="material-symbols-outlined text-2xl">school</span>
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200">
-                            Nama Lulusan
-                          </h3>
-                          <p className="text-base font-bold mt-0.5">{eventDetails.graduateName}</p>
-                          <p className="text-xs opacity-85 mt-0.5">{eventDetails.degreeName}</p>
-                        </div>
-                      </div>
-                    </StaggerChild>
-                    <StaggerChild variant="up">
-                      <div className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md flex items-start gap-4">
-                        <div className="p-3 rounded-xl bg-white/15 text-amber-300 shrink-0">
-                          <span className="material-symbols-outlined text-2xl">account_balance</span>
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200">
-                            Perguruan Tinggi
-                          </h3>
-                          <p className="text-sm font-bold mt-0.5">{eventDetails.institutionName}</p>
-                          <p className="text-xs opacity-85 mt-0.5">{eventDetails.parentsName}</p>
-                        </div>
-                      </div>
-                    </StaggerChild>
-                  </Stagger>
-                </section>
+                <EducationHostSection {...sectionProps} />
               )}
 
-              {/* SECTION 2e: EXTENDED CATEGORY HOST / INSTITUTION */}
               {(template.category === 'religious' ||
                 template.category === 'tasyakuran' ||
                 template.category === 'gathering' ||
@@ -1120,477 +570,22 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
                 template.category === 'anniversary' ||
                 template.category === 'family' ||
                 template.category === 'doa-haul') && (
-                <section className="my-10">
-                  <Stagger
-                    profile={profile}
-                    className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md flex items-start gap-4"
-                  >
-                    <StaggerChild variant="scale">
-                      <div className="p-3 rounded-xl bg-white/15 text-amber-300 shrink-0">
-                        <span className="material-symbols-outlined text-2xl">
-                          {template.category === 'religious'
-                            ? 'mosque'
-                            : template.category === 'tasyakuran'
-                              ? 'home'
-                              : template.category === 'gathering'
-                                ? 'groups'
-                                : template.category === 'business'
-                                  ? 'business_center'
-                                  : template.category === 'anniversary'
-                                    ? 'favorite'
-                                    : template.category === 'family'
-                                      ? 'family_restroom'
-                                      : 'prayer_times'}
-                        </span>
-                      </div>
-                    </StaggerChild>
-                    <StaggerChild variant="right">
-                      <div className="flex-1">
-                        <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200">
-                          {template.category === 'business'
-                            ? 'Penyelenggara'
-                            : template.category === 'doa-haul'
-                              ? 'Atas Nama Keluarga'
-                              : template.category === 'anniversary'
-                                ? 'Pasangan'
-                                : 'Penyelenggara'}
-                        </h3>
-                        <p className="text-base font-bold mt-0.5">
-                          {template.category === 'business'
-                            ? eventDetails.companyName || eventDetails.hostName
-                            : template.category === 'anniversary'
-                              ? eventDetails.coupleName || eventDetails.hostName
-                              : eventDetails.hostName || eventDetails.institutionName}
-                        </p>
-                        {template.category === 'doa-haul' && eventDetails.deceasedName && (
-                          <p className="text-sm mt-1 italic opacity-90">Untuk almarhum/almarhumah {eventDetails.deceasedName}</p>
-                        )}
-                        {template.category === 'anniversary' && eventDetails.anniversaryYear && (
-                          <p className="text-xs opacity-85 mt-0.5">
-                            Merayakan {eventDetails.anniversaryYear} tahun kebersamaan
-                          </p>
-                        )}
-                      </div>
-                    </StaggerChild>
-                  </Stagger>
-                </section>
+                <ExtendedHostSection {...sectionProps} />
               )}
 
-              {/* SECTION 3: EVENT DETAILS */}
-              <section className="my-10">
-                <Reveal profile={profile} variant="up">
-                  <h2
-                    className="text-2xl font-bold text-center mb-6 drop-shadow-sm"
-                    style={{ fontFamily: themeStyle.fontFamilyTitle, color: themeStyle.textColor }}
-                  >
-                    Event Details
-                  </h2>
-                </Reveal>
+              <EventDetailsSection {...sectionProps} />
+              <CountdownSection {...sectionProps} />
+              <GallerySection {...sectionProps} />
 
-                {template.category === 'wedding' && (
-                  <Stagger profile={profile} className="flex flex-col gap-4 mb-4">
-                    <StaggerChild variant="up">
-                      <div className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md flex items-start gap-4">
-                        <div className="p-3 rounded-xl bg-white/15 text-amber-300 shrink-0">
-                          <span className="material-symbols-outlined text-2xl">volunteer_activism</span>
-                        </div>
-                        <div>
-                          <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200">Akad Nikah</h3>
-                          <p className="text-base font-bold mt-0.5">{eventDetails.akadDate}</p>
-                          <p className="text-xs opacity-85 mt-0.5">08.00 WIB - 10.00 WIB</p>
-                        </div>
-                      </div>
-                    </StaggerChild>
-                    <StaggerChild variant="up">
-                      <div className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md flex items-start gap-4">
-                        <div className="p-3 rounded-xl bg-white/15 text-amber-300 shrink-0">
-                          <span className="material-symbols-outlined text-2xl">celebration</span>
-                        </div>
-                        <div>
-                          <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200">Resepsi</h3>
-                          <p className="text-base font-bold mt-0.5">{eventDetails.resepsiDate}</p>
-                          <p className="text-xs opacity-85 mt-0.5">{eventDetails.time}</p>
-                        </div>
-                      </div>
-                    </StaggerChild>
-                  </Stagger>
-                )}
+              {activeVideoUrl && <VideoSection {...sectionProps} />}
 
-                <Stagger profile={profile} className="flex flex-col gap-4">
-                  <StaggerChild variant="up">
-                    <div className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md flex items-start gap-4">
-                      <Reveal profile={profile} variant="scale" delay={0.15}>
-                        <div className="p-3 rounded-xl bg-white/15 text-amber-300 shrink-0">
-                          <span className="material-symbols-outlined text-2xl">calendar_today</span>
-                        </div>
-                      </Reveal>
-                      <div>
-                        <Reveal profile={profile} variant="right" delay={0.25}>
-                          <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200">Date & Time</h3>
-                        </Reveal>
-                        <Reveal profile={profile} variant="up" delay={0.35}>
-                          <p className="text-base font-bold mt-0.5">{eventDetails.date}</p>
-                        </Reveal>
-                        <Reveal profile={profile} variant="up" delay={0.45}>
-                          <p className="text-xs opacity-85 mt-0.5">{eventDetails.time}</p>
-                        </Reveal>
-                      </div>
-                    </div>
-                  </StaggerChild>
-
-                  <StaggerChild variant="up">
-                    <div className="p-5 rounded-2xl bg-black/40 border border-white/20 backdrop-blur-md flex items-start gap-4">
-                      <Reveal profile={profile} variant="scale" delay={0.15}>
-                        <div className="p-3 rounded-xl bg-white/15 text-amber-300 shrink-0">
-                          <span className="material-symbols-outlined text-2xl">pin_drop</span>
-                        </div>
-                      </Reveal>
-                      <div>
-                        <Reveal profile={profile} variant="fade" delay={0.25}>
-                          <h3 className="text-xs font-bold opacity-70 uppercase tracking-wider text-amber-200">Venue Location</h3>
-                        </Reveal>
-                        <Reveal profile={profile} variant="up" delay={0.35}>
-                          <p className="text-base font-bold mt-0.5">{eventDetails.venue}</p>
-                        </Reveal>
-                        <Reveal profile={profile} variant="up" delay={0.45}>
-                          <p className="text-xs opacity-85 leading-relaxed mt-1">{eventDetails.address}</p>
-                        </Reveal>
-                      </div>
-                    </div>
-                  </StaggerChild>
-                </Stagger>
-              </section>
-
-              {/* SECTION 4: LIVE COUNTDOWN */}
-              <section className="my-10 text-center">
-                <Reveal profile={profile} variant="up">
-                  <h2
-                    className="text-xl font-bold mb-4 drop-shadow-sm"
-                    style={{ fontFamily: themeStyle.fontFamilyTitle, color: themeStyle.textColor }}
-                  >
-                    {content.countdownTitle}
-                  </h2>
-                </Reveal>
-
-                <Stagger profile={profile} className="grid grid-cols-4 gap-2.5">
-                  <StaggerChild variant="scale">
-                    <div className="p-3.5 rounded-2xl bg-black/50 border border-white/20 backdrop-blur-md flex flex-col items-center">
-                      <span key={countdown.days} className="countdown-tick text-2xl font-black text-amber-300">{countdown.days}</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">Days</span>
-                    </div>
-                  </StaggerChild>
-                  <StaggerChild variant="scale">
-                    <div className="p-3.5 rounded-2xl bg-black/50 border border-white/20 backdrop-blur-md flex flex-col items-center">
-                      <span key={countdown.hours} className="countdown-tick text-2xl font-black text-amber-300">{countdown.hours}</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">Hours</span>
-                    </div>
-                  </StaggerChild>
-                  <StaggerChild variant="scale">
-                    <div className="p-3.5 rounded-2xl bg-black/50 border border-white/20 backdrop-blur-md flex flex-col items-center">
-                      <span key={countdown.mins} className="countdown-tick text-2xl font-black text-amber-300">{countdown.mins}</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">Mins</span>
-                    </div>
-                  </StaggerChild>
-                  <StaggerChild variant="scale">
-                    <div className="p-3.5 rounded-2xl bg-black/50 border border-white/20 backdrop-blur-md flex flex-col items-center">
-                      <span key={countdown.secs} className="countdown-tick text-2xl font-black text-amber-300">{countdown.secs}</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">Secs</span>
-                    </div>
-                  </StaggerChild>
-                </Stagger>
-              </section>
-
-              {/* SECTION 5: GALLERY */}
-              <section className="my-10">
-                <Reveal profile={profile} variant="up">
-                  <h2
-                    className="text-2xl font-bold text-center mb-6 drop-shadow-sm"
-                    style={{ fontFamily: themeStyle.fontFamilyTitle, color: themeStyle.textColor }}
-                  >
-                    {content.galleryHeading}
-                  </h2>
-                </Reveal>
-                <Reveal profile={profile} variant="fade">
-                  <p className="text-xs text-center opacity-80 mb-4 -mt-4">{content.galleryNote}</p>
-                </Reveal>
-
-                <Stagger profile={profile} stagger={0.12} className="grid grid-cols-2 gap-3">
-                  {eventDetails.galleryImages.map((imgUrl, index) => (
-                    <StaggerChild
-                      key={index}
-                      variant="photo"
-                      onClick={() => setGalleryImage(imgUrl)}
-                      className="card-lift aspect-square rounded-2xl overflow-hidden border border-white/20 shadow-lg cursor-pointer group relative bg-black/30"
-                    >
-                      <img
-                        src={imgUrl}
-                        alt={`Gallery ${index + 1}`}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="material-symbols-outlined text-white text-2xl">zoom_in</span>
-                      </div>
-                    </StaggerChild>
-                  ))}
-                </Stagger>
-              </section>
-
-              {/* SECTION 5b: VIDEO (streamed from public storage — every template) */}
-              {activeVideoUrl && (
-                <section className="my-10">
-                  <Reveal profile={profile} variant="up">
-                    <h2
-                      className="text-2xl font-bold text-center mb-6 drop-shadow-sm"
-                      style={{ fontFamily: themeStyle.fontFamilyTitle, color: themeStyle.textColor }}
-                    >
-                      Video
-                    </h2>
-                  </Reveal>
-                  <Reveal profile={profile} variant="fade">
-                    <InvitationVideo
-                      url={activeVideoUrl}
-                      type={videoOverride?.type}
-                      poster={eventDetails.portraitImage || undefined}
-                      name={videoOverride?.name}
-                    />
-                  </Reveal>
-                </section>
-              )}
-
-              {/* SECTION 6: LOCATION MAP */}
-              <section className="my-10 text-center">
-                <Reveal profile={profile} variant="up">
-                  <h2
-                    className="text-2xl font-bold mb-4 drop-shadow-sm"
-                    style={{ fontFamily: themeStyle.fontFamilyTitle, color: themeStyle.textColor }}
-                  >
-                    {content.mapHeading}
-                  </h2>
-                </Reveal>
-
-                <Stagger
-                  profile={profile}
-                  className="rounded-3xl overflow-hidden border border-white/20 shadow-2xl bg-black/40 backdrop-blur-md p-4"
-                >
-                  <StaggerChild variant="fade">
-                    <p className="text-xs opacity-90 mb-3 font-semibold">
-                      {eventDetails.venue} • {eventDetails.address}
-                    </p>
-                  </StaggerChild>
-
-                  <StaggerChild variant="photo">
-                    <div
-                      onClick={() => setMapModalOpen(true)}
-                      className="card-lift w-full h-44 rounded-2xl overflow-hidden relative cursor-pointer group border border-white/10"
-                    >
-                      <img
-                        src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=600&q=80"
-                        alt="Map Location"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                      />
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span className="px-4 py-2 rounded-full bg-white text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-sm">map</span>
-                          View Interactive Map
-                        </span>
-                      </div>
-                    </div>
-                  </StaggerChild>
-
-                  <StaggerChild variant="up">
-                    <a
-                      href={`https://maps.google.com/?q=${encodeURIComponent(eventDetails.venue + ' ' + eventDetails.address)}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn-micro mt-4 w-full py-3.5 rounded-2xl bg-white/15 border border-white/25 hover:bg-white/25 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer transition-colors"
-                    >
-                      <span className="material-symbols-outlined text-sm">directions</span>
-                      Open Google Maps
-                    </a>
-                  </StaggerChild>
-                </Stagger>
-              </section>
-
-              {/* SECTION 7: RSVP FORM */}
-              <section className="my-10">
-                <Stagger profile={profile} className="p-6 rounded-3xl bg-black/50 backdrop-blur-md border border-white/20 shadow-2xl">
-                  <StaggerChild variant="up">
-                    <h2
-                      className="text-2xl font-bold text-center mb-1 drop-shadow-sm"
-                      style={{ fontFamily: themeStyle.fontFamilyTitle, color: themeStyle.textColor }}
-                    >
-                      {content.rsvpHeading}
-                    </h2>
-                  </StaggerChild>
-                  <StaggerChild variant="fade">
-                    <p className="text-xs text-center opacity-80 mb-6">
-                      {content.rsvpNote}
-                    </p>
-                  </StaggerChild>
-
-                  {rsvpSubmitted ? (
-                    <StaggerChild variant="scale">
-                      <div className="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-center text-xs font-bold animate-fade-in">
-                        🎉 Terima kasih {rsvpData.name || 'Tamu'}! Konfirmasi RSVP kamu telah terkirim.
-                      </div>
-                    </StaggerChild>
-                  ) : (
-                    <form onSubmit={handleRSVPSubmit} className="flex flex-col gap-3">
-                      <Reveal profile={profile} variant="up" delay={0.05}>
-                        <input
-                          type="text"
-                          required
-                          value={rsvpData.name}
-                          onChange={(e) => setRsvpData({ ...rsvpData, name: e.target.value })}
-                          placeholder="Nama Lengkap Kamu"
-                          className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/20 text-white placeholder:text-white/50 text-xs focus:outline-none focus:border-white font-body"
-                        />
-                      </Reveal>
-
-                      <Reveal profile={profile} variant="up" delay={0.15}>
-                        <select
-                          value={rsvpData.attendance}
-                          onChange={(e) => setRsvpData({ ...rsvpData, attendance: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/20 text-white text-xs focus:outline-none focus:border-white font-body"
-                        >
-                          <option className="bg-slate-900 text-white">Hadir (I'll be there)</option>
-                          <option className="bg-slate-900 text-white">Maaf, Tidak Bisa Hadir (Can't make it)</option>
-                        </select>
-                      </Reveal>
-
-                      <Reveal profile={profile} variant="up" delay={0.25}>
-                        <input
-                          type="number"
-                          min={1}
-                          max={10}
-                          value={rsvpData.guests}
-                          onChange={(e) => setRsvpData({ ...rsvpData, guests: parseInt(e.target.value) || 1 })}
-                          placeholder="Jumlah Tamu"
-                          className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/20 text-white placeholder:text-white/50 text-xs focus:outline-none focus:border-white font-body"
-                        />
-                      </Reveal>
-
-                      <Reveal profile={profile} variant="up" delay={0.35}>
-          <button
-                          type="submit"
-                          className="btn-micro w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg cursor-pointer mt-2"
-                          style={{
-                            backgroundColor: themeStyle.primaryColor,
-                            color: '#ffffff',
-                          }}
-                        >
-                          Kirim RSVP
-                        </button>
-                      </Reveal>
-                    </form>
-                  )}
-                </Stagger>
-              </section>
-
-              {/* SECTION 8: WISHES / UCAPAN */}
-              <section className="my-10">
-                <Stagger profile={profile} className="p-6 rounded-3xl bg-black/50 backdrop-blur-md border border-white/20 shadow-2xl">
-                  <StaggerChild variant="up">
-                    <h2
-                      className="text-2xl font-bold text-center mb-1 drop-shadow-sm"
-                      style={{ fontFamily: themeStyle.fontFamilyTitle, color: themeStyle.textColor }}
-                    >
-                      {content.wishesHeading}
-                    </h2>
-                  </StaggerChild>
-                  <StaggerChild variant="fade">
-                    <p className="text-xs text-center opacity-80 mb-6">
-                      {content.wishesNote}
-                    </p>
-                  </StaggerChild>
-
-                  {wishSuccess && (
-                    <StaggerChild variant="scale">
-                      <div className="p-3 mb-4 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-center text-xs font-bold animate-fade-in">
-                        ✨ Terima kasih! Ucapan kamu telah ditambahkan.
-                      </div>
-                    </StaggerChild>
-                  )}
-
-                  <form onSubmit={handleSendWish} className="flex flex-col gap-3 mb-6">
-                    <Reveal profile={profile} variant="up" delay={0.05}>
-                      <input
-                        type="text"
-                        required
-                        value={newWishName}
-                        onChange={(e) => setNewWishName(e.target.value)}
-                        placeholder="Nama Kamu"
-                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/20 text-white placeholder:text-white/50 text-xs focus:outline-none focus:border-white font-body"
-                      />
-                    </Reveal>
-                    <Reveal profile={profile} variant="up" delay={0.15}>
-                      <textarea
-                        rows={3}
-                        required
-                        value={newWishText}
-                        onChange={(e) => setNewWishText(e.target.value)}
-                        placeholder={content.wishesPlaceholder}
-                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/20 text-white placeholder:text-white/50 text-xs focus:outline-none focus:border-white resize-none font-body"
-                      ></textarea>
-                    </Reveal>
-                    <Reveal profile={profile} variant="up" delay={0.25}>
-                      <button
-                        type="submit"
-                        className="btn-micro w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider bg-white/20 hover:bg-white/30 border border-white/30 text-white transition-colors cursor-pointer"
-                      >
-                        {content.wishButton}
-                      </button>
-                    </Reveal>
-                  </form>
-
-                  {/* Wishes List */}
-                  <div className="flex flex-col gap-3 max-h-60 overflow-y-auto pr-1">
-                    {wishesList.map((wish) => (
-                      <Reveal key={wish.id} profile={profile} variant="up">
-                        <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 text-left">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs font-bold text-amber-300">{wish.name}</span>
-                            <span className="text-[10px] opacity-60">{wish.date}</span>
-                          </div>
-                          <p className="text-xs opacity-90 leading-relaxed">{wish.message}</p>
-                        </div>
-                      </Reveal>
-                    ))}
-                  </div>
-                </Stagger>
-              </section>
-
-              {/* SECTION 9: CLOSING */}
-              <Stagger
-                profile={profile}
-                className="my-10 text-center border-t border-white/15 pt-10"
-              >
-                <StaggerChild variant="fade">
-                  <p className="text-xs font-bold uppercase tracking-widest opacity-80 mb-2 text-amber-200">
-                    Thank You
-                  </p>
-                </StaggerChild>
-                <StaggerChild variant="up">
-                  <h3
-                    className="text-2xl font-bold mb-4 drop-shadow-sm"
-                    style={{ fontFamily: themeStyle.fontFamilyTitle, color: themeStyle.textColor }}
-                  >
-                    {content.closingTitle}
-                  </h3>
-                </StaggerChild>
-                <StaggerChild variant="up">
-                  <p className="text-xs opacity-80 italic max-w-xs mx-auto mb-6">
-                    "{content.closingQuote}"
-                  </p>
-                </StaggerChild>
-                <StaggerChild variant="up">
-                  <div className="text-sm font-bold text-amber-300">
-                    — {content.closingBy}
-                  </div>
-                </StaggerChild>
-              </Stagger>
+              <MapSection {...sectionProps} />
+              <RsvpSection {...sectionProps} />
+              <WishesSection {...sectionProps} />
+              <ClosingSection {...sectionProps} />
             </div>
           )}
+
         </div>
       </TemplateBackground>
     );
