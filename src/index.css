@@ -219,16 +219,6 @@ h1, h2, h3, h4, h5, h6 {
   animation: deco-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Countdown digit change: small fade + scale */
-@keyframes tick-pop {
-  0% { opacity: 0.35; transform: scale(0.82); }
-  100% { opacity: 1; transform: scale(1); }
-}
-.countdown-tick {
-  display: inline-block;
-  animation: tick-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
 /* Music player equalizer — STATIC visual state (playing/paused).
    No continuous bounce: the state is shown by icon + bar heights only. */
 .eq-bar {
@@ -289,9 +279,6 @@ h1, h2, h3, h4, h5, h6 {
   .deco-glow-in {
     animation: none !important;
     opacity: 1;
-  }
-  .countdown-tick {
-    animation: none !important;
   }
 }
 

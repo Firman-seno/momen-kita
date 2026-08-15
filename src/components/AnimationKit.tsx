@@ -105,7 +105,15 @@ export interface RevealProps {
   profile?: AnimProfile;
 }
 
-/** Single element scroll-reveal. Plays once when it enters the viewport. */
+/**
+ * Single element scroll-reveal.
+ *
+ * ONCE-ONLY GUARANTEE: `viewport={{ once: true }}` makes the element
+ * animate the FIRST time it enters the viewport and never again — the
+ * equivalent of a `hasAnimated` latch. Scrolling away and back, or
+ * re-rendering the parent, does NOT restart the animation. After it
+ * completes the element stays in its final (still) state.
+ */
 export const Reveal: React.FC<RevealProps> = ({
   children,
   variant = 'up' as RevealVariant,
@@ -147,7 +155,11 @@ export interface StaggerProps {
   profile?: AnimProfile;
 }
 
-/** Container that staggers its <StaggerChild> elements sequentially. */
+/**
+ * Container that staggers its <StaggerChild> elements sequentially.
+ * Like `Reveal`, it animates ONCE (`viewport.once: true`) — the whole
+ * group plays on first viewport entry, then stays still forever.
+ */
 export const Stagger: React.FC<StaggerProps> = ({
   children,
   delay = 0,

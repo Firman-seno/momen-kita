@@ -7,6 +7,7 @@ import { TemplateBackground } from './TemplateBackground';
 import { MotionConfig, motion, AnimatePresence } from 'motion/react';
 import { getProfile, EASE_OUT } from './AnimationKit';
 import { getTemplatePrice } from '../lib/templatePricing';
+import { useCountdown } from '../hooks/useCountdown';
 import { RatingSection } from './RatingSection';
 import { isValidPublicVideoUrl } from '../lib/videoStorage';
 import { DemoContent, getDemoContent } from '../design/content';
@@ -133,14 +134,6 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
     return musicStartRef.current;
   };
 
-  // Live countdown state
-  const [countdown, setCountdown] = useState({
-    days: 38,
-    hours: 14,
-    mins: 22,
-    secs: 45,
-  });
-
   // RSVP state
   const [rsvpData, setRsvpData] = useState({
     name: '',
@@ -173,6 +166,11 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   const profile = getProfile(template.category);
   const ds = resolveDesignSystem(template);
   const family = ds.family;
+
+  // Live countdown — derived from the SAME eventDetails.date/time that the
+  // Date & Time card renders, so display and countdown can never disagree.
+  // Single 1s timer, cleared automatically on unmount (see useCountdown).
+  const countdown = useCountdown({ date: eventDetails.date, time: eventDetails.time });
 
   // Shared props for every design-system section
   const sectionProps: SectionProps = {
@@ -264,21 +262,6 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
       musicStartRef.current = null;
     };
   }, [template, activeMusic.url, activeMusic.fallbackUrl, activeMusic.startTime, disableMusic, isInvitation]);
-
-  // Ticking countdown interval
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev.secs > 0) return { ...prev, secs: prev.secs - 1 };
-        if (prev.mins > 0) return { ...prev, mins: 59, secs: 59 };
-        if (prev.hours > 0) return { ...prev, hours: prev.hours - 1, mins: 59, secs: 59 };
-        if (prev.days > 0) return { ...prev, days: prev.days - 1, hours: 23, mins: 59, secs: 59 };
-        return prev;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   // Public invitation: the FIRST user gesture anywhere on the page also starts
   // the music, so autoplay-blocked browsers (mobile) reliably begin playing on

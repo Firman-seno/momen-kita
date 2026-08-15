@@ -3,6 +3,7 @@ import { Mail, MapPin } from 'lucide-react';
 import { Template, WishItem, EventDetails } from '../types';
 import { AnimProfile, Reveal, Stagger, StaggerChild } from '../components/AnimationKit';
 import { DemoContent } from './content';
+import { CountdownParts } from '../lib/eventDateTime';
 import { DesignResolution, FamilyConfig } from './types';
 import {
   SectionHeading,
@@ -56,7 +57,7 @@ export interface SectionProps {
   catEmoji: string;
   templateNumber: string;
   onOpen: () => void;
-  countdown: { days: number; hours: number; mins: number; secs: number };
+  countdown: CountdownParts;
   onGalleryClick: (url: string) => void;
   onMapOpen: () => void;
   rsvpData: { name: string; attendance: string; guests: number; message: string };

@@ -4,6 +4,7 @@ import { cardTextClass, cardMutedClass, isPaperFamily } from './families';
 import { dividerFor, GoldDivider, FloralDivider, CornerFlourish, LeafSprig, EightStar, StarDivider, PartyBand, ScriptSwirl, ArchWreath, TapeStrip } from './ornaments';
 import { ThemeStyle, EventDetails } from '../types';
 import { AnimProfile, Reveal, Stagger, StaggerChild } from '../components/AnimationKit';
+import { CountdownParts, pad2 } from '../lib/eventDateTime';
 
 /* ============================================================
    REUSABLE DESIGN BLOCKS
@@ -403,19 +404,13 @@ export const FamilyPhotoFrame: React.FC<FamilyPhotoFrameProps> = ({
 export interface CountdownBlockProps {
   family: FamilyConfig;
   profile: AnimProfile;
-  countdown: { days: number; hours: number; mins: number; secs: number };
+  countdown: CountdownParts;
   accent?: string;
 }
 
 export const CountdownBlock: React.FC<CountdownBlockProps> = ({ family, profile, countdown, accent }) => {
   const isPaper = isPaperFamily(family);
   const valueColor = accent || (isPaper ? '#b08a3e' : family.accent);
-  const cells = [
-    { label: 'Days', value: countdown.days },
-    { label: 'Hours', value: countdown.hours },
-    { label: 'Mins', value: countdown.mins },
-    { label: 'Secs', value: countdown.secs },
-  ];
   const box =
     family.key === 'kids-fun' ||
     family.key === 'bday-balloon' ||
@@ -431,12 +426,51 @@ export const CountdownBlock: React.FC<CountdownBlockProps> = ({ family, profile,
             ? 'bg-white/70 border border-[#e5dcc4] rounded-2xl'
             : 'bg-black/45 border border-white/20 rounded-2xl';
 
+  const statusBox = `${box} p-6 sm:p-7 flex flex-col items-center text-center`;
+
+  if (countdown.status === 'invalid') {
+    return (
+      <Stagger profile={profile} className="flex justify-center">
+        <StaggerChild variant="fade">
+          <div className={statusBox}>
+            <span className="material-symbols-outlined text-3xl" style={{ color: valueColor }}>event_busy</span>
+            <div className="mt-2 text-xs sm:text-sm font-bold uppercase tracking-wider" style={{ color: valueColor }}>
+              Informasi tanggal acara belum tersedia
+            </div>
+          </div>
+        </StaggerChild>
+      </Stagger>
+    );
+  }
+
+  if (countdown.status === 'ongoing' || countdown.status === 'finished') {
+    return (
+      <Stagger profile={profile} className="flex justify-center">
+        <StaggerChild variant="fade">
+          <div className={statusBox}>
+            <span className="material-symbols-outlined text-3xl" style={{ color: valueColor }}>celebration</span>
+            <div className="mt-2 text-sm sm:text-base font-black uppercase tracking-wider" style={{ color: valueColor }}>
+              {countdown.status === 'ongoing' ? 'Acara Sedang Berlangsung' : 'Acara Telah Selesai'}
+            </div>
+          </div>
+        </StaggerChild>
+      </Stagger>
+    );
+  }
+
+  const cells = [
+    { label: 'Hari', value: String(countdown.days) },
+    { label: 'Jam', value: pad2(countdown.hours) },
+    { label: 'Menit', value: pad2(countdown.mins) },
+    { label: 'Detik', value: pad2(countdown.secs) },
+  ];
+
   return (
     <Stagger profile={profile} className="grid grid-cols-4 gap-2.5">
       {cells.map((c) => (
         <StaggerChild key={c.label} variant="scale">
           <div className={`${box} p-3.5 sm:p-4 flex flex-col items-center`}>
-            <span key={c.value} className="countdown-tick text-2xl sm:text-3xl font-black" style={{ color: valueColor }}>
+            <span className="text-2xl sm:text-3xl font-black tabular-nums" style={{ color: valueColor }}>
               {c.value}
             </span>
             <span className="text-[10px] font-bold uppercase tracking-wider opacity-70 mt-0.5">{c.label}</span>
