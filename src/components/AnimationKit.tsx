@@ -12,8 +12,20 @@ import { CategoryKey } from '../types';
    - sunatan  → elegant, calm & Islamic
    - wedding  → romantic & cinematic
    - aqiqah   → soft, cute & warm
-   Only GPU-friendly properties (opacity / transform / filter)
-   are animated, and all motion respects prefers-reduced-motion.
+
+   ANIMATION RULES (applied globally to EVERY template):
+   1. Entrance plays exactly ONCE, the first time the element
+      enters the viewport. A `hasAnimated` latch is stored in a
+      ref so leaving the viewport, scrolling back, or re-rendering
+      the parent can NEVER restart it.
+   2. After entrance the element stays in its final, STATIC state.
+      No loops, no re-triggers, no reset-on-scroll.
+   3. Scroll detection uses a single shared IntersectionObserver
+      (pooled per threshold) — efficient, no per-element observers.
+   4. Only GPU-friendly properties (opacity / transform / filter)
+      are animated → no layout jumps, no scrollbar changes.
+   5. prefers-reduced-motion: elements render immediately in their
+      normal, visible position — no animation at all.
    ============================================================ */
 
 export const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -55,8 +67,7 @@ export type RevealVariant =
   | 'fade'
   | 'card';
 
-const hiddenFor = (variant: RevealVariant, reduce: boolean): Record<string, number | string> => {
-  if (reduce) return { opacity: 0 };
+const hiddenFor = (variant: RevealVariant): Record<string, number | string> => {
   switch (variant) {
     case 'up':
       return { opacity: 0, y: 20 };
@@ -81,10 +92,90 @@ const hiddenFor = (variant: RevealVariant, reduce: boolean): Record<string, numb
   }
 };
 
-const show = (reduce: boolean): Record<string, number | string> =>
-  reduce
-    ? { opacity: 1 }
-    : { opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' };
+const show = (): Record<string, number | string> => ({
+  opacity: 1,
+  x: 0,
+  y: 0,
+  scale: 1,
+  filter: 'blur(0px)',
+});
+
+/* ============================================================
+   SHARED SCROLL DETECTION (IntersectionObserver)
+   -----------------------------------------
+   One observer per threshold value is created lazily and reused by
+   every element that needs that threshold. On the FIRST intersection
+   the element's callback fires once, then the element is unobserved —
+   this is the `hasAnimated` latch: it can never fire again, even if
+   the element leaves and re-enters the viewport.
+   ============================================================ */
+
+const observerPool = new Map<number, IntersectionObserver>();
+const pending = new Map<Element, () => void>();
+
+function getObserver(amount: number): IntersectionObserver {
+  let obs = observerPool.get(amount);
+  if (!obs) {
+    obs = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const cb = pending.get(entry.target);
+          if (cb) {
+            pending.delete(entry.target);
+            obs!.unobserve(entry.target);
+            cb();
+          }
+        }
+      },
+      { threshold: amount }
+    );
+    observerPool.set(amount, obs);
+  }
+  return obs;
+}
+
+/**
+ * Observes `ref.current` and returns `shown`, which flips to `true`
+ * exactly once when the element first enters the viewport. The latch
+ * is stored in `shownRef` so it is immune to scroll direction, parent
+ * re-renders, and viewport exits. When `disabled` is true (reduced
+ * motion or SSR without IntersectionObserver) the element is shown
+ * immediately with no animation.
+ */
+function useEntrance(amount: number, disabled: boolean): { ref: React.RefObject<HTMLDivElement | null>; shown: boolean } {
+  const ref = React.useRef<HTMLDivElement | null>(null);
+  const shownRef = React.useRef(disabled);
+  const [shown, setShown] = React.useState(disabled);
+
+  React.useEffect(() => {
+    if (shownRef.current) return;
+    const el = ref.current;
+    if (!el) return;
+
+    if (typeof IntersectionObserver === 'undefined') {
+      shownRef.current = true;
+      setShown(true);
+      return;
+    }
+
+    const obs = getObserver(amount);
+    const fire = () => {
+      if (shownRef.current) return;
+      shownRef.current = true;
+      setShown(true);
+    };
+    pending.set(el, fire);
+    obs.observe(el);
+
+    return () => {
+      if (pending.get(el) === fire) pending.delete(el);
+      obs.unobserve(el);
+    };
+  }, [amount]);
+
+  return { ref, shown };
+}
 
 interface AnimContextValue {
   duration: number;
@@ -108,13 +199,30 @@ export interface RevealProps {
 /**
  * Single element scroll-reveal.
  *
- * ONCE-ONLY GUARANTEE: `viewport={{ once: true }}` makes the element
- * animate the FIRST time it enters the viewport and never again — the
- * equivalent of a `hasAnimated` latch. Scrolling away and back, or
- * re-rendering the parent, does NOT restart the animation. After it
- * completes the element stays in its final (still) state.
+ * ONCE-ONLY GUARANTEE: when the element first enters the viewport a
+ * `hasAnimated` latch flips and the entrance animation plays. Scrolling
+ * away and back, or re-rendering the parent, does NOT restart it — the
+ * element stays in its final static state forever after.
+ *
+ * With `onView={false}` the animation plays once on mount instead.
  */
-export const Reveal: React.FC<RevealProps> = ({
+export const Reveal: React.FC<RevealProps> = (props) => {
+  const reduce = useReducedMotion();
+
+  // Reduced motion: render fully visible, no animation, no observer.
+  if (reduce) {
+    return (
+      <div className={props.className} style={props.style}>
+        {props.children}
+      </div>
+    );
+  }
+
+  return <RevealMotion {...props} />;
+};
+
+/** Internal motion layer for Reveal (keeps hook order stable). */
+const RevealMotion: React.FC<RevealProps> = ({
   children,
   variant = 'up' as RevealVariant,
   delay = 0,
@@ -125,17 +233,33 @@ export const Reveal: React.FC<RevealProps> = ({
   onView = true,
   profile,
 }) => {
-  const reduce = useReducedMotion();
   const effDuration = duration ?? (profile?.duration ?? 0.75);
   const ease = profile?.ease ?? EASE_OUT;
+  const hidden = hiddenFor(variant);
+
+  if (!onView) {
+    return (
+      <motion.div
+        className={className}
+        style={style}
+        initial={hidden}
+        animate={show()}
+        transition={{ duration: effDuration, ease, delay }}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+
+  const { ref, shown } = useEntrance(amount, false);
 
   return (
     <motion.div
+      ref={ref}
       className={className}
       style={style}
-      initial={hiddenFor(variant, !!reduce)}
-      {...(onView ? { whileInView: show(!!reduce) } : { animate: show(!!reduce) })}
-      viewport={{ once: true, amount }}
+      initial={hidden}
+      animate={shown ? show() : hidden}
       transition={{ duration: effDuration, ease, delay }}
     >
       {children}
@@ -157,8 +281,10 @@ export interface StaggerProps {
 
 /**
  * Container that staggers its <StaggerChild> elements sequentially.
- * Like `Reveal`, it animates ONCE (`viewport.once: true`) — the whole
- * group plays on first viewport entry, then stays still forever.
+ * Like `Reveal`, it animates ONCE (hasAnimated latch) — the whole group
+ * plays on first viewport entry, then stays still forever.
+ *
+ * With `onView={false}` the group animates once on mount instead.
  */
 export const Stagger: React.FC<StaggerProps> = ({
   children,
@@ -176,19 +302,75 @@ export const Stagger: React.FC<StaggerProps> = ({
   const effDuration = duration ?? (profile?.duration ?? 0.7);
   const ease = profile?.ease ?? EASE_OUT;
 
+  // Reduced motion: render fully visible, no animation, no observer.
+  if (reduce) {
+    return (
+      <div className={className} style={style}>
+        {children}
+      </div>
+    );
+  }
+
+  const animateProp = onView ? undefined : 'show';
+
+  return (
+    <StaggerMotion
+      className={className}
+      style={style}
+      delay={delay}
+      effStagger={effStagger}
+      effDuration={effDuration}
+      ease={ease}
+      onView={onView}
+      amount={amount}
+      animateProp={animateProp}
+    >
+      {children}
+    </StaggerMotion>
+  );
+};
+
+interface StaggerMotionProps {
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+  delay: number;
+  effStagger: number;
+  effDuration: number;
+  ease: number[];
+  onView: boolean;
+  amount: number;
+  animateProp?: string;
+}
+
+/** Internal motion layer for Stagger (keeps hooks order stable). */
+const StaggerMotion: React.FC<StaggerMotionProps> = ({
+  children,
+  className,
+  style,
+  delay,
+  effStagger,
+  effDuration,
+  ease,
+  onView,
+  amount,
+  animateProp,
+}) => {
+  const { ref, shown } = useEntrance(amount, !onView);
+
   return (
     <AnimContext.Provider value={{ duration: effDuration, ease }}>
       <motion.div
+        ref={ref}
         className={className}
         style={style}
         initial="hidden"
-        {...(onView ? { whileInView: 'show' } : { animate: 'show' })}
-        viewport={{ once: true, amount }}
+        animate={onView ? (shown ? 'show' : 'hidden') : animateProp}
         variants={{
           hidden: {},
           show: {
             transition: {
-              staggerChildren: reduce ? 0 : effStagger,
+              staggerChildren: effStagger,
               delayChildren: delay,
               duration: effDuration,
               ease,
@@ -221,14 +403,23 @@ export const StaggerChild: React.FC<StaggerChildProps> = ({
   const reduce = useReducedMotion();
   const ctx = React.useContext(AnimContext);
 
+  // Reduced motion: render fully visible, no animation.
+  if (reduce) {
+    return (
+      <div className={className} style={style}>
+        {children}
+      </div>
+    );
+  }
+
   return (
     <motion.div
       className={className}
       style={style}
       variants={{
-        hidden: hiddenFor(variant, !!reduce),
+        hidden: hiddenFor(variant),
         show: {
-          ...show(!!reduce),
+          ...show(),
           transition: { duration: duration ?? ctx.duration, ease: ctx.ease },
         },
       }}
