@@ -17,6 +17,14 @@ import { previewTrack, stopPreview } from '../lib/audioEngine';
 import { fileToOptimizedDataUrl, fileToDataUrl } from '../lib/imageUtils';
 import { uploadImageToPublic } from '../lib/imageStorage';
 import {
+  GalleryItem,
+  MAX_GALLERY,
+  DEFAULT_GALLERY,
+  genGalleryId,
+  toGalleryItems,
+  toGalleryImages,
+} from '../lib/gallery';
+import {
   validateVideoFile,
   isValidPublicVideoUrl,
   uploadVideoToPublic,
@@ -38,6 +46,7 @@ interface InvitationEditorProps {
   onOpenInvitation?: (slug: string) => void;
 }
 
+/** One slot in the dynamic FOTO GALERI list (unique id per gallery item). */
 interface FormData {
   customerName: string;
   customerPhone: string;
@@ -48,10 +57,7 @@ interface FormData {
   googleMapsUrl: string;
   messageQuote: string;
   portraitImage: string;
-  gallery1: string;
-  gallery2: string;
-  gallery3: string;
-  gallery4: string;
+  galleryItems: GalleryItem[];
   videoUrl: string;
   videoType: string;
   videoName: string;
@@ -84,6 +90,9 @@ const formatStartTime = (seconds: number): string => {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 };
 
+/** Max image size for gallery uploads (photos downscale to ~1280px JPEG anyway). */
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+
 const emptyForm = (): FormData => ({
   customerName: '',
   customerPhone: '',
@@ -94,10 +103,7 @@ const emptyForm = (): FormData => ({
   googleMapsUrl: '',
   messageQuote: '',
   portraitImage: '',
-  gallery1: '',
-  gallery2: '',
-  gallery3: '',
-  gallery4: '',
+  galleryItems: toGalleryItems([]),
   videoUrl: '',
   videoType: '',
   videoName: '',
@@ -133,12 +139,7 @@ const formFromTemplate = (template: Template): FormData => {
   f.googleMapsUrl = d.googleMapsUrl || '';
   f.messageQuote = d.messageQuote || '';
   f.portraitImage = d.portraitImage || '';
-  d.galleryImages?.forEach((g, i) => {
-    if (i === 0) f.gallery1 = g;
-    if (i === 1) f.gallery2 = g;
-    if (i === 2) f.gallery3 = g;
-    if (i === 3) f.gallery4 = g;
-  });
+  f.galleryItems = toGalleryItems(d.galleryImages);
   if (template.category === 'birthday') {
     f.birthdayPerson = d.birthdayPerson || '';
     f.age = d.age != null ? String(d.age) : '';
@@ -186,12 +187,7 @@ const formFromInvitation = (inv: Invitation): FormData => {
   f.googleMapsUrl = inv.googleMapsUrl || d.googleMapsUrl || '';
   f.messageQuote = d.messageQuote || '';
   f.portraitImage = d.portraitImage || '';
-  d.galleryImages?.forEach((g, i) => {
-    if (i === 0) f.gallery1 = g;
-    if (i === 1) f.gallery2 = g;
-    if (i === 2) f.gallery3 = g;
-    if (i === 3) f.gallery4 = g;
-  });
+  f.galleryItems = toGalleryItems(d.galleryImages);
   f.videoUrl = inv.videoUrl || '';
   f.videoType = inv.videoType || '';
   f.videoName = inv.videoName || '';
@@ -230,7 +226,7 @@ const formFromInvitation = (inv: Invitation): FormData => {
 
 /** Build the EventDetails override (customData) from the form. */
 const buildCustomData = (category: string, f: FormData): Partial<EventDetails> => {
-  const galleryImages = [f.gallery1, f.gallery2, f.gallery3, f.gallery4].filter(Boolean) as string[];
+  const galleryImages = toGalleryImages(f.galleryItems);
   const data: Partial<EventDetails> = {
     messageQuote: f.messageQuote,
     portraitImage: f.portraitImage || undefined,
@@ -390,6 +386,96 @@ const PhotoField: React.FC<PhotoFieldProps> = ({ label, value, onUpload, onRemov
   );
 };
 
+interface GalleryFieldProps {
+  id: string;
+  label: string;
+  value: string;
+  /** First 4 slots are default/protected — REMOVE GALERI is hidden for them. */
+  removable: boolean;
+  uploading: boolean;
+  onUpload: (file: File) => void;
+  onRemoveFoto: () => void;
+  onRemoveGaleri: () => void;
+}
+
+/** One dynamic FOTO GALERI card: preview + GANTI FOTO + REMOVE FOTO + REMOVE GALERI. */
+const GalleryField: React.FC<GalleryFieldProps> = ({
+  id,
+  label,
+  value,
+  removable,
+  uploading,
+  onUpload,
+  onRemoveFoto,
+  onRemoveGaleri,
+}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = (file: File | null) => {
+    if (!file) return;
+    onUpload(file);
+  };
+
+  return (
+    <div
+      id={`gallery-card-${id}`}
+      className="flex flex-col gap-2.5 rounded-2xl border border-outline-variant/50 bg-surface-container-lowest p-3"
+    >
+      <span className="block font-body text-[11px] sm:text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+        {label}
+      </span>
+      <div className="flex items-start gap-3">
+        <div className="w-24 h-32 rounded-xl border border-outline-variant/50 bg-surface-container-low overflow-hidden shrink-0 flex items-center justify-center">
+          {value ? (
+            <img src={value} alt={label} className="w-full h-full object-cover" />
+          ) : (
+            <span className="material-symbols-outlined text-2xl text-outline">image</span>
+          )}
+        </div>
+        <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0] || null;
+              if (f) handleFile(f);
+              e.target.value = '';
+            }}
+          />
+          <button
+            onClick={() => inputRef.current?.click()}
+            disabled={uploading}
+            className="btn-micro w-full min-h-[36px] px-3 rounded-lg border border-outline-variant bg-surface-container-low text-on-surface-variant hover:text-primary hover:border-primary font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+          >
+            <span className="material-symbols-outlined text-sm">{uploading ? 'hourglass_top' : value ? 'photo_camera' : 'upload'}</span>
+            {uploading ? 'Memproses...' : value ? 'Ganti Foto' : 'Upload Foto'}
+          </button>
+          <button
+            onClick={onRemoveFoto}
+            disabled={!value || uploading}
+            className="btn-micro w-full min-h-[36px] px-3 rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="material-symbols-outlined text-sm">delete</span>
+            Remove Foto
+          </button>
+          {removable && (
+            <button
+              onClick={onRemoveGaleri}
+              disabled={uploading}
+              className="btn-micro w-full min-h-[36px] px-3 rounded-lg border border-rose-300 bg-rose-100 text-rose-700 hover:bg-rose-200 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-sm">delete_sweep</span>
+              Remove Galeri
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const InvitationEditor: React.FC<InvitationEditorProps> = ({
   templateUid,
   invitationId,
@@ -517,6 +603,80 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
     } finally {
       setUploadingField(null);
     }
+  };
+
+  // ---- Dynamic FOTO GALERI -----------------------------------------
+
+  const updateGalleryItem = (id: string, url: string) =>
+    setForm((prev) => ({
+      ...prev,
+      galleryItems: prev.galleryItems.map((it) => (it.id === id ? { ...it, url } : it)),
+    }));
+
+  /** REMOVE GALERI — deletes the whole gallery slot (only allowed for extra items). */
+  const removeGalleryItem = (id: string) => {
+    setForm((prev) => ({
+      ...prev,
+      galleryItems: prev.galleryItems.filter((it) => it.id !== id),
+    }));
+    setToast('Galeri dihapus.');
+    setToastIcon('info');
+  };
+
+  /** REMOVE FOTO — clears the image but keeps the gallery slot. */
+  const removeGalleryPhoto = (id: string) => {
+    updateGalleryItem(id, '');
+    setToast('Foto galeri dihapus.');
+    setToastIcon('info');
+  };
+
+  /** Per-item upload — only ever writes to the gallery with `itemId`. */
+  const handleGalleryUpload = async (itemId: string, file: File | null) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setToast('Berkas harus berupa gambar (JPG/PNG/WebP).');
+      setToastIcon('error');
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      setToast('Ukuran foto maksimal 10 MB.');
+      setToastIcon('error');
+      return;
+    }
+    setUploadingField(`gallery-${itemId}`);
+    try {
+      const dataUrl = await fileToOptimizedDataUrl(file);
+      const folder = savedInvitation?.slug
+        ? `invitations/${savedInvitation.slug}`
+        : undefined;
+      const publicUrl = await uploadImageToPublic(dataUrl, folder);
+      if (publicUrl) {
+        updateGalleryItem(itemId, publicUrl);
+      } else {
+        updateGalleryItem(itemId, dataUrl);
+        setToast('Penyimpanan cloud belum aktif — foto disimpan lokal (pratinjau WhatsApp mungkin tidak menampilkan foto).');
+        setToastIcon('info');
+      }
+    } catch {
+      setToast('Gagal memproses foto.');
+      setToastIcon('error');
+    } finally {
+      setUploadingField(null);
+    }
+  };
+
+  /** "+ ADD GALERI" — appends one new empty slot (no page reload), then scrolls to it. */
+  const handleAddGaleri = () => {
+    if (form.galleryItems.length >= MAX_GALLERY) return;
+    const id = genGalleryId();
+    setForm((prev) =>
+      prev.galleryItems.length >= MAX_GALLERY
+        ? prev
+        : { ...prev, galleryItems: [...prev.galleryItems, { id, url: '' }] }
+    );
+    window.setTimeout(() => {
+      document.getElementById(`gallery-card-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 80);
   };
 
   const handleVideoUpload = async (file: File | null) => {
@@ -1151,10 +1311,38 @@ export const InvitationEditor: React.FC<InvitationEditorProps> = ({
             />
           </div>
           <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <PhotoField label="Foto Galeri 1" value={form.gallery1} onUpload={(file) => handlePhotoUpload('gallery1', file)} onRemove={() => set('gallery1')('')} uploading={uploadingField === 'gallery1'} />
-            <PhotoField label="Foto Galeri 2" value={form.gallery2} onUpload={(file) => handlePhotoUpload('gallery2', file)} onRemove={() => set('gallery2')('')} uploading={uploadingField === 'gallery2'} />
-            <PhotoField label="Foto Galeri 3" value={form.gallery3} onUpload={(file) => handlePhotoUpload('gallery3', file)} onRemove={() => set('gallery3')('')} uploading={uploadingField === 'gallery3'} />
-            <PhotoField label="Foto Galeri 4" value={form.gallery4} onUpload={(file) => handlePhotoUpload('gallery4', file)} onRemove={() => set('gallery4')('')} uploading={uploadingField === 'gallery4'} />
+            {form.galleryItems.map((item, idx) => (
+              <GalleryField
+                key={item.id}
+                id={item.id}
+                label={`Foto Galeri ${idx + 1}`}
+                value={item.url}
+                removable={idx >= DEFAULT_GALLERY}
+                uploading={uploadingField === `gallery-${item.id}`}
+                onUpload={(file) => handleGalleryUpload(item.id, file)}
+                onRemoveFoto={() => removeGalleryPhoto(item.id)}
+                onRemoveGaleri={() => removeGalleryItem(item.id)}
+              />
+            ))}
+          </div>
+          <div className="md:col-span-2 mt-3 flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={handleAddGaleri}
+              disabled={form.galleryItems.length >= MAX_GALLERY}
+              className="btn-micro inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-dashed border-primary/50 text-primary hover:border-primary hover:bg-primary/5 font-bold text-[11px] uppercase tracking-wider cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <span className="material-symbols-outlined text-base">add</span>
+              Add Galeri
+            </button>
+            <p className="font-body text-[10px] text-on-surface-variant">
+              {form.galleryItems.length}/{MAX_GALLERY} galeri
+            </p>
+            {form.galleryItems.length >= MAX_GALLERY && (
+              <p className="font-body text-[10px] font-bold text-amber-600">
+                Maksimal {MAX_GALLERY} foto galeri.
+              </p>
+            )}
           </div>
 
           {/* Section: Video */}

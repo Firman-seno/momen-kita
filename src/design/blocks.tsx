@@ -525,7 +525,7 @@ export const GalleryBlock: React.FC<GalleryBlockProps> = ({
     case 'polaroid':
       return (
         <Stagger profile={profile} stagger={0.1} className="flex flex-wrap justify-center gap-3">
-          {images.slice(0, 4).map((img, i) =>
+          {images.map((img, i) =>
             pic(
               img,
               i,
@@ -538,7 +538,7 @@ export const GalleryBlock: React.FC<GalleryBlockProps> = ({
     case 'collage':
       return (
         <Stagger profile={profile} stagger={0.1} className="grid grid-cols-2 gap-3 items-center">
-          {images.slice(0, 4).map((img, i) => (
+          {images.map((img, i) => (
             <div key={i} className={i % 3 === 0 ? 'col-span-2 aspect-[16/9]' : 'aspect-square'}>
               {pic(img, i, `w-full h-full border-2 border-white/20 p-0.5 rounded-2xl`, true)}
             </div>
@@ -548,15 +548,15 @@ export const GalleryBlock: React.FC<GalleryBlockProps> = ({
     case 'masonry':
       return (
         <Stagger profile={profile} stagger={0.08} className="grid grid-cols-2 gap-3 auto-rows-[130px] sm:auto-rows-[150px]">
-          {images.slice(0, 4).map((img, i) => (
+          {images.map((img, i) => (
             <div
               key={i}
               className={[
                 'h-full',
-                i === 0 ? 'row-span-2' : '',
-                i === 1 ? 'col-span-1' : '',
-                i === 2 ? 'row-span-1' : '',
-                i === 3 ? 'row-span-2' : '',
+                i % 4 === 0 ? 'row-span-2' : '',
+                i % 4 === 1 ? 'col-span-1' : '',
+                i % 4 === 2 ? 'row-span-1' : '',
+                i % 4 === 3 ? 'row-span-2' : '',
               ].join(' ')}
             >
               {pic(img, i, 'w-full h-full rounded-xl')}
@@ -567,7 +567,7 @@ export const GalleryBlock: React.FC<GalleryBlockProps> = ({
     case 'stacked':
       return (
         <Stagger profile={profile} stagger={0.12} className="flex flex-col gap-3">
-          {images.slice(0, 3).map((img, i) => (
+          {images.map((img, i) => (
             <div key={i}>
               {pic(img, i, 'w-full aspect-[4/3] rounded-xl border border-white/20')}
             </div>
@@ -577,7 +577,7 @@ export const GalleryBlock: React.FC<GalleryBlockProps> = ({
     case 'framed':
       return (
         <Stagger profile={profile} stagger={0.1} className="grid grid-cols-2 gap-3">
-          {images.slice(0, 4).map((img, i) => (
+          {images.map((img, i) => (
             <div key={i}>{pic(img, i, `w-full aspect-square ${framedCls}`)}</div>
           ))}
         </Stagger>
@@ -585,7 +585,7 @@ export const GalleryBlock: React.FC<GalleryBlockProps> = ({
     default:
       return (
         <Stagger profile={profile} stagger={0.1} className="grid grid-cols-2 gap-3">
-          {images.slice(0, 4).map((img, i) => (
+          {images.map((img, i) => (
             <div key={i}>{pic(img, i, `w-full aspect-square rounded-2xl border border-white/20`, i % 2 === 1)}</div>
           ))}
         </Stagger>
