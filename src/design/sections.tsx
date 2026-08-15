@@ -998,7 +998,7 @@ const HostCard: React.FC<{
   const { family } = p;
   const { muted } = useText(family);
   return (
-    <Reveal profile={p.profile} variant="up" delay={delay}>
+    <Reveal profile={p.profile} variant="card" delay={delay}>
       <CardShell family={family} className="p-5 flex items-start gap-4 relative overflow-hidden">
         <IconTile accent={family.accent}>
           <span className="material-symbols-outlined text-2xl">{icon}</span>
@@ -1115,7 +1115,7 @@ export const EventDetailsSection: React.FC<P> = (p) => {
   const { muted } = useText(family);
 
   const InfoRow: React.FC<{ icon: string; title: string; main: React.ReactNode; sub?: React.ReactNode }> = ({ icon, title, main, sub }) => (
-    <Reveal profile={p.profile} variant="up">
+    <Reveal profile={p.profile} variant="card">
       <CardShell family={family} className="p-5 flex items-start gap-4">
         <IconTile accent={family.accent}>
           <span className="material-symbols-outlined text-2xl">{icon}</span>
@@ -1403,7 +1403,7 @@ export const WishesSection: React.FC<P> = (p) => {
 
         <div className="flex flex-col gap-3 max-h-60 overflow-y-auto pr-1">
           {p.wishesList.map((wish) => (
-            <Reveal key={wish.id} profile={p.profile} variant="up">
+            <Reveal key={wish.id} profile={p.profile} variant="card">
               <div className={`p-3.5 rounded-2xl border text-left ${isPaper ? 'bg-white/70 border-[#e7dcc4]' : 'bg-black/35 border-white/10'}`}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-bold" style={{ color: family.accent }}>{wish.name}</span>

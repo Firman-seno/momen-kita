@@ -26,18 +26,18 @@ export interface AnimProfile {
 }
 
 export const PROFILES: Record<CategoryKey, AnimProfile> = {
-  birthday: { ease: [0.16, 1, 0.3, 1], stagger: 0.12, duration: 0.65, heroDuration: 0.9 },
-  sunatan: { ease: [0.22, 1, 0.36, 1], stagger: 0.18, duration: 0.75, heroDuration: 1.0 },
-  wedding: { ease: [0.22, 1, 0.36, 1], stagger: 0.2, duration: 0.8, heroDuration: 1.1 },
-  aqiqah: { ease: [0.2, 0.9, 0.3, 1], stagger: 0.15, duration: 0.7, heroDuration: 0.95 },
-  education: { ease: [0.22, 1, 0.36, 1], stagger: 0.18, duration: 0.75, heroDuration: 1.0 },
-  religious: { ease: [0.22, 1, 0.36, 1], stagger: 0.2, duration: 0.8, heroDuration: 1.05 },
-  tasyakuran: { ease: [0.22, 1, 0.36, 1], stagger: 0.18, duration: 0.75, heroDuration: 1.0 },
-  gathering: { ease: [0.16, 1, 0.3, 1], stagger: 0.12, duration: 0.65, heroDuration: 0.9 },
-  business: { ease: [0.22, 1, 0.36, 1], stagger: 0.14, duration: 0.7, heroDuration: 0.95 },
-  anniversary: { ease: [0.22, 1, 0.36, 1], stagger: 0.2, duration: 0.8, heroDuration: 1.1 },
-  family: { ease: [0.2, 0.9, 0.3, 1], stagger: 0.15, duration: 0.7, heroDuration: 0.95 },
-  'doa-haul': { ease: [0.22, 1, 0.36, 1], stagger: 0.2, duration: 0.8, heroDuration: 1.05 },
+  birthday: { ease: [0.16, 1, 0.3, 1], stagger: 0.1, duration: 0.5, heroDuration: 0.8 },
+  sunatan: { ease: [0.22, 1, 0.36, 1], stagger: 0.12, duration: 0.55, heroDuration: 0.85 },
+  wedding: { ease: [0.22, 1, 0.36, 1], stagger: 0.15, duration: 0.6, heroDuration: 0.9 },
+  aqiqah: { ease: [0.2, 0.9, 0.3, 1], stagger: 0.12, duration: 0.55, heroDuration: 0.85 },
+  education: { ease: [0.22, 1, 0.36, 1], stagger: 0.12, duration: 0.55, heroDuration: 0.85 },
+  religious: { ease: [0.22, 1, 0.36, 1], stagger: 0.15, duration: 0.6, heroDuration: 0.85 },
+  tasyakuran: { ease: [0.22, 1, 0.36, 1], stagger: 0.12, duration: 0.55, heroDuration: 0.85 },
+  gathering: { ease: [0.16, 1, 0.3, 1], stagger: 0.1, duration: 0.5, heroDuration: 0.8 },
+  business: { ease: [0.22, 1, 0.36, 1], stagger: 0.12, duration: 0.5, heroDuration: 0.8 },
+  anniversary: { ease: [0.22, 1, 0.36, 1], stagger: 0.15, duration: 0.6, heroDuration: 0.9 },
+  family: { ease: [0.2, 0.9, 0.3, 1], stagger: 0.12, duration: 0.55, heroDuration: 0.85 },
+  'doa-haul': { ease: [0.22, 1, 0.36, 1], stagger: 0.15, duration: 0.6, heroDuration: 0.85 },
 };
 
 export const getProfile = (category: CategoryKey): AnimProfile =>
@@ -52,29 +52,32 @@ export type RevealVariant =
   | 'zoom'
   | 'blur'
   | 'photo'
-  | 'fade';
+  | 'fade'
+  | 'card';
 
 const hiddenFor = (variant: RevealVariant, reduce: boolean): Record<string, number | string> => {
   if (reduce) return { opacity: 0 };
   switch (variant) {
     case 'up':
-      return { opacity: 0, y: 36 };
+      return { opacity: 0, y: 20 };
     case 'down':
-      return { opacity: 0, y: -32 };
+      return { opacity: 0, y: -16 };
     case 'left':
-      return { opacity: 0, x: -36 };
+      return { opacity: 0, x: -20 };
     case 'right':
-      return { opacity: 0, x: 36 };
+      return { opacity: 0, x: 20 };
     case 'scale':
-      return { opacity: 0, scale: 0.9 };
+      return { opacity: 0, scale: 0.94 };
     case 'zoom':
-      return { opacity: 0, scale: 1.07 };
+      return { opacity: 0, scale: 1.04 };
     case 'blur':
-      return { opacity: 0, filter: 'blur(10px)' };
+      return { opacity: 0, filter: 'blur(8px)' };
     case 'photo':
-      return { opacity: 0, scale: 0.92, filter: 'blur(10px)' };
+      return { opacity: 0, scale: 0.96, filter: 'blur(6px)' };
+    case 'card':
+      return { opacity: 0, y: 16 };
     default:
-      return { opacity: 0, y: 24 };
+      return { opacity: 0, y: 16 };
   }
 };
 

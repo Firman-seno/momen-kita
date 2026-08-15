@@ -179,7 +179,7 @@ export const AmbientMarks: React.FC<{ family: FamilyConfig; className?: string }
   className = '',
 }) => (
   <div aria-hidden className={`absolute inset-0 pointer-events-none overflow-hidden ${className}`}>
-    {family.ambientMarks.slice(0, 5).map((m, i) => (
+    {family.ambientMarks.slice(0, 3).map((m, i) => (
       <span
         key={i}
         className="absolute text-xl sm:text-2xl opacity-60 select-none animate-twinkle"

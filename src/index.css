@@ -145,23 +145,52 @@ h1, h2, h3, h4, h5, h6 {
   50% { opacity: 1; transform: scale(1.2); }
 }
 
-@keyframes neon-pulse {
-  0%, 100% { filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.6)); }
-  50% { filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.9)); }
-}
-
 @keyframes glitter-fall {
   0% { transform: translateY(-10%) rotate(0deg); opacity: 0; }
   20% { opacity: 1; }
   100% { transform: translateY(110%) rotate(360deg); opacity: 0; }
 }
 
+/* Ambient background loops — SLOW (4-8s) and used only on a FEW
+   decorative elements (2-3 per background) so the invitation does
+   not look busy. Everything else uses the one-shot *-in classes below. */
 .animate-float-up {
-  animation: float-up 6s ease-in-out infinite;
+  animation: float-up 8s ease-in-out infinite;
 }
 
 .animate-twinkle {
-  animation: twinkle 3s ease-in-out infinite;
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+/* Stagger ambient decorative motion so elements never move together */
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+/* One-shot decorative entrances — play once on load, then stay still.
+   Used by the vast majority of background ornaments & emojis. */
+@keyframes float-up-in {
+  0% { opacity: 0; transform: translateY(18px) scale(0.94); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.deco-float-in {
+  animation: float-up-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes twinkle-in {
+  0% { opacity: 0; transform: scale(0.6); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.deco-twinkle-in {
+  animation: twinkle-in 1.4s ease-out both;
+}
+
+@keyframes glow-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.deco-glow-in {
+  animation: glow-in 1.6s ease-out both;
 }
 
 /* Simple one-shot fade-in used for revealed sections & toasts */
@@ -171,10 +200,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 .animate-fade-in {
   animation: fade-in 0.5s ease-out both;
-}
-
-.animate-neon-pulse {
-  animation: neon-pulse 4s ease-in-out infinite;
 }
 
 .animate-glitter {
@@ -204,14 +229,10 @@ h1, h2, h3, h4, h5, h6 {
   animation: tick-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Floating music player equalizer bars (0.3-0.5s beat while playing) */
-@keyframes eq-bounce {
-  0%, 100% { transform: scaleY(0.35); }
-  50% { transform: scaleY(1); }
-}
+/* Music player equalizer — STATIC visual state (playing/paused).
+   No continuous bounce: the state is shown by icon + bar heights only. */
 .eq-bar {
   transform-origin: bottom;
-  animation: eq-bounce 0.42s ease-in-out infinite;
 }
 
 /* Universal button micro-interaction */
@@ -260,6 +281,12 @@ h1, h2, h3, h4, h5, h6 {
     scroll-behavior: auto !important;
   }
   .deco-fade-in {
+    animation: none !important;
+    opacity: 1;
+  }
+  .deco-float-in,
+  .deco-twinkle-in,
+  .deco-glow-in {
     animation: none !important;
     opacity: 1;
   }

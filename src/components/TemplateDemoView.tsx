@@ -450,7 +450,7 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
                 title={isPlayingMusic ? 'Pause Music' : 'Play Music'}
               >
                 {isPlayingMusic && (
-                  <span className="absolute inset-0 rounded-full border-2 border-dashed border-white/50 animate-[spin_4s_linear_infinite] pointer-events-none" />
+                  <span className="absolute inset-0 rounded-full border border-white/25 pointer-events-none" />
                 )}
                 <span className="material-symbols-outlined text-lg sm:text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
                   {isPlayingMusic ? 'pause' : 'play_arrow'}
@@ -461,8 +461,8 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
               {isPlayingMusic && (
                 <div className="flex items-end gap-[3px] h-5 px-0.5" title={template.musicTrackName}>
                   <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '10px', backgroundColor: themeStyle.primaryColor }} />
-                  <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '16px', animationDelay: '0.15s', backgroundColor: themeStyle.primaryColor }} />
-                  <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '13px', animationDelay: '0.3s', backgroundColor: themeStyle.primaryColor }} />
+                  <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '16px', backgroundColor: themeStyle.primaryColor }} />
+                  <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '13px', backgroundColor: themeStyle.primaryColor }} />
                 </div>
               )}
 
@@ -507,7 +507,7 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
             {isPlayingMusic && (
               <div className="max-w-[220px] truncate px-3 py-1.5 rounded-full bg-black/85 border border-white/15 backdrop-blur-md shadow-xl">
                 <span className="text-[10px] sm:text-[11px] font-semibold text-white truncate">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1.5 align-middle"></span>
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 align-middle"></span>
                   {activeMusic.title}
                 </span>
               </div>
@@ -530,8 +530,8 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
                 {isPlayingMusic ? (
                   <span className="flex items-end gap-[3px] h-4" aria-hidden="true">
                     <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '8px' }} />
-                    <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '14px', animationDelay: '0.15s' }} />
-                    <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '10px', animationDelay: '0.3s' }} />
+                    <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '14px' }} />
+                    <span className="w-[3px] rounded-full bg-amber-400 eq-bar" style={{ height: '10px' }} />
                   </span>
                 ) : (
                   <span className="material-symbols-outlined text-xl text-amber-300" style={{ fontVariationSettings: "'FILL' 1" }}>
