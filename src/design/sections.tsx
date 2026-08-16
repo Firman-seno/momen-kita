@@ -5,6 +5,7 @@ import { AnimProfile, Reveal, Stagger, StaggerChild } from '../components/Animat
 import { DemoContent } from './content';
 import { CountdownParts } from '../lib/eventDateTime';
 import { DesignResolution, FamilyConfig } from './types';
+import { isPaperFamily } from './families';
 import {
   SectionHeading,
   PrimaryButton,
@@ -18,6 +19,11 @@ import {
   CoverRibbon,
   useText,
   radiusFor,
+  isBirthdayFamily,
+  CoverBadge,
+  BirthdayDecor,
+  BirthdaySectionOrnament,
+  ConfettiFlourish,
 } from './blocks';
 import {
   EightStar,
@@ -38,6 +44,11 @@ import {
   ConfettiDivider,
   ThinDivider,
   dividerFor,
+  CakeMark,
+  BalloonMark,
+  PartyPopper,
+  SparkleMark,
+  Bunting,
 } from './ornaments';
 import { InvitationVideo } from '../components/InvitationVideo';
 
@@ -85,11 +96,17 @@ type P = SectionProps;
 export const CoverView: React.FC<P> = (p) => {
   const { family, themeStyle, content, eventDetails } = p;
   const { base, isPaper } = useText(family);
+  const isBirthday = p.template.category === 'birthday';
   const titleColor = isPaper ? '#3d2f12' : themeStyle.textColor;
   const subColor = isPaper ? 'text-slate-600' : 'text-white/80';
 
   const titleBlock = (
     <>
+      {isBirthday && (
+        <div className="mb-3">
+          <CoverBadge family={family} />
+        </div>
+      )}
       <h1
         className={`text-4xl sm:text-5xl font-black leading-tight drop-shadow-sm ${family.titleTracking} ${family.titleTransform}`}
         style={{ fontFamily: themeStyle.fontFamilyTitle, color: titleColor }}
@@ -119,7 +136,7 @@ export const CoverView: React.FC<P> = (p) => {
   const openButton = (
     <PrimaryButton family={family} themeStyle={themeStyle} onClick={p.onOpen} className="max-w-xs">
       <Mail size={18} aria-hidden="true" />
-      Open Invitation
+      {isBirthday ? 'Buka Undangan' : 'Open Invitation'}
     </PrimaryButton>
   );
 
@@ -451,6 +468,7 @@ export const CoverView: React.FC<P> = (p) => {
       return (
         <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
           <AmbientMarks family={family} />
+          <BirthdayDecor family={family} />
           <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
             <StaggerChild variant="down" duration={0.7}>
               <BalloonArch color={family.accent} className="w-56 mx-auto" />
@@ -480,6 +498,7 @@ export const CoverView: React.FC<P> = (p) => {
       return (
         <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
           <AmbientMarks family={family} />
+          <BirthdayDecor family={family} />
           <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
             <StaggerChild variant="down" duration={0.7}>
               <div className="flex items-center justify-center gap-2">
@@ -525,6 +544,7 @@ export const CoverView: React.FC<P> = (p) => {
       return (
         <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
           <AmbientMarks family={family} />
+          <BirthdayDecor family={family} />
           <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
             <StaggerChild variant="down" duration={0.7}>
               <RocketMark color={family.accent} className="w-14 mx-auto" />
@@ -557,6 +577,7 @@ export const CoverView: React.FC<P> = (p) => {
       return (
         <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
           <AmbientMarks family={family} />
+          <BirthdayDecor family={family} />
           <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
             <StaggerChild variant="down" duration={0.7}>
               <CrownMark color={family.accent} className="w-20 mx-auto" />
@@ -591,6 +612,7 @@ export const CoverView: React.FC<P> = (p) => {
       return (
         <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
           <AmbientMarks family={family} />
+          <BirthdayDecor family={family} />
           <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
             <StaggerChild variant="down" duration={0.8}>
               <div className="relative h-16 w-64 mx-auto">
@@ -624,6 +646,7 @@ export const CoverView: React.FC<P> = (p) => {
     case 'bday-minimal-type': {
       return (
         <section className="min-h-screen w-full flex flex-col items-center justify-center p-8 relative z-20 overflow-hidden">
+          <BirthdayDecor family={family} className="opacity-50" />
           <Stagger profile={p.profile} onView={false} delay={0.15} stagger={0.15} className="w-full max-w-md my-auto flex flex-col items-center text-center">
             <StaggerChild variant="up" duration={0.8}>
               <div className="text-[11px] font-bold uppercase tracking-[0.5em]" style={{ color: family.accent }}>
@@ -662,6 +685,7 @@ export const CoverView: React.FC<P> = (p) => {
     case 'bday-luxe-circle': {
       return (
         <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
+          <BirthdayDecor family={family} className="opacity-40" />
           <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
             <StaggerChild variant="down" duration={0.8}>
               <div className="text-[11px] font-bold uppercase tracking-[0.45em] text-amber-200/80">
@@ -699,6 +723,7 @@ export const CoverView: React.FC<P> = (p) => {
       return (
         <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
           <AmbientMarks family={family} />
+          <BirthdayDecor family={family} />
           <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
             <StaggerChild variant="down" duration={0.7}>
               <div
@@ -741,6 +766,7 @@ export const CoverView: React.FC<P> = (p) => {
       return (
         <section className="min-h-screen w-full flex flex-col items-center justify-center p-5 sm:p-8 relative z-20 overflow-hidden">
           <AmbientMarks family={family} />
+          <BirthdayDecor family={family} />
           <Stagger profile={p.profile} onView={false} delay={0.15} stagger={0.16} className="w-full max-w-lg my-auto">
             <StaggerChild variant="down" duration={0.7}>
               <CandyStripe color={family.accent} className="w-56 mx-auto mb-4" />
@@ -779,6 +805,7 @@ export const CoverView: React.FC<P> = (p) => {
     case 'bday-elegant-frame': {
       return (
         <section className="min-h-screen w-full flex flex-col items-center justify-center p-5 sm:p-8 relative z-20">
+          <BirthdayDecor family={family} className="opacity-40" />
           <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto">
             <StaggerChild variant="zoom" duration={0.9}>
               <div
@@ -816,6 +843,7 @@ export const CoverView: React.FC<P> = (p) => {
     case 'bday-retro-burst': {
       return (
         <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
+          <BirthdayDecor family={family} />
           <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none" style={{ color: family.accent }}>
             <ComicBurst color={family.accent} className="w-[420px] h-[420px]" />
           </div>
@@ -857,6 +885,7 @@ export const CoverView: React.FC<P> = (p) => {
       return (
         <section className="min-h-screen w-full flex flex-col items-center justify-center p-6 relative z-20 overflow-hidden">
           <AmbientMarks family={family} />
+          <BirthdayDecor family={family} className="opacity-60" />
           <Stagger profile={p.profile} onView={false} delay={0.2} stagger={0.18} className="w-full max-w-md my-auto flex flex-col items-center gap-4 text-center">
             <StaggerChild variant="down" duration={0.7}>
               <div className="text-[11px] font-bold uppercase tracking-[0.4em]" style={{ color: family.accent }}>
@@ -915,12 +944,24 @@ export const CoverView: React.FC<P> = (p) => {
 export const UnveiledHeader: React.FC<P> = (p) => {
   const { family, themeStyle, content, eventDetails } = p;
   const { isPaper } = useText(family);
+  const isBirthday = p.template.category === 'birthday';
   const titleColor = isPaper ? '#3d2f12' : themeStyle.textColor;
 
   return (
     <header className="min-h-[85vh] flex flex-col items-center justify-center text-center py-10 relative">
       <AmbientMarks family={family} className="!absolute" />
+      {isBirthday && (
+        <>
+          <BirthdayDecor family={family} className="!absolute" />
+          <Bunting color={family.accent} className="absolute top-3 left-1/2 -translate-x-1/2 w-56 opacity-70" />
+        </>
+      )}
       <Stagger profile={p.profile} onView={false} delay={0.1} stagger={0.18} className="flex flex-col items-center gap-4 relative z-10 my-auto">
+        {isBirthday && (
+          <StaggerChild variant="down" duration={0.6}>
+            <CoverBadge family={family} />
+          </StaggerChild>
+        )}
         <StaggerChild variant="down" duration={0.7}>
           <CoverRibbon family={family} label={`${p.catEmoji} ${p.catLabel} Invitation #${p.templateNumber}`} />
         </StaggerChild>
@@ -1114,6 +1155,22 @@ export const ExtendedHostSection: React.FC<P> = (p) => {
 export const EventDetailsSection: React.FC<P> = (p) => {
   const { family, themeStyle, eventDetails, template } = p;
   const { muted } = useText(family);
+  const isBirthday = template.category === 'birthday';
+
+  const BIRTHDAY_DRESS_CODES: Record<string, string> = {
+    'bday-balloon': 'Festive & Bright',
+    'bday-cartoon': 'Colorful Casual',
+    'bday-space': 'Galaxy / Space Vibe',
+    'bday-princess': 'Fairytale & Pink Royal',
+    'bday-pastel': 'Soft Pastels',
+    'bday-minimal': 'Smart Casual',
+    'bday-luxury': 'Black & Gold Elegance',
+    'bday-neon': 'Neon Glow Attire',
+    'bday-candy': 'Sweet Candy Colors',
+    'bday-elegant': 'Chic & Elegant',
+    'bday-retro': 'Retro 90s Pop',
+    'bday-boho': 'Boho & Earthy Styles',
+  };
 
   const InfoRow: React.FC<{ icon: string; title: string; main: React.ReactNode; sub?: React.ReactNode }> = ({ icon, title, main, sub }) => (
     <Reveal profile={p.profile} variant="card">
@@ -1129,6 +1186,67 @@ export const EventDetailsSection: React.FC<P> = (p) => {
       </CardShell>
     </Reveal>
   );
+
+  if (isBirthday) {
+    const dressCode = BIRTHDAY_DRESS_CODES[family.key] || 'Festive & Bright';
+    return (
+      <section className="my-10">
+        <SectionHeading family={family} themeStyle={themeStyle} profile={p.profile}>Event Details</SectionHeading>
+        <div className="flex flex-col gap-3 mt-6">
+          <Reveal profile={p.profile} variant="card">
+            <CardShell family={family} className="p-4 flex items-center gap-4">
+              <IconTile accent={family.accent}>
+                <CakeMark color={family.accent} className="w-6" />
+              </IconTile>
+              <div className="min-w-0 flex-1">
+                <h3 className={`text-[11px] font-bold uppercase tracking-wider ${muted}`}>Birthday Party</h3>
+                <p className="text-base font-bold mt-0.5">{eventDetails.date}</p>
+              </div>
+              <div
+                className="shrink-0 text-[10px] sm:text-xs font-black uppercase tracking-wider px-3.5 py-2 rounded-full border shadow-inner"
+                style={{
+                  backgroundColor: `${family.accent}1f`,
+                  borderColor: `${family.accent}44`,
+                  color: family.accent,
+                }}
+              >
+                {eventDetails.time}
+              </div>
+            </CardShell>
+          </Reveal>
+          <InfoRow icon="pin_drop" title="Venue Location" main={eventDetails.venue} sub={eventDetails.address} />
+          <Reveal profile={p.profile} variant="card">
+            <CardShell family={family} className="p-4 flex items-center gap-4">
+              <IconTile accent={family.accent}>
+                <span className="material-symbols-outlined text-2xl">checkroom</span>
+              </IconTile>
+              <div className="min-w-0 flex-1">
+                <h3 className={`text-[11px] font-bold uppercase tracking-wider ${muted}`}>Dress Code</h3>
+                <p className="text-base font-bold mt-0.5">{dressCode}</p>
+              </div>
+              <SparkleMark color={family.accent} className="w-4 shrink-0 animate-sparkle" />
+            </CardShell>
+          </Reveal>
+          <Reveal profile={p.profile} variant="up">
+            <a
+              href={`https://maps.google.com/?q=${encodeURIComponent(eventDetails.venue + ' ' + eventDetails.address)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-micro w-full py-3.5 rounded-2xl border text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer transition-colors hover:opacity-90"
+              style={{
+                backgroundColor: isPaperFamily(family) ? 'rgba(176,138,62,0.12)' : `${family.accent}26`,
+                borderColor: isPaperFamily(family) ? 'rgba(176,138,62,0.4)' : `${family.accent}55`,
+                color: isPaperFamily(family) ? '#6b5a2e' : family.accent,
+              }}
+            >
+              <span className="material-symbols-outlined text-sm">directions</span>
+              Open Google Maps
+            </a>
+          </Reveal>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="my-10">
@@ -1152,10 +1270,17 @@ export const EventDetailsSection: React.FC<P> = (p) => {
    ============================================================ */
 export const CountdownSection: React.FC<P> = (p) => {
   const { family, themeStyle, content } = p;
+  const isBirthday = p.template.category === 'birthday';
   return (
     <section className="my-10 text-center">
       <SectionHeading family={family} themeStyle={themeStyle} profile={p.profile}>{content.countdownTitle}</SectionHeading>
-      <div className="mt-6">
+      {isBirthday && (
+        <div className="mt-5">
+          <BirthdaySectionOrnament family={family} />
+        </div>
+      )}
+      <div className={`mt-6 ${isBirthday ? 'relative' : ''}`}>
+        {isBirthday && <ConfettiFlourish family={family} className="absolute -top-8 -left-2" />}
         <CountdownBlock family={family} profile={p.profile} countdown={p.countdown} />
       </div>
     </section>
@@ -1167,11 +1292,17 @@ export const CountdownSection: React.FC<P> = (p) => {
    ============================================================ */
 export const GallerySection: React.FC<P> = (p) => {
   const { family, themeStyle, content } = p;
+  const isBirthday = p.template.category === 'birthday';
   return (
     <section className="my-10">
       <SectionHeading family={family} themeStyle={themeStyle} profile={p.profile} subtitle={content.galleryNote}>
         {content.galleryHeading}
       </SectionHeading>
+      {isBirthday && (
+        <div className="mt-4">
+          <BirthdaySectionOrnament family={family} />
+        </div>
+      )}
       <div className="mt-6">
         <GalleryBlock
           family={family}
@@ -1261,6 +1392,7 @@ export const RsvpSection: React.FC<P> = (p) => {
   const { family, themeStyle, content } = p;
   const { muted } = useText(family);
   const isPaper = family.cardStyle === 'paper';
+  const isBirthday = p.template.category === 'birthday';
   const inputCls = isPaper
     ? 'bg-white/80 border border-[#e0d0a8] text-slate-800 placeholder:text-slate-400 focus:border-[#b08a3e]'
     : 'bg-black/40 border border-white/20 text-white placeholder:text-white/50 focus:border-white';
@@ -1269,7 +1401,8 @@ export const RsvpSection: React.FC<P> = (p) => {
   return (
     <section className="my-10">
       <Stagger profile={p.profile} className={`${radiusFor(family)} p-6 border shadow-2xl relative overflow-hidden ${family.cardClass}`}>
-        <StaggerChild variant="up">
+        {isBirthday && <BirthdayDecor family={family} className="opacity-30" />}
+        <StaggerChild variant="up" className="relative z-10">
           <h2
             className="text-2xl font-bold text-center mb-1"
             style={{ fontFamily: themeStyle.fontFamilyTitle, color: isPaper ? '#3d2f12' : themeStyle.textColor }}
@@ -1277,18 +1410,25 @@ export const RsvpSection: React.FC<P> = (p) => {
             {content.rsvpHeading}
           </h2>
         </StaggerChild>
-        <StaggerChild variant="fade">
+        <StaggerChild variant="fade" className="relative z-10">
           <p className={`text-xs text-center mb-6 ${muted}`}>{content.rsvpNote}</p>
         </StaggerChild>
+        {isBirthday && (
+          <StaggerChild variant="fade" className="relative z-10">
+            <div className="flex justify-center -mt-3 mb-5">
+              <BirthdaySectionOrnament family={family} />
+            </div>
+          </StaggerChild>
+        )}
 
         {p.rsvpSubmitted ? (
-          <StaggerChild variant="scale">
+          <StaggerChild variant="scale" className="relative z-10">
             <div className={`p-4 rounded-xl text-center text-xs font-bold animate-fade-in ${isPaper ? 'bg-emerald-50 border border-emerald-300 text-emerald-700' : 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-200'}`}>
               Terima kasih {p.rsvpData.name || 'Tamu'}! Konfirmasi RSVP kamu telah terkirim.
             </div>
           </StaggerChild>
         ) : (
-          <form onSubmit={p.onRsvpSubmit} className="flex flex-col gap-3">
+          <form onSubmit={p.onRsvpSubmit} className="flex flex-col gap-3 relative z-10">
             <Reveal profile={p.profile} variant="up" delay={0.05}>
               <input
                 type="text"
@@ -1357,6 +1497,13 @@ export const WishesSection: React.FC<P> = (p) => {
         <StaggerChild variant="fade">
           <p className={`text-xs text-center mb-6 ${muted}`}>{content.wishesNote}</p>
         </StaggerChild>
+        {p.template.category === 'birthday' && (
+          <StaggerChild variant="fade">
+            <div className="flex justify-center -mt-4 mb-5">
+              <BirthdaySectionOrnament family={family} />
+            </div>
+          </StaggerChild>
+        )}
 
         {p.wishSuccess && (
           <StaggerChild variant="scale">
@@ -1472,6 +1619,12 @@ export const ClosingSection: React.FC<P> = (p) => {
             <StarBurst color={family.accent} className="w-10 opacity-90" />
           ) : family.key === 'bday-balloon' || family.key === 'bday-candy' || family.key === 'bday-pastel' ? (
             <PartyBand color={family.accent} className="w-40" />
+          ) : isBirthdayFamily(family) ? (
+            <div className="flex items-center gap-5">
+              <BalloonMark color={family.accent} className="w-9" />
+              <CakeMark color={family.accent} className="w-12" />
+              <BalloonMark color={family.accent} className="w-9" />
+            </div>
           ) : (
             <StarDivider color={family.accent} className="w-44" />
           )}

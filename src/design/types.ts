@@ -60,7 +60,7 @@ export type GalleryStyle = 'grid' | 'polaroid' | 'collage' | 'masonry' | 'framed
 
 export type HeadingStyle = 'classic' | 'ornate' | 'modern' | 'script' | 'lines';
 
-export type DividerStyle = 'floral' | 'gold-line' | 'dots' | 'double-line' | 'geometric' | 'leaf' | 'stars' | 'arabesque' | 'batik' | 'thin' | 'confetti' | 'crown';
+export type DividerStyle = 'floral' | 'gold-line' | 'dots' | 'double-line' | 'geometric' | 'leaf' | 'stars' | 'arabesque' | 'batik' | 'thin' | 'confetti' | 'crown' | 'bunting';
 
 export type ButtonShape = 'round' | 'square' | 'pill' | 'angled';
 

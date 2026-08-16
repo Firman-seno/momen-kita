@@ -3,6 +3,20 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ThemeStyle } from '../types';
 import { EASE_OUT } from './AnimationKit';
 
+const BIRTHDAY_CONFETTI_TYPES = [
+  'balloon-party',
+  'confetti-burst',
+  'candy-sweet',
+  'retro-pop',
+  'neon-party',
+  'space-cosmic',
+  'princess-royal',
+  'pastel-cute',
+  'celebration-confetti',
+];
+
+const CONFETTI_COLORS = ['#f472b6', '#38bdf8', '#facc15', '#4ade80', '#c084fc', '#fb7185'];
+
 interface TemplateBackgroundProps {
   themeStyle: ThemeStyle;
   children: React.ReactNode;
@@ -343,6 +357,29 @@ export const TemplateBackground: React.FC<TemplateBackgroundProps> = ({ themeSty
           <div className="absolute top-[15%] left-[10%] text-2xl animate-twinkle opacity-60 select-none">✧</div>
           <div className="absolute top-[45%] right-[10%] text-2xl animate-twinkle opacity-60 select-none">✦</div>
           <div className="absolute top-[75%] left-[12%] text-2xl deco-twinkle-in opacity-60 select-none">○</div>
+        </div>
+      )}
+
+      {/* SHARED BIRTHDAY CONFETTI SPRINKLE — subtle extra layer on top of
+          any party backdrop so every birthday cover feels lively and rich. */}
+      {BIRTHDAY_CONFETTI_TYPES.includes(bgType) && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 deco-fade-in">
+          {CONFETTI_COLORS.map((color, i) => (
+            <span
+              key={i}
+              aria-hidden
+              className="absolute top-0 w-2 h-3 rounded-[2px] animate-confetti-fall"
+              style={{
+                left: `${(i * 7.7 + 4) % 92}%`,
+                backgroundColor: color,
+                opacity: 0.6,
+                animationDelay: `${(i % 5) * 1.6}s`,
+                animationDuration: `${10 + (i % 3) * 3}s`,
+              }}
+            />
+          ))}
+          <span aria-hidden className="absolute top-[18%] left-[12%] text-2xl animate-sparkle opacity-70 select-none">✨</span>
+          <span aria-hidden className="absolute top-[58%] right-[8%] text-xl animate-sparkle opacity-60 select-none" style={{ animationDelay: '1.4s' }}>🎈</span>
         </div>
       )}
 

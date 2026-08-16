@@ -1,7 +1,7 @@
 import React from 'react';
 import { FamilyConfig, GalleryStyle } from './types';
 import { cardTextClass, cardMutedClass, isPaperFamily } from './families';
-import { dividerFor, GoldDivider, FloralDivider, CornerFlourish, LeafSprig, EightStar, StarDivider, PartyBand, ScriptSwirl, ArchWreath, TapeStrip } from './ornaments';
+import { dividerFor, GoldDivider, FloralDivider, CornerFlourish, LeafSprig, EightStar, StarDivider, PartyBand, ScriptSwirl, ArchWreath, TapeStrip, StarBurst, SparkleMark, BalloonMark, CakeMark, PartyPopper, ConfettiBurst, Bunting } from './ornaments';
 import { ThemeStyle, EventDetails } from '../types';
 import { AnimProfile, Reveal, Stagger, StaggerChild } from '../components/AnimationKit';
 import { CountdownParts, pad2 } from '../lib/eventDateTime';
@@ -11,6 +11,9 @@ import { CountdownParts, pad2 } from '../lib/eventDateTime';
    Every block is family-aware. This is what turns one shared
    renderer into 10 genuinely different premium templates.
    ============================================================ */
+
+export const isBirthdayFamily = (family: FamilyConfig): boolean =>
+  family.key.startsWith('bday');
 
 export interface BlockCtx {
   family: FamilyConfig;
@@ -180,7 +183,7 @@ export const AmbientMarks: React.FC<{ family: FamilyConfig; className?: string }
   className = '',
 }) => (
   <div aria-hidden className={`absolute inset-0 pointer-events-none overflow-hidden ${className}`}>
-    {family.ambientMarks.slice(0, 3).map((m, i) => (
+    {family.ambientMarks.slice(0, 4).map((m, i) => (
       <span
         key={i}
         className="absolute text-xl sm:text-2xl opacity-60 select-none animate-twinkle"
@@ -254,7 +257,8 @@ export const FamilyPhotoFrame: React.FC<FamilyPhotoFrameProps> = ({
     <div className={`relative ${cls} shrink-0`}>{node}</div>
   );
 
-  switch (shape) {
+  const body = (() => {
+    switch (shape) {
     case 'arch':
       return wrap(
         <>
@@ -397,7 +401,29 @@ export const FamilyPhotoFrame: React.FC<FamilyPhotoFrameProps> = ({
         </div>,
         ''
       );
+    }
+  })();
+
+  /* Birthday families get a festive halo: glow, bunting & sparkles. */
+  if (isBirthdayFamily(family)) {
+    return (
+      <div className="relative shrink-0">
+        <div
+          aria-hidden
+          className="absolute -inset-6 rounded-full opacity-50 blur-2xl pointer-events-none"
+          style={{ background: `radial-gradient(circle, ${family.accent}40, transparent 70%)` }}
+        />
+        {size === 'cover' && (
+          <Bunting color={family.accent} className="absolute -top-9 left-1/2 -translate-x-1/2 w-44 opacity-90 z-10" />
+        )}
+        <SparkleMark color="#ffffff" className="absolute -top-2 -right-3 w-6 animate-sparkle z-10" />
+        <SparkleMark color={family.accent} className="absolute -bottom-3 -left-4 w-5 animate-sparkle z-10" style={{ animationDelay: '1.2s' }} />
+        {body}
+      </div>
+    );
   }
+
+  return body;
 };
 
 /* ---------------- Countdown ---------------- */
@@ -410,6 +436,7 @@ export interface CountdownBlockProps {
 
 export const CountdownBlock: React.FC<CountdownBlockProps> = ({ family, profile, countdown, accent }) => {
   const isPaper = isPaperFamily(family);
+  const bday = isBirthdayFamily(family);
   const valueColor = accent || (isPaper ? '#b08a3e' : family.accent);
   const box =
     family.key === 'kids-fun' ||
@@ -418,13 +445,15 @@ export const CountdownBlock: React.FC<CountdownBlockProps> = ({ family, profile,
     family.key === 'bday-cartoon' ||
     family.key === 'bday-pastel'
       ? 'bg-white/10 border-2 border-white/25 rounded-3xl'
-      : family.key === 'modern' || family.key === 'bday-neon' || family.key === 'bday-minimal'
-        ? 'bg-white/5 border border-white/20 rounded-xl'
-        : family.key === 'bday-luxury'
-          ? 'bg-[#160f08]/60 border border-amber-200/25 rounded-md'
-          : isPaper
-            ? 'bg-white/70 border border-[#e5dcc4] rounded-2xl'
-            : 'bg-black/45 border border-white/20 rounded-2xl';
+      : bday
+        ? 'bg-white/10 border border-white/20 rounded-2xl backdrop-blur-sm'
+        : family.key === 'modern' || family.key === 'bday-neon' || family.key === 'bday-minimal'
+          ? 'bg-white/5 border border-white/20 rounded-xl'
+          : family.key === 'bday-luxury'
+            ? 'bg-[#160f08]/60 border border-amber-200/25 rounded-md'
+            : isPaper
+              ? 'bg-white/70 border border-[#e5dcc4] rounded-2xl'
+              : 'bg-black/45 border border-white/20 rounded-2xl';
 
   const statusBox = `${box} p-6 sm:p-7 flex flex-col items-center text-center`;
 
@@ -468,9 +497,19 @@ export const CountdownBlock: React.FC<CountdownBlockProps> = ({ family, profile,
   return (
     <Stagger profile={profile} className="grid grid-cols-4 gap-2.5">
       {cells.map((c) => (
-        <StaggerChild key={c.label} variant="scale">
-          <div className={`${box} p-3.5 sm:p-4 flex flex-col items-center`}>
-            <span className="text-2xl sm:text-3xl font-black tabular-nums" style={{ color: valueColor }}>
+        <StaggerChild key={c.label} variant="scale" className="active:scale-95 transition-transform">
+          <div
+            className={`${box} p-3 sm:p-4 flex flex-col items-center relative`}
+            style={bday ? { background: `linear-gradient(180deg, ${family.accent}1a 0%, rgba(255,255,255,0.04) 100%)` } : undefined}
+          >
+            {bday && (
+              <span
+                aria-hidden
+                className="absolute top-1.5 left-1/2 -translate-x-1/2 h-0.5 w-6 rounded-full opacity-70"
+                style={{ background: `linear-gradient(90deg, transparent, ${family.accent}, transparent)` }}
+              />
+            )}
+            <span className="text-2xl sm:text-3xl font-black tabular-nums drop-shadow-sm" style={{ color: valueColor }}>
               {c.value}
             </span>
             <span className="text-[10px] font-bold uppercase tracking-wider opacity-70 mt-0.5">{c.label}</span>
@@ -504,7 +543,7 @@ export const GalleryBlock: React.FC<GalleryBlockProps> = ({
       key={i}
       variant="photo"
       onClick={() => onImageClick?.(img)}
-      className={`${cls} card-lift overflow-hidden cursor-pointer group relative`}
+      className={`${cls} card-lift overflow-hidden cursor-pointer group relative active:scale-95 transition-transform`}
     >
       {tape && <TapeStrip className="absolute -top-1 left-1/2 -translate-x-1/2 z-10" />}
       <img
@@ -512,6 +551,12 @@ export const GalleryBlock: React.FC<GalleryBlockProps> = ({
         alt={`Gallery ${i + 1}`}
         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
       />
+      {isBirthdayFamily(family) && (
+        <SparkleMark
+          color="#ffffff"
+          className="absolute top-2 right-2 w-4 opacity-0 group-hover:opacity-90 transition-opacity duration-300 animate-sparkle z-10"
+        />
+      )}
       <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
         <span className="material-symbols-outlined text-white text-2xl">zoom_in</span>
       </div>
@@ -596,8 +641,12 @@ export const GalleryBlock: React.FC<GalleryBlockProps> = ({
 /* ---------------- Event detail icon tile ---------------- */
 export const IconTile: React.FC<{ accent?: string; children: React.ReactNode }> = ({ accent, children }) => (
   <div
-    className="p-3 rounded-xl shrink-0 flex items-center justify-center"
-    style={{ backgroundColor: accent ? `${accent}1f` : 'rgba(255,255,255,0.12)', color: accent || '#fbbf24' }}
+    className="p-3 rounded-2xl shrink-0 flex items-center justify-center shadow-inner"
+    style={{
+      backgroundColor: accent ? `${accent}1f` : 'rgba(255,255,255,0.12)',
+      color: accent || '#fbbf24',
+      boxShadow: `inset 0 0 0 1px ${accent ? accent + '33' : 'rgba(255,255,255,0.14)'}`,
+    }}
   >
     {children}
   </div>
@@ -618,5 +667,76 @@ export const CoverRibbon: React.FC<{ family: FamilyConfig; label: string }> = ({
       <span>{label}</span>
       <span>{family.ambientMarks[0]}</span>
     </div>
+  </div>
+);
+
+/* ============================================================
+   BIRTHDAY PARTY COMPONENTS
+   Shared festive layer for the 12 birthday families — every
+   birthday cover & header uses these so the party always feels
+   colorful, playful and rich, while each family keeps its own
+   composition on top.
+   ============================================================ */
+
+const CONFETTI_COLORS = ['#f472b6', '#38bdf8', '#facc15', '#4ade80', '#c084fc', '#fb7185', '#f97316'];
+
+/* Floating confetti + balloons + sparkles for cover backgrounds. */
+export const BirthdayDecor: React.FC<{ family: FamilyConfig; className?: string }> = ({ family, className = '' }) => (
+  <div aria-hidden className={`absolute inset-0 pointer-events-none overflow-hidden ${className}`}>
+    {Array.from({ length: 10 }).map((_, i) => (
+      <span
+        key={`cf-${i}`}
+        className="absolute top-0 w-2 h-3 rounded-[2px] animate-confetti-fall"
+        style={{
+          left: `${4 + i * 9.2}%`,
+          backgroundColor: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+          animationDelay: `${(i % 6) * 1.3}s`,
+          animationDuration: `${8 + (i % 4) * 2}s`,
+        }}
+      />
+    ))}
+    <BalloonMark color={family.accent} className="absolute top-[13%] left-[4%] w-9 opacity-70 animate-float-slow" />
+    <BalloonMark color={family.accent} className="absolute top-[47%] right-[4%] w-8 opacity-60 animate-float-slow" style={{ animationDelay: '1.6s' }} />
+    <BalloonMark color="#ffffff" className="absolute top-[78%] left-[6%] w-6 opacity-50 animate-float-slow" style={{ animationDelay: '0.9s' }} />
+    <SparkleMark color="#ffffff" className="absolute top-[9%] right-[15%] w-4 opacity-70 animate-sparkle" />
+    <SparkleMark color={family.accent} className="absolute top-[71%] left-[11%] w-5 opacity-70 animate-sparkle" style={{ animationDelay: '1.1s' }} />
+    <SparkleMark color="#ffffff" className="absolute top-[88%] right-[9%] w-4 opacity-60 animate-sparkle" style={{ animationDelay: '0.5s' }} />
+    <CakeMark color={family.accent} className="absolute top-[30%] right-[5%] w-10 opacity-45 animate-sway" />
+    <PartyPopper color={family.accent} className="absolute top-[88%] right-[24%] w-8 opacity-45 animate-sway" style={{ animationDelay: '0.8s' }} />
+  </div>
+);
+
+/* "You're Invited" / celebration badge for cover tops. */
+export const CoverBadge: React.FC<{ family: FamilyConfig; label?: string }> = ({
+  family,
+  label = "You're Invited",
+}) => (
+  <div
+    className="inline-flex items-center gap-2 px-5 py-2 rounded-full shadow-lg border"
+    style={{
+      background: isPaperFamily(family) ? 'rgba(255,255,255,0.92)' : 'rgba(0,0,0,0.35)',
+      borderColor: `${family.accent}55`,
+      color: isPaperFamily(family) ? '#6b5a2e' : '#ffffff',
+    }}
+  >
+    <SparkleMark color={family.accent} className="w-3.5 animate-sparkle" />
+    <span className="text-[10px] sm:text-xs font-black uppercase tracking-[0.3em]">{label}</span>
+    <SparkleMark color={family.accent} className="w-3.5 animate-sparkle" style={{ animationDelay: '0.8s' }} />
+  </div>
+);
+
+/* Small ornament row (cake + balloons + popper) for section headings. */
+export const BirthdaySectionOrnament: React.FC<{ family: FamilyConfig; className?: string }> = ({ family, className = '' }) => (
+  <div aria-hidden className={`flex items-center justify-center gap-4 ${className}`}>
+    <BalloonMark color={family.accent} className="w-6 opacity-80" />
+    <CakeMark color={family.accent} className="w-8 opacity-90" />
+    <PartyPopper color={family.accent} className="w-6 opacity-80" />
+  </div>
+);
+
+/* Confetti burst flourish behind section content (light, subtle). */
+export const ConfettiFlourish: React.FC<{ family: FamilyConfig; className?: string }> = ({ family, className = '' }) => (
+  <div aria-hidden className={`pointer-events-none select-none ${className}`}>
+    <ConfettiBurst color={family.accent} className="w-16 opacity-50" />
   </div>
 );

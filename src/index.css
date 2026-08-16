@@ -197,6 +197,61 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================================
+   BIRTHDAY PARTY MOTION
+   Light, GPU-friendly ambient loops used ONLY on a few decorative
+   elements (balloons, confetti, sparkles) so the invitation stays
+   lively but never busy. Reduced-motion is handled globally below.
+   ============================================================ */
+
+/* Gentle vertical bob — balloons & floating ornaments */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-14px) rotate(3deg); }
+}
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+/* Balloon rising from the bottom edge of the screen */
+@keyframes balloon-rise {
+  0% { transform: translateY(105vh) rotate(-6deg); opacity: 0; }
+  8% { opacity: 0.9; }
+  92% { opacity: 0.9; }
+  100% { transform: translateY(-20vh) rotate(6deg); opacity: 0; }
+}
+.animate-balloon-rise {
+  animation: balloon-rise 16s linear infinite;
+}
+
+/* Confetti piece falling with rotation + sway */
+@keyframes confetti-fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  6% { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(540deg); opacity: 0; }
+}
+.animate-confetti-fall {
+  animation: confetti-fall 9s linear infinite;
+}
+
+/* Soft side-to-side sway (sparkles, small marks) */
+@keyframes sway {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  50% { transform: translateX(6px) rotate(8deg); }
+}
+.animate-sway {
+  animation: sway 5s ease-in-out infinite;
+}
+
+/* Twinkle used by cover sparkles — bigger than the ambient twinkle */
+@keyframes sparkle {
+  0%, 100% { opacity: 0.35; transform: scale(0.7) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.15) rotate(20deg); }
+}
+.animate-sparkle {
+  animation: sparkle 3.2s ease-in-out infinite;
+}
+
+/* ============================================================
    PREMIUM MOTION SYSTEM
    ============================================================ */
 
