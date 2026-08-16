@@ -26,7 +26,10 @@ interface InvitationViewProps {
 
 export const InvitationView: React.FC<InvitationViewProps> = ({ slug, onGoHome }) => {
   const [local, setLocal] = useState<Invitation | undefined>(() => getInvitationBySlug(slug) || undefined);
-  const [showLoading, setShowLoading] = useState(true);
+  // Only show the loading screen when there is NO cached copy (fresh device).
+  // When the invitation is already in localStorage it renders instantly and the
+  // server copy is refreshed silently in the background — no artificial delay.
+  const [showLoading, setShowLoading] = useState(() => !getInvitationBySlug(slug));
   // Authoritative server-side expiration result captured when the invitation
   // was fetched. Expiration is monotonic, so this never "un-expires".
   const [serverExpired, setServerExpired] = useState(false);
@@ -35,17 +38,7 @@ export const InvitationView: React.FC<InvitationViewProps> = ({ slug, onGoHome }
   // server so the link also opens on devices without the admin's data.
   useEffect(() => {
     let cancelled = false;
-    const start = Date.now();
-    setShowLoading(true);
     setLocal(getInvitationBySlug(slug) || undefined);
-
-    const finish = () => {
-      if (cancelled) return;
-      const wait = Math.max(0, 450 - (Date.now() - start));
-      window.setTimeout(() => {
-        if (!cancelled) setShowLoading(false);
-      }, wait);
-    };
 
     fetchPublicInvitation(slug)
       .then((data) => {
@@ -56,9 +49,11 @@ export const InvitationView: React.FC<InvitationViewProps> = ({ slug, onGoHome }
           const fresh = getInvitationBySlug(slug);
           if (fresh) setLocal(fresh);
         }
-        finish();
       })
-      .catch(() => finish());
+      .catch(() => undefined)
+      .finally(() => {
+        if (!cancelled) setShowLoading(false);
+      });
 
     return () => {
       cancelled = true;

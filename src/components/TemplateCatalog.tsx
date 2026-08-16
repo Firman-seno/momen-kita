@@ -253,7 +253,8 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
           {filteredTemplates.map((template) => (
             <article
               key={template.uid}
-              className="template-card group relative bg-surface-container-lowest rounded-[18px] overflow-hidden border border-outline-variant/40 flex flex-col h-full shadow-sm hover:shadow-xl min-w-0 w-full box-border"
+              onClick={() => onOpenDemo(template)}
+              className="template-card cv-auto group relative bg-surface-container-lowest rounded-[18px] overflow-hidden border border-outline-variant/40 flex flex-col h-full shadow-sm hover:shadow-xl active:scale-[0.99] cursor-pointer min-w-0 w-full box-border"
             >
               <TemplateImage
                 src={template.image}
@@ -265,7 +266,10 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
                 demoAccentColor={template.themeStyle.primaryColor}
                 badgeText={template.badge}
                 badgeClassName={template.badge ? BADGE_STYLES[template.badge] : undefined}
-                onClick={() => onOpenDemo(template)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenDemo(template);
+                }}
               />
 
               {/* Promo ribbon — marketing hook; the real price is still shown
@@ -287,7 +291,10 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
                   )}
                 </div>
                 <h3
-                  onClick={() => onOpenDemo(template)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenDemo(template);
+                  }}
                   className="font-headline text-sm sm:text-base font-bold text-on-surface mb-1.5 line-clamp-2 hover:text-primary transition-colors cursor-pointer leading-tight min-h-[36px] sm:min-h-[40px]"
                 >
                   {template.name}
@@ -333,7 +340,10 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
                 <div className="flex flex-col gap-2 w-full min-w-0 mt-auto pt-1 box-border">
                   {/* Music Preview */}
                   <button
-                    onClick={() => handlePreviewMusic(template)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePreviewMusic(template);
+                    }}
                     className={`w-full min-h-[46px] px-3 py-2 rounded-xl border-2 transition-all flex items-center justify-center gap-2 cursor-pointer box-border text-[11px] sm:text-xs font-bold ${
                       previewingUid === template.uid
                         ? 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100 active:scale-[0.98]'
@@ -355,7 +365,10 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
                       full), side-by-side from sm up. Equal height, never truncated. */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full min-w-0 box-border">
                     <button
-                      onClick={() => onOpenDemo(template)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenDemo(template);
+                      }}
                       title="Lihat demo interaktif template ini"
                       className="inline-flex items-center justify-center gap-2 min-h-[52px] w-full px-2.5 sm:px-3 rounded-xl bg-[#14213D] text-white font-bold uppercase tracking-wider text-[10px] sm:text-[11px] whitespace-nowrap border border-[#14213D] shadow-sm hover:bg-[#1d2d54] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all select-none cursor-pointer min-w-0"
                     >
@@ -363,7 +376,10 @@ export const TemplateCatalog: React.FC<TemplateCatalogProps> = ({
                       Lihat Demo
                     </button>
                     <button
-                      onClick={() => onOrder(template)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOrder(template);
+                      }}
                       title="Pesan template ini (langsung diisi & bayar di sini)"
                       className="inline-flex items-center justify-center gap-2 min-h-[52px] w-full px-2.5 sm:px-3 rounded-xl bg-emerald-600 text-white font-bold uppercase tracking-wider text-[10px] sm:text-[11px] whitespace-nowrap border border-emerald-600 shadow-sm hover:bg-emerald-700 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] transition-all select-none cursor-pointer min-w-0"
                     >

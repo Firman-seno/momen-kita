@@ -16,7 +16,7 @@ interface TemplateImageProps {
   demoAccentColor: string;
   badgeText?: string;
   badgeClassName?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 export const TemplateImage: React.FC<TemplateImageProps> = ({

@@ -8,9 +8,10 @@ interface NavigationProps {
   onSelectTab: (tab: NavigationTab) => void;
   onOpenWhatsApp: (templateInfo?: string) => void;
   onOpenOrderStatus: () => void;
+  onOpenAdminLogin: () => void;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab, onOpenWhatsApp, onOpenOrderStatus }) => {
+export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab, onOpenWhatsApp, onOpenOrderStatus, onOpenAdminLogin }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems: { id: NavigationTab; label: string }[] = [
@@ -33,6 +34,13 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab,
     return () => window.removeEventListener("keydown", onKey);
   }, [mobileMenuOpen]);
 
+  /** Navigate immediately and close the drawer in the same interaction —
+      the route swap is never gated behind the drawer closing. */
+  const go = (tab: NavigationTab) => {
+    onSelectTab(tab);
+    setMobileMenuOpen(false);
+  };
+
   return (
     <nav className="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/60 shadow-[0px_10px_30px_rgba(20,33,61,0.08)]">
       {/*
@@ -45,11 +53,8 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab,
       <div className="flex justify-between items-center h-16 sm:h-20 px-3.5 sm:px-5 xl:px-6 max-w-[1280px] mx-auto gap-2 sm:gap-3">
         {/* Logo / Wordmark — never shrinks, never wraps */}
         <button
-          onClick={() => {
-            onSelectTab("home");
-            setMobileMenuOpen(false);
-          }}
-          className="flex items-center gap-1.5 sm:gap-2 text-lg sm:text-xl md:text-2xl font-bold font-headline text-primary cursor-pointer tracking-tight shrink-0 whitespace-nowrap rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          onClick={() => go("home")}
+          className="flex items-center gap-1.5 sm:gap-2 text-lg sm:text-xl md:text-2xl font-bold font-headline text-primary cursor-pointer tracking-tight shrink-0 whitespace-nowrap rounded-lg active:scale-[0.98] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
         >
           <span className="material-symbols-outlined text-xl sm:text-2xl text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>
             auto_awesome
@@ -66,8 +71,9 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab,
               <button
                 key={item.id}
                 onClick={() => onSelectTab(item.id)}
-                className={`inline-flex items-center whitespace-nowrap py-2 font-body text-xs font-bold uppercase tracking-wider transition-all cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
-                  isActive ? "text-primary border-b-2 border-primary" : "text-on-surface-variant hover:text-primary hover:scale-[1.02]"
+                aria-current={isActive ? "page" : undefined}
+                className={`inline-flex items-center whitespace-nowrap py-2 px-1 font-body text-xs font-bold uppercase tracking-wider transition-colors active:scale-[0.97] active:opacity-70 cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+                  isActive ? "text-primary border-b-2 border-primary" : "text-on-surface-variant hover:text-primary"
                 }`}
               >
                 {item.label}
@@ -81,22 +87,22 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab,
           {/* Status Pesanan — desktop only (secondary action) */}
           <button
             onClick={onOpenOrderStatus}
-            className="hidden xl:inline-flex items-center gap-1.5 font-body text-[11px] font-extrabold uppercase tracking-wider text-on-surface-variant hover:text-primary border border-outline-variant rounded-full px-4 py-2.5 transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className="hidden xl:inline-flex items-center gap-1.5 font-body text-[11px] font-extrabold uppercase tracking-wider text-on-surface-variant hover:text-primary border border-outline-variant rounded-full px-4 py-2.5 active:scale-[0.97] active:bg-surface-container-high transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             title="Lacak status pesanan Anda"
           >
             <span className="material-symbols-outlined text-sm">receipt_long</span>
             Status Pesanan
           </button>
 
-          {/* Kelola Undangan — desktop only (secondary action) */}
-          <a
-            href="/login?force=1"
-            className="hidden xl:inline-flex items-center gap-1.5 font-body text-[11px] font-extrabold uppercase tracking-wider text-primary border border-primary/40 rounded-full px-4 py-2.5 hover:bg-primary hover:text-white transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          {/* Kelola Undangan — desktop only (secondary action, client-side nav) */}
+          <button
+            onClick={onOpenAdminLogin}
+            className="hidden xl:inline-flex items-center gap-1.5 font-body text-[11px] font-extrabold uppercase tracking-wider text-primary border border-primary/40 rounded-full px-4 py-2.5 hover:bg-primary hover:text-white active:bg-primary active:scale-[0.97] transition-colors cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             title="Buka halaman login admin MomenKita"
           >
             <span className="material-symbols-outlined text-sm">dashboard</span>
             Kelola Undangan
-          </a>
+          </button>
 
           {/* Primary CTA — kept visible from tablet portrait up */}
           <div className="hidden md:block shrink-0">
@@ -108,7 +114,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab,
           {/* Hamburger — mobile + tablet portrait (< 1024px) */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden text-on-surface w-11 h-11 flex items-center justify-center rounded-xl bg-surface-container-high/60 active:bg-surface-container-high cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className="lg:hidden text-on-surface w-11 h-11 flex items-center justify-center rounded-xl bg-surface-container-high/60 active:bg-surface-container-high active:scale-[0.96] cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             aria-label={mobileMenuOpen ? "Tutup menu" : "Buka menu"}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-nav-menu"
@@ -118,53 +124,54 @@ export const Navigation: React.FC<NavigationProps> = ({ currentTab, onSelectTab,
         </div>
       </div>
 
-      {/* Mobile / tablet-portrait Drawer */}
+      {/* Mobile / tablet-portrait Drawer — every row is a large, fully
+          clickable target; tapping anywhere on a row navigates instantly. */}
       {mobileMenuOpen && (
         <div
           id="mobile-nav-menu"
           aria-label="Menu navigasi"
-          className="lg:hidden bg-surface-container-lowest/98 backdrop-blur-xl border-b border-outline-variant/60 px-5 py-5 flex flex-col gap-3 shadow-2xl max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5rem)] overflow-y-auto"
+          className="lg:hidden bg-surface-container-lowest/98 backdrop-blur-xl border-b border-outline-variant/60 px-3 sm:px-5 py-3 sm:py-4 flex flex-col gap-2 shadow-2xl max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5rem)] overflow-y-auto"
         >
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => {
-                onSelectTab(item.id);
-                setMobileMenuOpen(false);
-              }}
-              className={`text-left font-body text-sm font-bold uppercase tracking-wider py-3 px-3 rounded-xl transition-colors cursor-pointer flex items-center justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+              onClick={() => go(item.id)}
+              aria-current={currentTab === item.id ? "page" : undefined}
+              className={`w-full text-left font-body text-sm font-bold uppercase tracking-wider py-3.5 px-3.5 rounded-xl active:bg-surface-container-high active:scale-[0.99] transition-colors cursor-pointer flex items-center justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
                 currentTab === item.id ? "bg-primary/10 text-primary" : "text-on-surface-variant hover:bg-surface-container-high"
               }`}
             >
               <span>{item.label}</span>
-              <span className="material-symbols-outlined text-base opacity-60">chevron_right</span>
+              <span className="material-symbols-outlined text-base opacity-60 pointer-events-none" aria-hidden="true">chevron_right</span>
             </button>
           ))}
-          <a
-            href="/login?force=1"
-            onClick={() => setMobileMenuOpen(false)}
-            className="text-left font-body text-sm font-bold uppercase tracking-wider py-3 px-3 rounded-xl transition-colors cursor-pointer flex items-center justify-between text-primary hover:bg-surface-container-high focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false);
+              onOpenAdminLogin();
+            }}
+            className="w-full text-left font-body text-sm font-bold uppercase tracking-wider py-3.5 px-3.5 rounded-xl transition-colors cursor-pointer flex items-center justify-between text-primary hover:bg-surface-container-high active:bg-surface-container-high active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             title="Buka halaman login admin MomenKita"
           >
             <span className="flex items-center gap-2">
               <span className="material-symbols-outlined text-base">dashboard</span>
               Kelola Undangan
             </span>
-            <span className="material-symbols-outlined text-base opacity-60">arrow_forward</span>
-          </a>
+            <span className="material-symbols-outlined text-base opacity-60 pointer-events-none" aria-hidden="true">arrow_forward</span>
+          </button>
           <button
             onClick={() => {
               setMobileMenuOpen(false);
               onOpenOrderStatus();
             }}
-            className="text-left font-body text-sm font-bold uppercase tracking-wider py-3 px-3 rounded-xl transition-colors cursor-pointer flex items-center justify-between text-on-surface-variant hover:bg-surface-container-high focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className="w-full text-left font-body text-sm font-bold uppercase tracking-wider py-3.5 px-3.5 rounded-xl transition-colors cursor-pointer flex items-center justify-between text-on-surface-variant hover:bg-surface-container-high active:bg-surface-container-high active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             title="Lacak status pesanan Anda"
           >
             <span className="flex items-center gap-2">
               <span className="material-symbols-outlined text-base">receipt_long</span>
               Status Pesanan
             </span>
-            <span className="material-symbols-outlined text-base opacity-60">arrow_forward</span>
+            <span className="material-symbols-outlined text-base opacity-60 pointer-events-none" aria-hidden="true">arrow_forward</span>
           </button>
           <UiButton variant="primary" size="md" fullWidth href={waHref} external icon="chat" iconFilled className="mt-2" onClick={() => setMobileMenuOpen(false)}>
             Pesan via WhatsApp

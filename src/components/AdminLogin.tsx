@@ -23,7 +23,6 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onGoHome, tit
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,16 +30,13 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onGoHome, tit
       setError('Masukkan email dan password admin.');
       return;
     }
-    setSubmitting(true);
-    // Small delay so the button shows a "spinner" state before redirecting.
-    window.setTimeout(() => {
-      if (loginAsAdmin(email, password)) {
-        onSuccess();
-      } else {
-        setError('Email atau password tidak sesuai.');
-        setSubmitting(false);
-      }
-    }, 300);
+    // loginAsAdmin is a synchronous localStorage check — navigate immediately,
+    // no artificial spinner delay before the dashboard opens.
+    if (loginAsAdmin(email, password)) {
+      onSuccess();
+    } else {
+      setError('Email atau password tidak sesuai.');
+    }
   };
 
   return (
@@ -134,23 +130,10 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onGoHome, tit
           {/* Submit */}
           <button
             type="submit"
-            disabled={submitting}
-            className="inline-flex items-center justify-center gap-2 w-full min-h-[52px] rounded-xl px-4 font-bold uppercase tracking-wider text-sm text-on-primary bg-primary hover:bg-[#1d2d54] shadow-sm hover:shadow-lg transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center gap-2 w-full min-h-[52px] rounded-xl px-4 font-bold uppercase tracking-wider text-sm text-on-primary bg-primary hover:bg-[#1d2d54] shadow-sm hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer"
           >
-            {submitting ? (
-              <>
-                <span
-                  className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"
-                  aria-hidden="true"
-                />
-                Memeriksa...
-              </>
-            ) : (
-              <>
-                <LogIn size={18} aria-hidden="true" />
-                Masuk
-              </>
-            )}
+            <LogIn size={18} aria-hidden="true" />
+            Masuk
           </button>
         </form>
 

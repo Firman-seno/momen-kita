@@ -17,15 +17,18 @@ import { InvitationEditor } from "./components/InvitationEditor";
 import { Dashboard } from "./components/Dashboard";
 import { AdminLogin } from "./components/AdminLogin";
 import { AccessDenied } from "./components/AccessDenied";
-import { TEMPLATES, getTemplateByUid } from "./data/templates";
+import { TEMPLATES, getTemplateByUid, CATEGORIES } from "./data/templates";
 import { resetSocialMeta } from "./lib/socialMeta";
 import { isAdminAuthenticated, logoutAdmin } from "./lib/admin";
 import { NavigationTab, Template, CategoryKey } from "./types";
+import { scrollToTopInstant } from "./lib/navigation";
+
+const VALID_CATEGORY_KEYS = CATEGORIES.map((c) => c.key);
 
 const readCategoryFromUrl = (): string => {
   const params = new URLSearchParams(window.location.search);
   const cat = params.get("category");
-  if (cat && ["birthday", "sunatan", "wedding", "aqiqah"].includes(cat)) return cat;
+  if (cat && VALID_CATEGORY_KEYS.includes(cat as CategoryKey)) return cat;
   return "All";
 };
 
@@ -65,21 +68,21 @@ export default function App() {
   const goHome = () => {
     setCurrentTab("home");
     window.history.pushState({}, "", "/");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToTopInstant();
   };
 
   const openInvitation = (slug: string) => {
     setInvitationSlug(slug);
     setCurrentTab("invitation");
     window.history.pushState({}, "", `/i/${slug}`);
-    window.scrollTo({ top: 0 });
+    scrollToTopInstant();
   };
 
   // ---- Admin routing ----
   const goAdminLogin = () => {
     setCurrentTab("admin-login");
     window.history.pushState({}, "", "/login");
-    window.scrollTo({ top: 0 });
+    scrollToTopInstant();
   };
 
   const goAdminDashboard = () => {
@@ -89,7 +92,7 @@ export default function App() {
     }
     setCurrentTab("admin");
     window.history.pushState({}, "", "/admin/dashboard");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToTopInstant();
   };
 
   const openAdminEditorNew = (templateUid?: string, orderId?: string) => {
@@ -102,7 +105,7 @@ export default function App() {
     setEditorOrderId(orderId || null);
     setCurrentTab("admin-editor");
     window.history.pushState({}, "", templateUid ? `/admin/editor/new/${templateUid}` : "/admin/editor/new");
-    window.scrollTo({ top: 0 });
+    scrollToTopInstant();
   };
 
   const openAdminEditorEdit = (id: string) => {
@@ -115,14 +118,14 @@ export default function App() {
     setEditorOrderId(null);
     setCurrentTab("admin-editor");
     window.history.pushState({}, "", `/admin/editor/${id}`);
-    window.scrollTo({ top: 0 });
+    scrollToTopInstant();
   };
 
   const handleLogout = () => {
     logoutAdmin();
     setCurrentTab("admin-login");
     window.history.pushState({}, "", "/login");
-    window.scrollTo({ top: 0 });
+    scrollToTopInstant();
   };
 
   // Route URL handler
@@ -280,7 +283,7 @@ export default function App() {
     if (tab === "categories") {
       setCurrentTab("categories");
       window.history.pushState({}, "", "/categories");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTopInstant();
       return;
     }
     if (tab === "dashboard") {
@@ -293,7 +296,7 @@ export default function App() {
     } else if (tab === "templates") {
       window.history.pushState({}, "", "/templates");
     }
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToTopInstant();
   };
 
   const handleOpenCategory = (category: CategoryKey | "All") => {
@@ -305,14 +308,14 @@ export default function App() {
     else params.set("category", cat);
     const qs = params.toString();
     window.history.pushState({}, "", qs ? `/templates?${qs}` : "/templates");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToTopInstant();
   };
 
   const handleOpenDemo = (template: Template) => {
     setActiveDemoTemplate(template);
     setCurrentTab("demo");
     window.history.pushState({}, "", template.demoUrl);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToTopInstant();
   };
 
   const handleOpenWhatsAppModal = (template?: Template | null) => {
@@ -331,7 +334,7 @@ export default function App() {
     else params.delete("category");
     const qs = params.toString();
     window.history.pushState({}, "", qs ? `/templates?${qs}` : "/templates");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollToTopInstant();
   };
 
   // Reset social meta whenever we leave the invitation page
@@ -344,7 +347,7 @@ export default function App() {
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col font-body">
       {/* Top Navbar (hidden on customer invitation & admin pages for a clean fullscreen experience) */}
-      {!isFullscreenPage && <Navigation currentTab={currentTab as NavigationTab} onSelectTab={handleSelectTab} onOpenWhatsApp={handleOpenWhatsAppModal} onOpenOrderStatus={() => openOrderStatus()} />}
+      {!isFullscreenPage && <Navigation currentTab={currentTab as NavigationTab} onSelectTab={handleSelectTab} onOpenWhatsApp={handleOpenWhatsAppModal} onOpenOrderStatus={() => openOrderStatus()} onOpenAdminLogin={goAdminLogin} />}
 
       {/* Main Views */}
       <main className="flex-grow flex flex-col">
@@ -403,7 +406,6 @@ export default function App() {
 
       {/* Footer (hidden on customer invitation & admin pages) */}
       {!isFullscreenPage && <Footer onSelectTab={handleSelectTab} onSelectCategory={handleOpenCategory} onOpenWhatsApp={() => handleOpenWhatsAppModal()} onOpenDashboard={goAdminDashboard} onOpenOrderStatus={() => openOrderStatus()} />}
-
       {/* Floating WhatsApp Button (hidden in demo/invitation so it never covers the music player) */}
       {currentTab !== "demo" && !isFullscreenPage && <FloatingWhatsAppButton />}
 

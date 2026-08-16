@@ -92,14 +92,14 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, onSelectCategory, o
 
           {onOpenDashboard && (
             <div className="mt-2 pt-2 border-t border-white/15">
-              <a
-                href="/login?force=1"
+              <button
+                onClick={onOpenDashboard}
                 className="text-left font-body text-xs font-bold text-white/75 hover:text-secondary transition-colors hover:underline underline-offset-4 cursor-pointer flex items-center gap-1.5"
-                title="Buka halaman login admin MomenKita"
+                title="Buka dashboard admin MomenKita"
               >
                 <span className="material-symbols-outlined text-sm">dashboard</span>
                 Kelola Undangan (Dashboard)
-              </a>
+              </button>
             </div>
           )}
         </div>

@@ -121,11 +121,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .template-card {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s ease;
 }
 .template-card:hover {
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0px 20px 40px rgba(20, 33, 61, 0.12);
+}
+.template-card:active {
+  transform: scale(0.99);
+}
+
+/* Render off-screen grid cards lazily — makes large grids (400+ template
+   cards) mount almost instantly on slow phones. Intrinsic size reserves the
+   card height before it is rendered so the scrollbar never jumps. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 620px;
 }
 
 @keyframes float-up {
@@ -270,14 +281,15 @@ h1, h2, h3, h4, h5, h6 {
   transform-origin: bottom;
 }
 
-/* Universal button micro-interaction */
+/* Universal button micro-interaction — snappy (≈180ms) so taps feel
+   immediate; hover lift + press scale give feedback without gating nav. */
 .btn-micro {
   transition:
-    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.25s ease,
-    background-color 0.25s ease,
-    border-color 0.25s ease,
-    opacity 0.25s ease;
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    opacity 0.18s ease;
   will-change: transform;
 }
 @media (hover: hover) and (pointer: fine) {
@@ -293,9 +305,9 @@ h1, h2, h3, h4, h5, h6 {
 /* Clickable card lift (desktop hover only) */
 .card-lift {
   transition:
-    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.3s ease,
-    border-color 0.3s ease;
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
   will-change: transform;
 }
 @media (hover: hover) and (pointer: fine) {

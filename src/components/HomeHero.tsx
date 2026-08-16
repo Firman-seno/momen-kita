@@ -133,7 +133,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
           {CATEGORIES.map((cat) => (
             <article
               key={cat.key}
-              className="bg-surface-container-lowest rounded-2xl sm:rounded-3xl overflow-hidden border border-outline-variant/40 flex flex-col group shadow-sm hover:-translate-y-1 hover:shadow-xl transition-all cursor-pointer"
+              className="bg-surface-container-lowest rounded-2xl sm:rounded-3xl overflow-hidden border border-outline-variant/40 flex flex-col group shadow-sm hover:-translate-y-1 hover:shadow-xl transition-all active:scale-[0.99] cursor-pointer"
               onClick={() => onSelectCategory(cat.key)}
             >
               <div className="relative h-40 sm:h-44 overflow-hidden">

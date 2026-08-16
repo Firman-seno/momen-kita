@@ -43,7 +43,7 @@ export const CategoriesPage: React.FC<CategoriesPageProps> = ({ onSelectCategory
           return (
             <article
               key={cat.key}
-              className="template-card bg-surface-container-lowest rounded-2xl sm:rounded-3xl overflow-hidden border border-outline-variant/40 flex flex-col group shadow-sm hover:shadow-lg transition-all cursor-pointer"
+              className="template-card cv-auto bg-surface-container-lowest rounded-2xl sm:rounded-3xl overflow-hidden border border-outline-variant/40 flex flex-col group shadow-sm hover:shadow-lg transition-all active:scale-[0.99] cursor-pointer"
               onClick={() => onSelectCategory(cat.key)}
             >
               <div className="relative h-44 sm:h-56 overflow-hidden">
