@@ -73,12 +73,16 @@ export interface SectionProps {
   onMapOpen: () => void;
   rsvpData: { name: string; attendance: string; guests: number; message: string };
   rsvpSubmitted: boolean;
+  /** Server rejection message (e.g. expired invitation) shown above the form. */
+  rsvpError?: string;
   onRsvpChange: (patch: Partial<SectionProps['rsvpData']>) => void;
   onRsvpSubmit: (e: React.FormEvent) => void;
   wishesList: WishItem[];
   newWishName: string;
   newWishText: string;
   wishSuccess: boolean;
+  /** Server rejection message (e.g. expired invitation) shown above the form. */
+  wishError?: string;
   onWishNameChange: (v: string) => void;
   onWishTextChange: (v: string) => void;
   onWishSubmit: (e: React.FormEvent) => void;
@@ -1428,7 +1432,15 @@ export const RsvpSection: React.FC<P> = (p) => {
             </div>
           </StaggerChild>
         ) : (
-          <form onSubmit={p.onRsvpSubmit} className="flex flex-col gap-3 relative z-10">
+          <>
+            {p.rsvpError && (
+              <StaggerChild variant="fade" className="relative z-10">
+                <div className={`p-4 rounded-xl text-center text-xs font-bold animate-fade-in mb-4 ${isPaper ? 'bg-rose-50 border border-rose-300 text-rose-700' : 'bg-rose-500/20 border border-rose-500/40 text-rose-200'}`}>
+                  {p.rsvpError}
+                </div>
+              </StaggerChild>
+            )}
+            <form onSubmit={p.onRsvpSubmit} className="flex flex-col gap-3 relative z-10">
             <Reveal profile={p.profile} variant="up" delay={0.05}>
               <input
                 type="text"
@@ -1466,6 +1478,7 @@ export const RsvpSection: React.FC<P> = (p) => {
               </PrimaryButton>
             </Reveal>
           </form>
+          </>
         )}
       </Stagger>
     </section>
@@ -1509,6 +1522,14 @@ export const WishesSection: React.FC<P> = (p) => {
           <StaggerChild variant="scale">
             <div className={`p-3 mb-4 rounded-xl text-center text-xs font-bold animate-fade-in ${isPaper ? 'bg-emerald-50 border border-emerald-300 text-emerald-700' : 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-200'}`}>
               Terima kasih! Ucapan kamu telah ditambahkan.
+            </div>
+          </StaggerChild>
+        )}
+
+        {p.wishError && (
+          <StaggerChild variant="fade">
+            <div className={`p-3 mb-4 rounded-xl text-center text-xs font-bold animate-fade-in ${isPaper ? 'bg-rose-50 border border-rose-300 text-rose-700' : 'bg-rose-500/20 border border-rose-500/40 text-rose-200'}`}>
+              {p.wishError}
             </div>
           </StaggerChild>
         )}

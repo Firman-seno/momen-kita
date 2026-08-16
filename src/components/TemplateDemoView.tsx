@@ -10,6 +10,7 @@ import { getTemplatePrice } from '../lib/templatePricing';
 import { useCountdown } from '../hooks/useCountdown';
 import { RatingSection } from './RatingSection';
 import { isValidPublicVideoUrl } from '../lib/videoStorage';
+import { submitRsvp, submitWish } from '../lib/serverApi';
 import { DemoContent, getDemoContent } from '../design/content';
 import { resolveDesignSystem } from '../design/families';
 import { SectionProps } from '../design/sections';
@@ -77,6 +78,7 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
   disableMusic = false,
   videoOverride,
   onBackLabel,
+  invitationSlug,
 }) => {
   // Admin-chosen music for customer invitations (falls back to template default)
   const activeMusic = {
@@ -142,12 +144,14 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
     message: '',
   });
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
+  const [rsvpError, setRsvpError] = useState('');
 
   // Wishes / Guestbook state
   const [wishesList, setWishesList] = useState<WishItem[]>(() => wishesOverride ?? template.sampleWishes ?? []);
   const [newWishName, setNewWishName] = useState('');
   const [newWishText, setNewWishText] = useState('');
   const [wishSuccess, setWishSuccess] = useState(false);
+  const [wishError, setWishError] = useState('');
 
   // Modals
   const [mapModalOpen, setMapModalOpen] = useState(false);
@@ -190,12 +194,14 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
     onMapOpen: () => setMapModalOpen(true),
     rsvpData,
     rsvpSubmitted,
+    rsvpError,
     onRsvpChange: (patch) => setRsvpData((prev) => ({ ...prev, ...patch })),
     onRsvpSubmit: (e) => void handleRSVPSubmit(e),
     wishesList,
     newWishName,
     newWishText,
     wishSuccess,
+    wishError,
     onWishNameChange: setNewWishName,
     onWishTextChange: setNewWishText,
     onWishSubmit: (e) => void handleSendWish(e),
@@ -362,9 +368,28 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
     }
   };
 
-  const handleRSVPSubmit = (e: React.FormEvent) => {
+  const handleRSVPSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rsvpData.name.trim()) return;
+    setRsvpError('');
+
+    // Real guest invitations are validated server-side too, so a manual API
+    // call after the event has ended can never be accepted. Demo/catalog mode
+    // keeps its local-only success state.
+    if (isInvitation && invitationSlug) {
+      const res = await submitRsvp({
+        slug: invitationSlug,
+        name: rsvpData.name.trim(),
+        attendance: rsvpData.attendance,
+        guests: rsvpData.guests,
+        message: rsvpData.message,
+      });
+      if (!res.ok) {
+        setRsvpError(res.error || 'Konfirmasi RSVP tidak dapat dikirim. Silakan coba lagi.');
+        return;
+      }
+    }
+
     setRsvpSubmitted(true);
     setTimeout(() => {
       setRsvpSubmitted(false);
@@ -377,9 +402,25 @@ export const TemplateDemoView: React.FC<TemplateDemoViewProps> = ({
     }, 4000);
   };
 
-  const handleSendWish = (e: React.FormEvent) => {
+  const handleSendWish = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newWishName.trim() || !newWishText.trim()) return;
+    setWishError('');
+
+    // Same server-side expiry validation as RSVP — expired invitations reject
+    // guestbook submissions with "Invitation has expired."
+    if (isInvitation && invitationSlug) {
+      const res = await submitWish({
+        slug: invitationSlug,
+        name: newWishName.trim(),
+        message: newWishText.trim(),
+        attendance: 'Hadir',
+      });
+      if (!res.ok) {
+        setWishError(res.error || 'Ucapan tidak dapat dikirim. Silakan coba lagi.');
+        return;
+      }
+    }
 
     const newWish: WishItem = {
       id: `w-${Date.now()}`,

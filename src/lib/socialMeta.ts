@@ -90,6 +90,16 @@ export const resetSocialMeta = (): void => {
   applySocialMeta(DEFAULT_HOME);
 };
 
+/** Apply metadata for an invitation whose event has already ended. */
+export const applyExpiredMeta = (url: string): void => {
+  applySocialMeta({
+    title: 'Undangan Telah Berakhir',
+    description:
+      'Acara ini telah selesai. Terima kasih atas perhatian dan kehadiran Anda.',
+    url,
+  });
+};
+
 /** Apply dynamic metadata for a published invitation. */
 export const applyInvitationMeta = (
   invitation: Invitation,

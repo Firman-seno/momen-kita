@@ -116,16 +116,88 @@ export const mergeServerDataIntoLocal = (data: ServerDataset): void => {
    Public read (no login needed)
    ----------------------------------------------- */
 
-export const fetchPublicInvitation = async (slug: string): Promise<unknown | null> => {
+export interface PublicInvitationResult {
+  invitation: unknown | null;
+  /** Server-side expiration check (WIB-anchored) at fetch time. */
+  expired: boolean;
+  /** Whether the event date/time parsed cleanly on the server. */
+  valid: boolean;
+  /** Server-computed absolute event instant (ms). */
+  targetMs: number;
+}
+
+export const fetchPublicInvitation = async (slug: string): Promise<PublicInvitationResult | null> => {
   try {
     const res = await fetch(`${API_BASE}/invitation/${encodeURIComponent(slug)}`);
     if (!res.ok) return null;
-    const data = (await res.json()) as { invitation?: unknown };
-    return data?.invitation || null;
+    const data = (await res.json()) as {
+      invitation?: unknown;
+      expired?: boolean;
+      valid?: boolean;
+      targetMs?: number;
+    };
+    return {
+      invitation: data?.invitation || null,
+      expired: !!data?.expired,
+      valid: !!data?.valid,
+      targetMs: data?.targetMs || 0,
+    };
   } catch {
     return null;
   }
 };
+
+/* -----------------------------------------------
+   Public write (no login needed)
+   ----------------------------------------------- */
+
+export interface RsvpPayload {
+  slug: string;
+  name: string;
+  attendance: string;
+  guests: number;
+  message: string;
+}
+
+export interface WishPayload {
+  slug: string;
+  name: string;
+  message: string;
+  attendance: string;
+}
+
+export interface ServerSubmitResult {
+  ok: boolean;
+  /** Machine-readable rejection reason (e.g. 'EXPIRED'). */
+  code?: string;
+  /** Human-readable error message when not ok. */
+  error?: string;
+}
+
+const postPublic = async (path: string, body: object): Promise<ServerSubmitResult> => {
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = (await res.json().catch(() => ({}))) as {
+      code?: string;
+      error?: string;
+    };
+    return { ok: res.ok, code: data?.code, error: data?.error };
+  } catch {
+    return { ok: false, error: 'Tidak dapat terhubung ke server. Periksa koneksi Anda.' };
+  }
+};
+
+/** Submit RSVP. The server re-validates the invitation's expiry itself. */
+export const submitRsvp = (payload: RsvpPayload): Promise<ServerSubmitResult> =>
+  postPublic('/rsvp', payload);
+
+/** Submit a guestbook wish. The server re-validates the invitation's expiry itself. */
+export const submitWish = (payload: WishPayload): Promise<ServerSubmitResult> =>
+  postPublic('/wishes', payload);
 
 /* -----------------------------------------------
    Debounced sync trigger for data-layer mutations

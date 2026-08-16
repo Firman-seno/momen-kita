@@ -11,8 +11,10 @@ import {
 } from '../lib/invitations';
 import { fetchPublicInvitation } from '../lib/serverApi';
 import { buildWaLink, changeRequestMessage, WHATSAPP_PRIMARY } from '../lib/whatsapp';
-import { applyInvitationMeta, resetSocialMeta } from '../lib/socialMeta';
+import { applyInvitationMeta, applyExpiredMeta, resetSocialMeta } from '../lib/socialMeta';
 import { TemplateDemoView } from './TemplateDemoView';
+import { InvitationExpirationGuard } from './InvitationExpirationGuard';
+import { ExpiredInvitation } from './ExpiredInvitation';
 import { LoadingScreen } from './LoadingScreen';
 import { InvitationNotFound } from './InvitationNotFound';
 import { UiButton } from './UiButton';
@@ -25,6 +27,9 @@ interface InvitationViewProps {
 export const InvitationView: React.FC<InvitationViewProps> = ({ slug, onGoHome }) => {
   const [local, setLocal] = useState<Invitation | undefined>(() => getInvitationBySlug(slug) || undefined);
   const [showLoading, setShowLoading] = useState(true);
+  // Authoritative server-side expiration result captured when the invitation
+  // was fetched. Expiration is monotonic, so this never "un-expires".
+  const [serverExpired, setServerExpired] = useState(false);
 
   // Try localStorage first (fast, offline-capable), then fall back to the
   // server so the link also opens on devices without the admin's data.
@@ -46,7 +51,8 @@ export const InvitationView: React.FC<InvitationViewProps> = ({ slug, onGoHome }
       .then((data) => {
         if (cancelled) return;
         if (data) {
-          upsertInvitationFromServer(data);
+          setServerExpired(data.expired);
+          upsertInvitationFromServer(data.invitation);
           const fresh = getInvitationBySlug(slug);
           if (fresh) setLocal(fresh);
         }
@@ -68,12 +74,17 @@ export const InvitationView: React.FC<InvitationViewProps> = ({ slug, onGoHome }
   // Dynamic social metadata for this invitation
   useEffect(() => {
     if (invitation && template) {
-      applyInvitationMeta(invitation, template, window.location.href);
+      const isExpired = invitation.status === 'expired' || serverExpired;
+      if (isExpired) {
+        applyExpiredMeta(window.location.href);
+      } else {
+        applyInvitationMeta(invitation, template, window.location.href);
+      }
     } else {
       resetSocialMeta();
     }
     return () => resetSocialMeta();
-  }, [invitation, template]);
+  }, [invitation, template, serverExpired]);
 
   if (showLoading) {
     return <LoadingScreen label="Menyiapkan undangan..." />;
@@ -122,25 +133,40 @@ export const InvitationView: React.FC<InvitationViewProps> = ({ slug, onGoHome }
 
   return (
     <div className="relative">
-      <TemplateDemoView
-        key={invitation.slug}
-        template={template}
-        isInvitation
-        invitationSlug={invitation.slug}
-        invitationTitle={invitationTitle}
-        invitationPhone={invitation.customerPhone || null}
-        eventDetailsOverride={eventDetails}
-        wishesOverride={template.sampleWishes}
-        musicOverride={invitation.music ? { title: invitation.music.title, url: invitation.music.url, startTime: invitation.music.startTime } : null}
-        disableMusic={invitation.musicEnabled === false}
-        videoOverride={
-          invitation.videoUrl
-            ? { url: invitation.videoUrl, type: invitation.videoType, name: invitation.videoName }
-            : null
+      <InvitationExpirationGuard
+        date={invitation.eventDate}
+        time={invitation.eventTime}
+        storedExpired={invitation.status === 'expired'}
+        serverExpired={serverExpired}
+        expiredView={
+          <ExpiredInvitation
+            template={template}
+            date={invitation.eventDate}
+            time={invitation.eventTime}
+            onGoHome={onGoHome}
+          />
         }
-        onOpenWhatsApp={() => undefined}
-        onBackToCatalog={onGoHome}
-      />
+      >
+        <TemplateDemoView
+          key={invitation.slug}
+          template={template}
+          isInvitation
+          invitationSlug={invitation.slug}
+          invitationTitle={invitationTitle}
+          invitationPhone={invitation.customerPhone || null}
+          eventDetailsOverride={eventDetails}
+          wishesOverride={template.sampleWishes}
+          musicOverride={invitation.music ? { title: invitation.music.title, url: invitation.music.url, startTime: invitation.music.startTime } : null}
+          disableMusic={invitation.musicEnabled === false}
+          videoOverride={
+            invitation.videoUrl
+              ? { url: invitation.videoUrl, type: invitation.videoType, name: invitation.videoName }
+              : null
+          }
+          onOpenWhatsApp={() => undefined}
+          onBackToCatalog={onGoHome}
+        />
+      </InvitationExpirationGuard>
     </div>
   );
 };

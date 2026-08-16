@@ -6,7 +6,7 @@ import React from 'react';
    Each element accepts a `color` so it inherits the family accent.
    ============================================================ */
 
-interface OrnamentProps {
+export interface OrnamentProps {
   color?: string;
   className?: string;
   style?: React.CSSProperties;

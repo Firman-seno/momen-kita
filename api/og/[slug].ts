@@ -8,6 +8,7 @@ import {
   withOgImageParams,
 } from '../_og.js';
 import { migrateOgImage } from '../_blob.js';
+import { computeInvitationExpiration } from '../_expiration.js';
 
 /* ============================================================
    Server-rendered invitation page (/i/:slug)
@@ -25,6 +26,8 @@ interface StoredInvitation {
   status?: string;
   category?: string;
   customData?: Record<string, unknown> | null;
+  eventDate?: string;
+  eventTime?: string;
   [key: string]: unknown;
 }
 
@@ -95,6 +98,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
         title: 'Undangan Tidak Ditemukan',
         description:
           'Maaf, link undangan ini tidak tersedia atau sudah tidak aktif. Silakan hubungi pemilik undangan.',
+        image: `${siteBase}${LOGO_IMAGE}`,
+        canonical,
+        robots,
+      });
+      return;
+    }
+
+    // Server-side WIB-anchored expiration — crawlers and direct visitors get
+    // a dedicated "Undangan Telah Berakhir" shell (noindex) and the SPA boots
+    // to the themed expired page instead of the invitation.
+    const expiration = computeInvitationExpiration(
+      String(invitation.eventDate ?? ''),
+      String(invitation.eventTime ?? '')
+    );
+    const isExpired =
+      invitation.status === 'expired' || (expiration.valid && expiration.expired);
+    if (isExpired) {
+      sendShell(res, 200, {
+        title: 'Undangan Telah Berakhir',
+        description:
+          'Acara ini telah selesai. Terima kasih atas perhatian dan kehadiran Anda.',
         image: `${siteBase}${LOGO_IMAGE}`,
         canonical,
         robots,
